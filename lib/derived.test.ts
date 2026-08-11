@@ -6,8 +6,6 @@ import {
   priorityColor,
   monthCategoryContribution,
   teamCategoryDistribution,
-  monthlyTaskCounts,
-  dueDateHeatmapColumns,
 } from "./derived";
 import type { Task } from "./types";
 import { CATEGORIES } from "./types";
@@ -132,53 +130,5 @@ describe("teamCategoryDistribution", () => {
     expect(result.find((r) => r.category === "제품개발")?.count).toBe(2);
     expect(result.find((r) => r.category === "기타업무")?.count).toBe(1);
     expect(result.find((r) => r.category === "OKR")?.count).toBe(0);
-  });
-});
-
-describe("monthlyTaskCounts", () => {
-  it("returns one entry per month for the requested range, most recent last", () => {
-    const today = new Date("2026-08-11T00:00:00");
-    const result = monthlyTaskCounts([], 3, today);
-    expect(result.map((r) => r.month)).toEqual(["2026-06", "2026-07", "2026-08"]);
-    expect(result.every((r) => r.count === 0)).toBe(true);
-  });
-
-  it("counts tasks by created_at month", () => {
-    const today = new Date("2026-08-11T00:00:00");
-    const tasks = [
-      makeTask({ created_at: "2026-08-01T00:00:00Z" }),
-      makeTask({ created_at: "2026-08-05T00:00:00Z" }),
-      makeTask({ created_at: "2026-07-01T00:00:00Z" }),
-      makeTask({ created_at: "2026-01-01T00:00:00Z" }), // out of range, excluded
-    ];
-    const result = monthlyTaskCounts(tasks, 3, today);
-    expect(result.find((r) => r.month === "2026-08")?.count).toBe(2);
-    expect(result.find((r) => r.month === "2026-07")?.count).toBe(1);
-    expect(result.find((r) => r.month === "2026-06")?.count).toBe(0);
-  });
-});
-
-describe("dueDateHeatmapColumns", () => {
-  it("returns an empty array for empty input", () => {
-    expect(dueDateHeatmapColumns([])).toEqual([]);
-  });
-
-  it("counts the true number of tasks due on each day (color leveling happens in the chart, not here)", () => {
-    const tasks = [
-      makeTask({ due_date: "2026-08-11" }),
-      makeTask({ due_date: "2026-08-11" }),
-      makeTask({ due_date: "2026-08-11" }),
-      makeTask({ due_date: "2026-08-11" }),
-      makeTask({ due_date: "2026-08-11" }), // 5 tasks same day — should NOT be capped
-      makeTask({ due_date: "2026-08-12" }),
-      makeTask({ due_date: null }), // ignored
-    ];
-    const columns = dueDateHeatmapColumns(tasks);
-    const localKey = (d: Date) =>
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    const allBins = columns.flatMap((c) => c.bins);
-    const byKey = new Map(allBins.map((b) => [localKey(b.date), b.count]));
-    expect(byKey.get("2026-08-11")).toBe(5);
-    expect(byKey.get("2026-08-12")).toBe(1);
   });
 });

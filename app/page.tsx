@@ -9,8 +9,6 @@ import { TaskTable } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
 import { ContributionReport } from "@/components/contribution-report";
 import { TaskCalendar } from "@/components/task-calendar";
-import { TaskTrendChart } from "@/components/task-trend-chart";
-import { TaskActivityHeatmap } from "@/components/task-activity-heatmap";
 import { HeroBackground } from "@/components/hero-background";
 import { CountUpNumber } from "@/components/count-up-number";
 import { Button } from "@/components/ui/button";
@@ -241,11 +239,6 @@ export default function DashboardPage() {
         </div>
 
         <ContributionReport tasks={tasks} />
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <TaskTrendChart tasks={tasks} />
-          <TaskActivityHeatmap tasks={tasks} />
-        </div>
 
         <TaskCalendar tasks={tasks} />
 
