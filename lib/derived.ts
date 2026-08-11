@@ -1,5 +1,7 @@
 import type { Member, Priority, Status, Task } from "./types";
 
+// Assumes both dates are interpreted in the server/browser's local timezone (KST for this team).
+// A UTC-pinned deployment (e.g. some serverless runtimes) could shift "today" by a day near midnight.
 export function isOverdue(task: Task, today: Date = new Date()): boolean {
   if (!task.due_date || task.status === "완료") return false;
   const due = new Date(`${task.due_date}T00:00:00`);
