@@ -94,7 +94,7 @@ export function HeroBackground({ children, className, imageUrl, imageAlt }: Prop
 
       {imageUrl && (
         <motion.div
-          className="absolute right-4 top-4 hidden h-40 w-40 overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/40 sm:block sm:h-48 sm:w-48"
+          className="absolute left-4 top-16 z-[5] hidden aspect-[4/3] w-40 overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/40 sm:left-6 sm:top-20 sm:block sm:w-56"
           style={{ rotateX, rotateY, transformPerspective: 800 }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
