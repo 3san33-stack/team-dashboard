@@ -95,7 +95,7 @@ export function TaskCalendar({ tasks }: Props) {
                 const dayTasks = tasksOn(day);
                 return (
                   <div
-                    key={day.toISOString()}
+                    key={toLocalDateKey(day)}
                     className={`min-h-20 rounded-md border p-1 text-xs ${
                       inMonth ? "bg-card" : "bg-transparent opacity-40"
                     }`}
