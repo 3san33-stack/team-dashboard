@@ -108,9 +108,9 @@ export default function DashboardPage() {
   const overdue = tasks.filter((t) => isOverdue(t)).length;
 
   return (
-    <main className="mx-auto max-w-5xl space-y-6 p-6">
+    <main className="min-h-screen w-full space-y-8 px-6 py-8 md:px-10 lg:px-16">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">디자인R&D 팀 업무 대시보드</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">디자인R&D 팀 업무 대시보드</h1>
         <TaskFormDialog
           member={member}
           trigger={<Button>업무 추가</Button>}
@@ -125,12 +125,19 @@ export default function DashboardPage() {
       )}
 
       <SummaryCards total={total} inProgress={inProgress} completed={completed} overdue={overdue} />
-      <MemberProgressBars tasks={tasks} />
-      <TaskTable
-        tasks={tasks}
-        onEdit={setEditingTask}
-        onDelete={handleDelete}
-      />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <MemberProgressBars tasks={tasks} />
+        </div>
+        <div className="lg:col-span-2">
+          <TaskTable
+            tasks={tasks}
+            onEdit={setEditingTask}
+            onDelete={handleDelete}
+          />
+        </div>
+      </div>
 
       {editingTask && (
         <TaskFormDialog
