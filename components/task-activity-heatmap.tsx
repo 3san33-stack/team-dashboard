@@ -15,11 +15,11 @@ export function TaskActivityHeatmap({ tasks }: Props) {
       <CardHeader>
         <CardTitle>마감일 밀집도</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-80">
         {columns.length === 0 ? (
           <p className="text-sm text-muted-foreground">표시할 마감일 데이터가 없습니다.</p>
         ) : (
-          <HeatmapChart data={columns} layout="fluid">
+          <HeatmapChart data={columns} layout="fill">
             <HeatmapCells />
           </HeatmapChart>
         )}

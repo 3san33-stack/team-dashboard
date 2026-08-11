@@ -144,8 +144,12 @@ export default function DashboardPage() {
       </div>
 
       <ContributionReport tasks={tasks} />
-      <TaskTrendChart tasks={tasks} />
-      <TaskActivityHeatmap tasks={tasks} />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <TaskTrendChart tasks={tasks} />
+        <TaskActivityHeatmap tasks={tasks} />
+      </div>
+
       <TaskCalendar tasks={tasks} />
 
       {editingTask && (
