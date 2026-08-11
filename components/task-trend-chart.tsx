@@ -18,6 +18,10 @@ export function TaskTrendChart({ tasks }: Props) {
         <CardTitle>최근 6개월 업무 등록 추이</CardTitle>
       </CardHeader>
       <CardContent>
+        {/* xDataKey values ("YYYY-MM") are re-parsed by LineChart via `new Date(...)`,
+            which is UTC-anchored — harmless for month-precision labels since KST
+            (UTC+9) never crosses a month boundary earlier than UTC, but keep this
+            in mind if this ever runs for a team west of UTC. */}
         <LineChart data={data} xDataKey="month">
           <Grid />
           <XAxis />
