@@ -87,7 +87,15 @@ export function TaskTable({ tasks, onEdit, onDelete }: Props) {
                 </TableCell>
                 <TableCell className="space-x-2">
                   <Button variant="ghost" size="sm" onClick={() => onEdit(task)}>수정</Button>
-                  <Button variant="ghost" size="sm" onClick={() => onDelete(task.id)}>삭제</Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm(`"${task.project}" 업무를 삭제할까요?`)) onDelete(task.id);
+                    }}
+                  >
+                    삭제
+                  </Button>
                 </TableCell>
               </motion.tr>
             ))}
