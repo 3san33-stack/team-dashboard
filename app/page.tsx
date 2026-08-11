@@ -8,6 +8,8 @@ import { TaskTable } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
 import { ContributionReport } from "@/components/contribution-report";
 import { TaskCalendar } from "@/components/task-calendar";
+import { TaskTrendChart } from "@/components/task-trend-chart";
+import { TaskActivityHeatmap } from "@/components/task-activity-heatmap";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -142,6 +144,8 @@ export default function DashboardPage() {
       </div>
 
       <ContributionReport tasks={tasks} />
+      <TaskTrendChart tasks={tasks} />
+      <TaskActivityHeatmap tasks={tasks} />
       <TaskCalendar tasks={tasks} />
 
       {editingTask && (
