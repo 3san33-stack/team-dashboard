@@ -6,6 +6,8 @@ import { SummaryCards } from "@/components/summary-cards";
 import { MemberProgressBars } from "@/components/member-progress-bars";
 import { TaskTable } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
+import { ContributionReport } from "@/components/contribution-report";
+import { TaskCalendar } from "@/components/task-calendar";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -138,6 +140,9 @@ export default function DashboardPage() {
           />
         </div>
       </div>
+
+      <ContributionReport tasks={tasks} />
+      <TaskCalendar tasks={tasks} />
 
       {editingTask && (
         <TaskFormDialog
