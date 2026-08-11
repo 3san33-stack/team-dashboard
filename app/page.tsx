@@ -124,11 +124,7 @@ export default function DashboardPage() {
     <div className="min-h-screen w-full space-y-6 bg-white p-3 sm:p-4 md:p-6">
       {/* Hero — mirrors forma-landing's page anatomy: glass navbar, big headline, floating card,
           plus a mouse-reactive blob background for extra motion. */}
-      <HeroBackground
-        className="p-4 sm:p-6 md:p-8"
-        imageUrl="/hero-towel.jpg"
-        imageAlt="송월타월 제품 디테일"
-      >
+      <HeroBackground className="p-4 sm:p-6 md:p-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 rounded-2xl bg-white/60 px-4 py-2 shadow-sm backdrop-blur-md">
             <svg width="24" height="24" viewBox="0 0 256 256">

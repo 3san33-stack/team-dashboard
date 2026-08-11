@@ -39,12 +39,12 @@ function Blob({
   );
 }
 
-type Props = { children: ReactNode; className?: string; imageUrl?: string; imageAlt?: string };
+type Props = { children: ReactNode; className?: string };
 
-export function HeroBackground({ children, className, imageUrl, imageAlt }: Props) {
+export function HeroBackground({ children, className }: Props) {
   // Raw pixel position of the cursor within the hero, used two ways:
   // 1) directly, for a glow that visibly follows the cursor 1:1 (springed for a trailing feel)
-  // 2) normalized to -0.5..0.5, for the ambient blobs' parallax drift and the image tilt
+  // 2) normalized to -0.5..0.5, for the ambient blobs' parallax drift
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
   const rawNormX = useMotionValue(0);
@@ -54,9 +54,6 @@ export function HeroBackground({ children, className, imageUrl, imageAlt }: Prop
   const glowY = useSpring(rawY, { stiffness: 120, damping: 20, mass: 0.3 });
   const normX = useSpring(rawNormX, { stiffness: 60, damping: 16 });
   const normY = useSpring(rawNormY, { stiffness: 60, damping: 16 });
-
-  const rotateX = useTransform(normY, (v) => v * -20);
-  const rotateY = useTransform(normX, (v) => v * 20);
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -91,16 +88,6 @@ export function HeroBackground({ children, className, imageUrl, imageAlt }: Prop
           style={{ x: glowX, y: glowY, translateX: "-50%", translateY: "-50%" }}
         />
       </div>
-
-      {imageUrl && (
-        <motion.div
-          className="absolute left-4 top-16 z-[5] hidden aspect-[4/3] w-40 overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/40 sm:left-6 sm:top-20 sm:block sm:w-56"
-          style={{ rotateX, rotateY, transformPerspective: 800 }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageUrl} alt={imageAlt ?? ""} className="h-full w-full object-cover" />
-        </motion.div>
-      )}
 
       <div className="relative z-10">{children}</div>
     </div>
