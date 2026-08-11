@@ -20,8 +20,16 @@ export function MemberSelect({ onSelect }: Props) {
             whileHover={{ y: -4 }}
           >
             <Card
+              role="button"
+              tabIndex={0}
               className="w-32 cursor-pointer text-center transition-shadow hover:shadow-lg"
               onClick={() => onSelect(member)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelect(member);
+                }
+              }}
             >
               <CardContent className="py-6 text-lg font-medium">{member}</CardContent>
             </Card>
