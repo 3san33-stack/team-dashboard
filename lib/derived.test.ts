@@ -1,6 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { isOverdue, averageProgress, statusColor, priorityColor } from "./derived";
+import {
+  isOverdue,
+  averageProgress,
+  statusColor,
+  priorityColor,
+  monthCategoryContribution,
+  teamCategoryDistribution,
+} from "./derived";
 import type { Task } from "./types";
+import { CATEGORIES } from "./types";
 
 function makeTask(overrides: Partial<Task>): Task {
   return {
@@ -77,5 +85,50 @@ describe("priorityColor", () => {
       )
     );
     expect(colors.size).toBe(4);
+  });
+});
+
+describe("monthCategoryContribution", () => {
+  it("returns 0 when the member has no tasks in that month", () => {
+    expect(monthCategoryContribution([], "이은혜", "제품개발", 2026, 8)).toBe(0);
+  });
+
+  it("returns the share of a member's tasks in a given month that fall in the given category", () => {
+    const tasks = [
+      makeTask({ member: "이은혜", category: "제품개발", start_date: "2026-08-01" }),
+      makeTask({ member: "이은혜", category: "제품개발", start_date: "2026-08-05" }),
+      makeTask({ member: "이은혜", category: "기타업무", start_date: "2026-08-10" }),
+      makeTask({ member: "이은혜", category: "제품개발", start_date: "2026-07-01" }), // different month, excluded
+      makeTask({ member: "김혜진", category: "제품개발", start_date: "2026-08-02" }), // different member, excluded
+    ];
+    expect(monthCategoryContribution(tasks, "이은혜", "제품개발", 2026, 8)).toBe(67);
+  });
+
+  it("uses start_date to bucket by month, ignoring tasks with no start_date", () => {
+    const tasks = [
+      makeTask({ member: "이은혜", category: "제품개발", start_date: null }),
+      makeTask({ member: "이은혜", category: "제품개발", start_date: "2026-08-01" }),
+    ];
+    expect(monthCategoryContribution(tasks, "이은혜", "제품개발", 2026, 8)).toBe(100);
+  });
+});
+
+describe("teamCategoryDistribution", () => {
+  it("returns an empty-friendly zero count per category when there are no tasks", () => {
+    const result = teamCategoryDistribution([]);
+    expect(result.every((r) => r.count === 0)).toBe(true);
+    expect(result.map((r) => r.category)).toEqual([...CATEGORIES]);
+  });
+
+  it("counts tasks per category across all members", () => {
+    const tasks = [
+      makeTask({ category: "제품개발" }),
+      makeTask({ category: "제품개발" }),
+      makeTask({ category: "기타업무" }),
+    ];
+    const result = teamCategoryDistribution(tasks);
+    expect(result.find((r) => r.category === "제품개발")?.count).toBe(2);
+    expect(result.find((r) => r.category === "기타업무")?.count).toBe(1);
+    expect(result.find((r) => r.category === "OKR")?.count).toBe(0);
   });
 });

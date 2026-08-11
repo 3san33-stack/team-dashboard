@@ -1,4 +1,4 @@
-import type { Member, Priority, Status, Task } from "./types";
+import { CATEGORIES, type Category, type Member, type Priority, type Status, type Task } from "./types";
 
 // Assumes both dates are interpreted in the server/browser's local timezone (KST for this team).
 // A UTC-pinned deployment (e.g. some serverless runtimes) could shift "today" by a day near midnight.
@@ -37,4 +37,35 @@ const PRIORITY_COLORS: Record<Priority, string> = {
 
 export function priorityColor(priority: Priority): string {
   return PRIORITY_COLORS[priority];
+}
+
+/**
+ * Reproduces the original spreadsheet's "제품개발 기여율" formula, generalized to any category:
+ * (member's tasks in that category, in that month) / (member's total tasks in that month).
+ * Buckets by `start_date` (the spreadsheet used its "시작일" column the same way).
+ */
+export function monthCategoryContribution(
+  tasks: Task[],
+  member: Member,
+  category: Category,
+  year: number,
+  month: number // 1-12
+): number {
+  const inMonth = tasks.filter((t) => {
+    if (t.member !== member || !t.start_date) return false;
+    const d = new Date(`${t.start_date}T00:00:00`);
+    return d.getFullYear() === year && d.getMonth() + 1 === month;
+  });
+  if (inMonth.length === 0) return 0;
+  const inCategory = inMonth.filter((t) => t.category === category).length;
+  return Math.round((inCategory / inMonth.length) * 100);
+}
+
+export function teamCategoryDistribution(
+  tasks: Task[]
+): { category: Category; count: number }[] {
+  return CATEGORIES.map((category) => ({
+    category,
+    count: tasks.filter((t) => t.category === category).length,
+  }));
 }
