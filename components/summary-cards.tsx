@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 function CountUpNumber({ value }: { value: number }) {
   const motionValue = useMotionValue(0);
-  const spring = useSpring(motionValue, { duration: 800 });
+  const spring = useSpring(motionValue, { duration: 0.8 }); // seconds, not ms
   const display = useTransform(spring, (v) => Math.round(v).toString());
   const ref = useRef<HTMLSpanElement>(null);
 
