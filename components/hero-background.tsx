@@ -10,9 +10,9 @@ import {
 import type { ReactNode } from "react";
 
 const BLOBS = [
-  { size: 240, top: "-8%", left: "8%", depth: 25, duration: 7 },
-  { size: 170, top: "45%", left: "78%", depth: 40, duration: 5.5 },
-  { size: 130, top: "10%", left: "58%", depth: 15, duration: 6.5 },
+  { size: 260, top: "-10%", left: "5%", depth: 90, duration: 7 },
+  { size: 190, top: "50%", left: "80%", depth: 130, duration: 5.5 },
+  { size: 140, top: "8%", left: "55%", depth: 60, duration: 6.5 },
 ] as const;
 
 function Blob({
@@ -21,15 +21,11 @@ function Blob({
   left,
   depth,
   duration,
-  mx,
-  my,
-}: (typeof BLOBS)[number] & { mx: MotionValue<number>; my: MotionValue<number> }) {
-  // Parallax offset (follows the cursor) is applied on the inner div via
-  // motion values; the outer div drives a separate, independent floating
-  // loop — kept on different elements so the two animations don't fight
-  // over the same transform.
-  const x = useTransform(mx, (v) => v * depth);
-  const y = useTransform(my, (v) => v * depth);
+  normX,
+  normY,
+}: (typeof BLOBS)[number] & { normX: MotionValue<number>; normY: MotionValue<number> }) {
+  const x = useTransform(normX, (v) => v * depth);
+  const y = useTransform(normY, (v) => v * depth);
 
   return (
     <motion.div
@@ -38,31 +34,43 @@ function Blob({
       animate={{ y: [0, -16, 0] }}
       transition={{ duration, repeat: Infinity, ease: "easeInOut" }}
     >
-      <motion.div
-        className="rounded-full bg-white/25 blur-2xl"
-        style={{ width: size, height: size, x, y }}
-      />
+      <motion.div className="rounded-full bg-white/25 blur-2xl" style={{ width: size, height: size, x, y }} />
     </motion.div>
   );
 }
 
-type Props = { children: ReactNode; className?: string };
+type Props = { children: ReactNode; className?: string; imageUrl?: string; imageAlt?: string };
 
-export function HeroBackground({ children, className }: Props) {
+export function HeroBackground({ children, className, imageUrl, imageAlt }: Props) {
+  // Raw pixel position of the cursor within the hero, used two ways:
+  // 1) directly, for a glow that visibly follows the cursor 1:1 (springed for a trailing feel)
+  // 2) normalized to -0.5..0.5, for the ambient blobs' parallax drift and the image tilt
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
-  const mx = useSpring(rawX, { stiffness: 50, damping: 14 });
-  const my = useSpring(rawY, { stiffness: 50, damping: 14 });
+  const rawNormX = useMotionValue(0);
+  const rawNormY = useMotionValue(0);
+
+  const glowX = useSpring(rawX, { stiffness: 120, damping: 20, mass: 0.3 });
+  const glowY = useSpring(rawY, { stiffness: 120, damping: 20, mass: 0.3 });
+  const normX = useSpring(rawNormX, { stiffness: 60, damping: 16 });
+  const normY = useSpring(rawNormY, { stiffness: 60, damping: 16 });
+
+  const rotateX = useTransform(normY, (v) => v * -20);
+  const rotateY = useTransform(normX, (v) => v * 20);
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
-    rawX.set((e.clientX - rect.left) / rect.width - 0.5);
-    rawY.set((e.clientY - rect.top) / rect.height - 0.5);
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    rawX.set(px);
+    rawY.set(py);
+    rawNormX.set(px / rect.width - 0.5);
+    rawNormY.set(py / rect.height - 0.5);
   }
 
   function handleMouseLeave() {
-    rawX.set(0);
-    rawY.set(0);
+    rawNormX.set(0);
+    rawNormY.set(0);
   }
 
   return (
@@ -72,10 +80,28 @@ export function HeroBackground({ children, className }: Props) {
       className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-400 to-amber-200 sm:rounded-3xl ${className ?? ""}`}
     >
       <div className="pointer-events-none absolute inset-0">
+        {/* Ambient blobs — always slowly floating, plus a parallax drift keyed to cursor position. */}
         {BLOBS.map((b) => (
-          <Blob key={b.top} {...b} mx={mx} my={my} />
+          <Blob key={b.top} {...b} normX={normX} normY={normY} />
         ))}
+
+        {/* Cursor glow — directly, visibly follows the mouse (springed trail). */}
+        <motion.div
+          className="h-[420px] w-[420px] rounded-full bg-white/20 blur-3xl"
+          style={{ x: glowX, y: glowY, translateX: "-50%", translateY: "-50%" }}
+        />
       </div>
+
+      {imageUrl && (
+        <motion.div
+          className="absolute right-4 top-4 hidden h-40 w-40 overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/40 sm:block sm:h-48 sm:w-48"
+          style={{ rotateX, rotateY, transformPerspective: 800 }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageUrl} alt={imageAlt ?? ""} className="h-full w-full object-cover" />
+        </motion.div>
+      )}
+
       <div className="relative z-10">{children}</div>
     </div>
   );
