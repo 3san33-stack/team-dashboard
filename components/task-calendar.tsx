@@ -18,6 +18,16 @@ function startOfMonthGrid(year: number, month: number): Date {
   return start;
 }
 
+// `toISOString()` converts to UTC first, which shifts the date backward by a
+// day for timezones ahead of UTC (e.g. KST) — build the key from local
+// Y/M/D instead so it matches `due_date` strings as stored (local calendar dates).
+function toLocalDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export function TaskCalendar({ tasks }: Props) {
   const [memberFilter, setMemberFilter] = useState<string>("all");
   const [cursor, setCursor] = useState(() => {
@@ -42,7 +52,7 @@ export function TaskCalendar({ tasks }: Props) {
   }, [cursor]);
 
   function tasksOn(day: Date) {
-    const key = day.toISOString().slice(0, 10);
+    const key = toLocalDateKey(day);
     return filtered.filter((t) => t.due_date === key);
   }
 

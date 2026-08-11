@@ -296,7 +296,7 @@ export function TaskCalendar({ tasks }: Props) {
   }, [cursor]);
 
   function tasksOn(day: Date) {
-    const key = day.toISOString().slice(0, 10);
+    const key = toLocalDateKey(day); // NOT day.toISOString().slice(0,10) — that shifts a day back in KST (UTC+9)
     return filtered.filter((t) => t.due_date === key);
   }
 
