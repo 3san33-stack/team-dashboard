@@ -7,7 +7,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { MEMBERS, type Task } from "@/lib/types";
-import { priorityColor } from "@/lib/derived";
+import { priorityColor, toLocalDateKey } from "@/lib/derived";
 
 type Props = { tasks: Task[] };
 
@@ -16,16 +16,6 @@ function startOfMonthGrid(year: number, month: number): Date {
   const start = new Date(first);
   start.setDate(start.getDate() - start.getDay());
   return start;
-}
-
-// `toISOString()` converts to UTC first, which shifts the date backward by a
-// day for timezones ahead of UTC (e.g. KST) — build the key from local
-// Y/M/D instead so it matches `due_date` strings as stored (local calendar dates).
-function toLocalDateKey(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
 }
 
 export function TaskCalendar({ tasks }: Props) {

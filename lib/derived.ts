@@ -71,6 +71,8 @@ export function teamCategoryDistribution(
   }));
 }
 
+// created_at is a full ISO timestamp (unlike due_date's plain YYYY-MM-DD); bucketed
+// here by the LOCAL calendar month of that timestamp, not UTC.
 export function monthlyTaskCounts(
   tasks: Task[], monthsBack: number, today: Date = new Date()
 ): { month: string; count: number }[] {
@@ -91,8 +93,9 @@ export function monthlyTaskCounts(
 }
 
 // Local Y/M/D key, NOT toISOString() — avoids the KST off-by-one bug already
-// found and fixed in components/task-calendar.tsx (toLocalDateKey there).
-function toLocalDateKey(d: Date): string {
+// found and fixed in components/task-calendar.tsx. Exported so that component
+// can import this instead of keeping its own duplicate copy.
+export function toLocalDateKey(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
