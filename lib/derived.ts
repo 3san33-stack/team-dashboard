@@ -124,7 +124,10 @@ export function dueDateHeatmapColumns(tasks: Task[]): HeatmapColumn[] {
       const d = new Date(colDate);
       d.setDate(d.getDate() + day);
       const key = toLocalDateKey(d);
-      const count = Math.min(counts.get(key) ?? 0, 4);
+      // Pass the true count — HeatmapCells/getHeatmapContributionLevel already
+      // buckets it into a 0-4 color level internally; capping here would also
+      // corrupt the tooltip's exact-count display.
+      const count = counts.get(key) ?? 0;
       return { bin: day, date: d, count };
     });
     columns.push({ bin: colIndex, bins });

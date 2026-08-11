@@ -163,13 +163,13 @@ describe("dueDateHeatmapColumns", () => {
     expect(dueDateHeatmapColumns([])).toEqual([]);
   });
 
-  it("counts tasks due on each day, capped to a 0-4 level", () => {
+  it("counts the true number of tasks due on each day (color leveling happens in the chart, not here)", () => {
     const tasks = [
       makeTask({ due_date: "2026-08-11" }),
       makeTask({ due_date: "2026-08-11" }),
       makeTask({ due_date: "2026-08-11" }),
       makeTask({ due_date: "2026-08-11" }),
-      makeTask({ due_date: "2026-08-11" }), // 5 tasks same day, should cap at 4
+      makeTask({ due_date: "2026-08-11" }), // 5 tasks same day — should NOT be capped
       makeTask({ due_date: "2026-08-12" }),
       makeTask({ due_date: null }), // ignored
     ];
@@ -178,7 +178,7 @@ describe("dueDateHeatmapColumns", () => {
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const allBins = columns.flatMap((c) => c.bins);
     const byKey = new Map(allBins.map((b) => [localKey(b.date), b.count]));
-    expect(byKey.get("2026-08-11")).toBe(4);
+    expect(byKey.get("2026-08-11")).toBe(5);
     expect(byKey.get("2026-08-12")).toBe(1);
   });
 });
