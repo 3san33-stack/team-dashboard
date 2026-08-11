@@ -344,3 +344,4 @@ git commit -m "feat: add trend chart and activity heatmap to dashboard"
 
 - `dueDateHeatmapColumns`의 날짜 키 생성이 `task-calendar.tsx`에서 이미 고친 KST 버그를 재도입하지 않도록 Task L1 구현 시 반드시 로컬 날짜 방식을 쓸 것 (계획 본문에 경고 포함).
 - `monthlyTaskCounts`는 `created_at`(업무 등록 시각) 기준, 히트맵은 `due_date`(마감일) 기준 — 서로 다른 날짜 필드를 쓰는 이유를 각 컴포넌트/함수 주석에 남길 것.
+- **주의:** 이 문서의 Task L1 코드 예시(`Math.min(counts.get(key) ?? 0, 4)`로 캡핑)는 계획 초안 당시의 설계이며, 실제 구현/코드 리뷰 과정에서 버그로 확인되어 제거됐다(캡핑이 히트맵 툴팁의 정확한 건수 표시를 왜곡함). 실제 동작은 `lib/derived.ts`와 커밋 `43c5279`을 기준으로 볼 것 — 이 문서의 예시 코드를 그대로 복사하지 말 것.
