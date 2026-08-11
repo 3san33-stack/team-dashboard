@@ -113,11 +113,18 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen w-full space-y-8 px-6 py-8 md:px-10 lg:px-16">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">디자인R&D 팀 업무 대시보드</h1>
+      <div className="flex items-center justify-between rounded-2xl bg-white/60 px-4 py-3 shadow-sm backdrop-blur-md sm:px-6">
+        <h1 className="text-2xl font-medium tracking-tight text-black">
+          디자인R&D 팀 업무{" "}
+          <span
+            style={{ fontFamily: "var(--font-serif-accent)", fontStyle: "italic" }}
+          >
+            대시보드
+          </span>
+        </h1>
         <TaskFormDialog
           member={member}
-          trigger={<Button>업무 추가</Button>}
+          trigger={<Button className="rounded-xl">업무 추가</Button>}
           onSubmit={handleCreate}
         />
       </div>
