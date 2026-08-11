@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { MemberSelect } from "@/components/member-select";
 import { SummaryCards } from "@/components/summary-cards";
 import { MemberProgressBars } from "@/components/member-progress-bars";
@@ -10,6 +11,8 @@ import { ContributionReport } from "@/components/contribution-report";
 import { TaskCalendar } from "@/components/task-calendar";
 import { TaskTrendChart } from "@/components/task-trend-chart";
 import { TaskActivityHeatmap } from "@/components/task-activity-heatmap";
+import { HeroBackground } from "@/components/hero-background";
+import { CountUpNumber } from "@/components/count-up-number";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -119,8 +122,9 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen w-full space-y-6 bg-white p-3 sm:p-4 md:p-6">
-      {/* Hero — mirrors forma-landing's page anatomy: glass navbar, big headline, floating card */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-400 to-amber-200 p-4 sm:rounded-3xl sm:p-6 md:p-8">
+      {/* Hero — mirrors forma-landing's page anatomy: glass navbar, big headline, floating card,
+          plus a mouse-reactive blob background for extra motion. */}
+      <HeroBackground className="p-4 sm:p-6 md:p-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 rounded-2xl bg-white/60 px-4 py-2 shadow-sm backdrop-blur-md">
             <svg width="24" height="24" viewBox="0 0 256 256">
@@ -130,22 +134,26 @@ export default function DashboardPage() {
             <span className="text-sm font-medium text-gray-800">디자인R&D</span>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <motion.button
               type="button"
               onClick={switchMember}
-              className="rounded-xl bg-white/60 px-4 py-2 text-sm font-medium text-gray-800 shadow-sm backdrop-blur-md transition-opacity hover:opacity-70"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.96 }}
+              className="rounded-xl bg-white/60 px-4 py-2 text-sm font-medium text-gray-800 shadow-sm backdrop-blur-md"
             >
               {member}님 · 전환
-            </button>
+            </motion.button>
             <TaskFormDialog
               member={member}
               trigger={
-                <button
+                <motion.button
                   type="button"
-                  className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 sm:px-5"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white sm:px-5"
                 >
                   업무 추가
-                </button>
+                </motion.button>
               }
               onSubmit={handleCreate}
             />
@@ -153,7 +161,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="mt-16 flex flex-col gap-6 sm:mt-24 lg:flex-row lg:items-end lg:justify-between">
-          <p className="shrink-0 text-3xl font-medium leading-tight text-white drop-shadow-lg sm:text-4xl xl:max-w-xl xl:text-5xl">
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="shrink-0 text-3xl font-medium leading-tight text-white drop-shadow-lg sm:text-4xl xl:max-w-xl xl:text-5xl"
+          >
             {member}님, 안녕하세요
             <br />
             오늘도 함께{" "}
@@ -163,33 +176,47 @@ export default function DashboardPage() {
               성장
             </span>
             해봐요
-          </p>
+          </motion.p>
 
-          <div className="w-full shrink-0 overflow-hidden rounded-2xl bg-white p-4 shadow-2xl sm:rounded-3xl sm:p-6 lg:w-[380px]">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            whileHover={{ y: -4 }}
+            className="w-full shrink-0 overflow-hidden rounded-2xl bg-white p-4 shadow-2xl sm:rounded-3xl sm:p-6 lg:w-[380px]"
+          >
             <h2 className="text-lg font-semibold text-black sm:text-xl">
               오늘의 현황
             </h2>
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
                 <div className="text-xs text-gray-500">전체 업무</div>
-                <div className="text-xl font-semibold text-black">{total}</div>
+                <div className="text-xl font-semibold text-black">
+                  <CountUpNumber value={total} />
+                </div>
               </div>
               <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
                 <div className="text-xs text-gray-500">진행중</div>
-                <div className="text-xl font-semibold text-black">{inProgress}</div>
+                <div className="text-xl font-semibold text-black">
+                  <CountUpNumber value={inProgress} />
+                </div>
               </div>
               <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
                 <div className="text-xs text-gray-500">완료</div>
-                <div className="text-xl font-semibold text-black">{completed}</div>
+                <div className="text-xl font-semibold text-black">
+                  <CountUpNumber value={completed} />
+                </div>
               </div>
               <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
                 <div className="text-xs text-gray-500">지연</div>
-                <div className="text-xl font-semibold text-black">{overdue}</div>
+                <div className="text-xl font-semibold text-black">
+                  <CountUpNumber value={overdue} />
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </HeroBackground>
 
       <main className="w-full space-y-8 px-1 sm:px-2 md:px-4">
         {actionError && (
