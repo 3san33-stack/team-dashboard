@@ -22,7 +22,14 @@ export function MemberProgressBars({ tasks }: Props) {
                 <span>{member}</span>
                 <span className="text-muted-foreground">{percent}%</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                role="progressbar"
+                aria-valuenow={percent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${member} 평균 진행률`}
+                className="h-2 w-full overflow-hidden rounded-full bg-muted"
+              >
                 <motion.div
                   className="h-full rounded-full bg-primary"
                   initial={{ width: 0 }}
