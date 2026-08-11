@@ -2,6 +2,7 @@ import { CATEGORIES, type Category, type Member, type Priority, type Status, typ
 
 // Assumes both dates are interpreted in the server/browser's local timezone (KST for this team).
 // A UTC-pinned deployment (e.g. some serverless runtimes) could shift "today" by a day near midnight.
+// Uses due_date (overdue/calendar views); monthCategoryContribution below uses start_date instead.
 export function isOverdue(task: Task, today: Date = new Date()): boolean {
   if (!task.due_date || task.status === "완료") return false;
   const due = new Date(`${task.due_date}T00:00:00`);
