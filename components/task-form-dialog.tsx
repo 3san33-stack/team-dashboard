@@ -22,28 +22,39 @@ type Props = {
   onSubmit: (input: TaskInput) => Promise<void>;
 };
 
+function buildDefaultForm(member: Member): TaskInput {
+  return {
+    member,
+    project: "",
+    category: "제품개발",
+    detail: "",
+    priority: "P3-보통",
+    start_date: null,
+    due_date: null,
+    progress: 0,
+    status: "예정",
+    comment: "",
+  };
+}
+
 export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenChange, onSubmit }: Props) {
   const [openState, setOpenState] = useState(false);
   const open = openProp ?? openState;
   const setOpen = onOpenChange ?? setOpenState;
-  const [form, setForm] = useState<TaskInput>(
-    task ?? {
-      member,
-      project: "",
-      category: "제품개발",
-      detail: "",
-      priority: "P3-보통",
-      start_date: null,
-      due_date: null,
-      progress: 0,
-      status: "예정",
-      comment: "",
-    }
-  );
+  const [form, setForm] = useState<TaskInput>(task ?? buildDefaultForm(member));
 
   async function handleSubmit() {
-    await onSubmit(form);
-    setOpen(false);
+    try {
+      await onSubmit(form);
+      setOpen(false);
+      // Uncontrolled "add" dialogs are never unmounted between opens, so reset
+      // the form back to defaults after a successful add to avoid carrying the
+      // previous submission's values into the next one.
+      if (!task) setForm(buildDefaultForm(member));
+    } catch {
+      // onSubmit already surfaces the error to the user (see app/page.tsx);
+      // keep the dialog open with the user's input so they can retry.
+    }
   }
 
   return (

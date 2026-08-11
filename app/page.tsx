@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(MEMBER_STORAGE_KEY) as Member | null;
@@ -27,6 +28,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!member) return;
+    setLoading(true);
     refresh();
   }, [member]);
 
@@ -36,6 +38,8 @@ export default function DashboardPage() {
       setError(null);
     } catch {
       setError("데이터를 불러오지 못했습니다.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -51,6 +55,9 @@ export default function DashboardPage() {
       await refresh();
     } catch {
       setActionError("업무를 저장하지 못했습니다. 다시 시도해 주세요.");
+      // Re-throw so TaskFormDialog knows the submit failed and keeps the
+      // dialog open with the user's input instead of closing as if it succeeded.
+      throw new Error("create failed");
     }
   }
 
@@ -62,6 +69,7 @@ export default function DashboardPage() {
       setEditingTask(null);
     } catch {
       setActionError("업무를 수정하지 못했습니다. 다시 시도해 주세요.");
+      throw new Error("update failed");
     }
   }
 
@@ -82,6 +90,14 @@ export default function DashboardPage() {
       <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p>{error}</p>
         <Button onClick={refresh}>다시 시도</Button>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+        불러오는 중...
       </div>
     );
   }
