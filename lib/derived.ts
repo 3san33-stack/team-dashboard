@@ -70,3 +70,65 @@ export function teamCategoryDistribution(
     count: tasks.filter((t) => t.category === category).length,
   }));
 }
+
+export function monthlyTaskCounts(
+  tasks: Task[], monthsBack: number, today: Date = new Date()
+): { month: string; count: number }[] {
+  const result: { month: string; count: number }[] = [];
+  for (let i = monthsBack - 1; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const count = tasks.filter((t) => {
+      const created = new Date(t.created_at);
+      return (
+        created.getFullYear() === d.getFullYear() &&
+        created.getMonth() === d.getMonth()
+      );
+    }).length;
+    result.push({ month: key, count });
+  }
+  return result;
+}
+
+// Local Y/M/D key, NOT toISOString() — avoids the KST off-by-one bug already
+// found and fixed in components/task-calendar.tsx (toLocalDateKey there).
+function toLocalDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+type HeatmapBin = { bin: number; date: Date; count: number };
+type HeatmapColumnLocal = { bin: number; bins: HeatmapBin[] };
+
+export function dueDateHeatmapColumns(tasks: Task[]): HeatmapColumnLocal[] {
+  const dueDates = tasks.map((t) => t.due_date).filter((d): d is string => !!d);
+  if (dueDates.length === 0) return [];
+
+  const counts = new Map<string, number>();
+  for (const d of dueDates) counts.set(d, (counts.get(d) ?? 0) + 1);
+
+  const sorted = [...dueDates].sort();
+  const start = new Date(`${sorted[0]}T00:00:00`);
+  const end = new Date(`${sorted[sorted.length - 1]}T00:00:00`);
+  const weekStart = new Date(start);
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+  const columns: HeatmapColumnLocal[] = [];
+  const colDate = new Date(weekStart);
+  let colIndex = 0;
+  while (colDate <= end) {
+    const bins: HeatmapBin[] = Array.from({ length: 7 }, (_, day) => {
+      const d = new Date(colDate);
+      d.setDate(d.getDate() + day);
+      const key = toLocalDateKey(d);
+      const count = Math.min(counts.get(key) ?? 0, 4);
+      return { bin: day, date: d, count };
+    });
+    columns.push({ bin: colIndex, bins });
+    colDate.setDate(colDate.getDate() + 7);
+    colIndex++;
+  }
+  return columns;
+}
