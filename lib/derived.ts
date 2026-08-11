@@ -1,4 +1,5 @@
 import { CATEGORIES, type Category, type Member, type Priority, type Status, type Task } from "./types";
+import type { HeatmapBin, HeatmapColumn } from "@/components/charts/heatmap";
 
 // Assumes both dates are interpreted in the server/browser's local timezone (KST for this team).
 // A UTC-pinned deployment (e.g. some serverless runtimes) could shift "today" by a day near midnight.
@@ -102,10 +103,7 @@ export function toLocalDateKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-type HeatmapBin = { bin: number; date: Date; count: number };
-type HeatmapColumnLocal = { bin: number; bins: HeatmapBin[] };
-
-export function dueDateHeatmapColumns(tasks: Task[]): HeatmapColumnLocal[] {
+export function dueDateHeatmapColumns(tasks: Task[]): HeatmapColumn[] {
   const dueDates = tasks.map((t) => t.due_date).filter((d): d is string => !!d);
   if (dueDates.length === 0) return [];
 
@@ -118,7 +116,7 @@ export function dueDateHeatmapColumns(tasks: Task[]): HeatmapColumnLocal[] {
   const weekStart = new Date(start);
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
 
-  const columns: HeatmapColumnLocal[] = [];
+  const columns: HeatmapColumn[] = [];
   const colDate = new Date(weekStart);
   let colIndex = 0;
   while (colDate <= end) {
