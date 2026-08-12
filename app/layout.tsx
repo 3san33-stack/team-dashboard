@@ -24,9 +24,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${inter.variable} ${instrumentSerif.variable} dark h-full antialiased`}
+      className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Apply the saved theme before first paint so a dark-mode user
+            doesn't get a white flash. Light is the default. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("team-dashboard:theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`,
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
