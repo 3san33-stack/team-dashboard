@@ -24,9 +24,9 @@ export function SummaryCards({ total, inProgress, completed, overdue }: Props) {
           transition={{ delay: i * 0.06 }}
           whileHover={{ y: -4 }}
         >
-          <Card>
+          <Card className="border-white/15 bg-white/10 text-white ring-white/15 backdrop-blur-sm">
             <CardContent className="py-6">
-              <div className="text-sm text-muted-foreground">{item.label}</div>
+              <div className="text-sm text-white/60">{item.label}</div>
               <div className="text-3xl font-semibold">
                 <CountUpNumber value={item.value} />
               </div>

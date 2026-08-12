@@ -120,35 +120,41 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen w-full space-y-6 bg-white p-3 sm:p-4 md:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-black sm:text-3xl">
-          {member}님, 안녕하세요
-        </h1>
-        <div className="flex items-center gap-2">
-          <motion.button
-            type="button"
-            onClick={switchMember}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.96 }}
-            className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-sm font-medium text-gray-800"
-          >
-            {member}님 · 전환
-          </motion.button>
-          <TaskFormDialog
-            member={member}
-            trigger={
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.96 }}
-                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white sm:px-5"
-              >
-                업무 추가
-              </motion.button>
-            }
-            onSubmit={handleCreate}
-          />
+      {/* Night-sky panel — same navy family as the member-select scene,
+          so the dashboard opens with a piece of the same world. */}
+      <div className="space-y-6 rounded-3xl bg-gradient-to-br from-[#0b1220] via-[#101b33] to-[#1a2947] p-4 shadow-lg sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl font-semibold text-white sm:text-3xl">
+            {member}님, 안녕하세요
+          </h1>
+          <div className="flex items-center gap-2">
+            <motion.button
+              type="button"
+              onClick={switchMember}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.96 }}
+              className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
+            >
+              {member}님 · 전환
+            </motion.button>
+            <TaskFormDialog
+              member={member}
+              trigger={
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#101b33] sm:px-5"
+                >
+                  업무 추가
+                </motion.button>
+              }
+              onSubmit={handleCreate}
+            />
+          </div>
         </div>
+
+        <SummaryCards total={total} inProgress={inProgress} completed={completed} overdue={overdue} />
       </div>
 
       <main className="w-full space-y-8 px-1 sm:px-2 md:px-4">
@@ -157,8 +163,6 @@ export default function DashboardPage() {
             {actionError}
           </p>
         )}
-
-        <SummaryCards total={total} inProgress={inProgress} completed={completed} overdue={overdue} />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <motion.div whileHover={{ y: -4 }}>

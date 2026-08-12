@@ -15,6 +15,20 @@ import { priorityColor, statusColor, dayStatusEmojis, toLocalDateKey } from "@/l
 
 type Props = { tasks: Task[] };
 
+// ponytail: fixed solar holidays only — lunar ones (설날, 추석, 석가탄신일) and
+// substitute holidays shift every year; add a per-year table or an API if
+// the team needs them exact.
+const KR_FIXED_HOLIDAYS = new Set([
+  "01-01", "03-01", "05-05", "06-06", "08-15", "10-03", "10-09", "12-25",
+]);
+
+function isRedDay(day: Date): boolean {
+  const dow = day.getDay();
+  if (dow === 0 || dow === 6) return true;
+  const mmdd = `${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
+  return KR_FIXED_HOLIDAYS.has(mmdd);
+}
+
 function startOfMonthGrid(year: number, month: number): Date {
   const first = new Date(year, month, 1);
   const start = new Date(first);
@@ -80,8 +94,10 @@ export function TaskCalendar({ tasks }: Props) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
-          {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
-            <div key={d} className="pb-1">{d}</div>
+          {["일", "월", "화", "수", "목", "금", "토"].map((d, i) => (
+            <div key={d} className={`pb-1 ${i === 0 || i === 6 ? "text-red-500" : ""}`}>
+              {d}
+            </div>
           ))}
         </div>
         <div className="space-y-1">
@@ -101,7 +117,9 @@ export function TaskCalendar({ tasks }: Props) {
                     }`}
                   >
                     <div className="flex items-center justify-between text-muted-foreground">
-                      <span>{day.getDate()}</span>
+                      <span className={isRedDay(day) ? "font-medium text-red-500" : ""}>
+                        {day.getDate()}
+                      </span>
                       {dayTasks.length > 0 && (
                         <span aria-hidden="true" className="flex gap-0.5 text-[11px] leading-none">
                           {dayStatusEmojis(dayTasks).map((emoji, i) => (
