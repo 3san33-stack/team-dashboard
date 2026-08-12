@@ -38,7 +38,7 @@ export function MemberSelect({ onSelect }: Props) {
       {hasMoved && (
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute h-[360px] w-[360px] rounded-full bg-white/40 blur-3xl"
+          className="pointer-events-none absolute left-0 top-0 h-[360px] w-[360px] rounded-full bg-white/40 blur-3xl"
           style={{
             x: glowX,
             y: glowY,

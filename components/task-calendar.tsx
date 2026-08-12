@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,10 +91,9 @@ export function TaskCalendar({ tasks }: Props) {
                 const inMonth = day.getMonth() === cursor.month;
                 const dayTasks = tasksOn(day);
                 return (
-                  <motion.button
+                  <button
                     type="button"
                     key={toLocalDateKey(day)}
-                    layoutId={`day-${toLocalDateKey(day)}`}
                     onClick={() => setSelectedDay(day)}
                     aria-label={`${day.getDate()}일${dayTasks.length > 0 ? `, 업무 ${dayTasks.length}건` : ""}`}
                     className={`h-20 overflow-hidden rounded-md border p-1 text-left text-xs transition-colors hover:bg-accent ${
@@ -112,7 +110,7 @@ export function TaskCalendar({ tasks }: Props) {
                         </span>
                       )}
                     </div>
-                  </motion.button>
+                  </button>
                 );
               })}
             </div>
@@ -122,38 +120,36 @@ export function TaskCalendar({ tasks }: Props) {
 
       <Dialog open={!!selectedDay} onOpenChange={(open) => !open && setSelectedDay(null)}>
         <DialogContent>
-          <motion.div layoutId={selectedDay ? `day-${toLocalDateKey(selectedDay)}` : undefined}>
-            <DialogHeader>
-              <DialogTitle>
-                {selectedDay &&
-                  `${selectedDay.getFullYear()}년 ${selectedDay.getMonth() + 1}월 ${selectedDay.getDate()}일 업무`}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="max-h-96 space-y-2 overflow-y-auto">
-              {selectedDayTasks.length === 0 ? (
-                <p className="text-sm text-muted-foreground">해당 날짜에 마감인 업무가 없습니다.</p>
-              ) : (
-                selectedDayTasks.map((t) => (
-                  <div key={t.id} className="rounded-md border p-3 text-sm">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium">{t.project}</span>
-                      <Badge className={statusColor(t.status)}>{t.status}</Badge>
-                    </div>
-                    <div className="mt-1 text-muted-foreground">
-                      {t.member} · {t.category}
-                    </div>
-                    <div className="mt-2 flex items-center gap-2">
-                      <Badge className={priorityColor(t.priority)}>{t.priority}</Badge>
-                      <span className="text-muted-foreground">진행률 {t.progress}%</span>
-                    </div>
-                    {t.comment && (
-                      <p className="mt-2 text-xs text-muted-foreground">{t.comment}</p>
-                    )}
+          <DialogHeader>
+            <DialogTitle>
+              {selectedDay &&
+                `${selectedDay.getFullYear()}년 ${selectedDay.getMonth() + 1}월 ${selectedDay.getDate()}일 업무`}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-96 space-y-2 overflow-y-auto">
+            {selectedDayTasks.length === 0 ? (
+              <p className="text-sm text-muted-foreground">해당 날짜에 마감인 업무가 없습니다.</p>
+            ) : (
+              selectedDayTasks.map((t) => (
+                <div key={t.id} className="rounded-md border p-3 text-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium">{t.project}</span>
+                    <Badge className={statusColor(t.status)}>{t.status}</Badge>
                   </div>
-                ))
-              )}
-            </div>
-          </motion.div>
+                  <div className="mt-1 text-muted-foreground">
+                    {t.member} · {t.category}
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Badge className={priorityColor(t.priority)}>{t.priority}</Badge>
+                    <span className="text-muted-foreground">진행률 {t.progress}%</span>
+                  </div>
+                  {t.comment && (
+                    <p className="mt-2 text-xs text-muted-foreground">{t.comment}</p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </Card>
