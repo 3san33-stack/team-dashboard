@@ -97,6 +97,7 @@ export function TaskCalendar({ tasks }: Props) {
                     key={toLocalDateKey(day)}
                     layoutId={`day-${toLocalDateKey(day)}`}
                     onClick={() => setSelectedDay(day)}
+                    aria-label={`${day.getDate()}일${dayTasks.length > 0 ? `, 업무 ${dayTasks.length}건` : ""}`}
                     className={`h-20 overflow-hidden rounded-md border p-1 text-left text-xs transition-colors hover:bg-accent ${
                       inMonth ? "bg-card" : "bg-transparent opacity-40"
                     }`}
@@ -104,7 +105,7 @@ export function TaskCalendar({ tasks }: Props) {
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span>{day.getDate()}</span>
                       {dayTasks.length > 0 && (
-                        <span className="flex gap-0.5 text-[11px] leading-none">
+                        <span aria-hidden="true" className="flex gap-0.5 text-[11px] leading-none">
                           {dayStatusEmojis(dayTasks).map((emoji, i) => (
                             <span key={i}>{emoji}</span>
                           ))}
