@@ -27,34 +27,34 @@ export function MemberSelect({ onSelect }: Props) {
   const reducedMotion = useReducedMotion();
 
   return (
-    <main className="flex min-h-screen w-full bg-black p-2 lg:h-screen lg:overflow-hidden lg:p-4">
-      <div className="relative hidden h-full w-[52%] flex-col items-center justify-end overflow-hidden rounded-3xl px-12 pb-32 shadow-2xl lg:flex">
-        {reducedMotion === true ? (
-          <div
-            aria-hidden
-            className="absolute inset-0 scale-105 bg-cover bg-center blur-md"
-            style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
-          />
-        ) : (
-          <video
-            aria-hidden
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster="/member-select-bg.jpg"
-            className="absolute inset-0 h-full w-full scale-105 object-cover blur-md"
-          >
-            <source src="/member-select-bg.mp4" type="video/mp4" />
-          </video>
-        )}
-
+    <main className="relative flex min-h-screen w-full overflow-hidden bg-black p-2 lg:h-screen lg:p-4">
+      {reducedMotion === true ? (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
-          style={{ backgroundImage: `url("${GRAIN_SVG}")`, backgroundSize: "200px 200px" }}
+          className="absolute inset-0 scale-105 bg-cover bg-center blur-md"
+          style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
         />
+      ) : (
+        <video
+          aria-hidden
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/member-select-bg.jpg"
+          className="absolute inset-0 h-full w-full scale-105 object-cover blur-md"
+        >
+          <source src="/member-select-bg.mp4" type="video/mp4" />
+        </video>
+      )}
 
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
+        style={{ backgroundImage: `url("${GRAIN_SVG}")`, backgroundSize: "200px 200px" }}
+      />
+
+      <div className="relative hidden h-full w-[52%] flex-col items-center justify-end overflow-hidden rounded-3xl px-12 pb-32 lg:flex">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
@@ -79,7 +79,12 @@ export function MemberSelect({ onSelect }: Props) {
         </motion.div>
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-12 sm:px-12 lg:overflow-hidden lg:px-16 xl:px-24">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 left-0 bg-black/35 lg:left-[52%]"
+      />
+
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-12 sm:px-12 lg:overflow-hidden lg:px-16 xl:px-24">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -87,8 +92,8 @@ export function MemberSelect({ onSelect }: Props) {
           className="w-full max-w-xl space-y-8"
         >
           <div>
-            <h2 className="text-3xl font-medium tracking-tight text-white">누구신가요?</h2>
-            <p className="mt-2 text-sm text-white/40">이름을 선택해 주세요.</p>
+            <h2 className="text-3xl font-medium tracking-tight text-white drop-shadow-md">누구신가요?</h2>
+            <p className="mt-2 text-sm text-white/60 drop-shadow-sm">이름을 선택해 주세요.</p>
           </div>
           <div className="space-y-3">
             {MEMBERS.map((member, i) => (
@@ -113,9 +118,9 @@ function MemberCard({ member, index, onSelect }: MemberCardProps) {
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onSelect(member)}
-      className="group flex w-full items-center gap-4 rounded-xl border border-white/10 bg-[#1A1A1A] p-4 text-left text-white shadow-lg shadow-black/40 transition-colors hover:border-white/25 hover:bg-white/5"
+      className="group flex w-full items-center gap-4 rounded-xl border border-white/20 bg-white/10 p-4 text-left text-white shadow-lg shadow-black/40 backdrop-blur-xl backdrop-saturate-150 transition-colors hover:border-white/30 hover:bg-white/15"
     >
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 text-base font-semibold">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/15 text-base font-semibold">
         {member[0]}
       </span>
       <span className="flex-1 text-lg font-medium">{member}</span>
