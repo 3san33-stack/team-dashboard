@@ -97,7 +97,9 @@ const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 // Last 7 days ending today (oldest first), each bucket counting tasks whose
 // updated_at (local calendar day, same KST convention as isOverdue) falls on
 // that day and are 완료. Mirrors the spreadsheet's "완료 처리일" semantics —
-// there's no separate completed_at column, so updated_at doubles as it.
+// there's no separate completed_at column, so updated_at doubles as it. Caveat:
+// any later edit to an already-완료 task (see lib/supabase.ts updateTask) also
+// bumps updated_at, which would move it to that edit's day in this chart.
 export function weeklyActivityCounts(
   tasks: Task[],
   today: Date = new Date()
