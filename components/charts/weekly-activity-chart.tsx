@@ -7,7 +7,9 @@ import type { Task } from "@/lib/types";
 
 type Props = { tasks: Task[] };
 
-const BAR_MAX_HEIGHT = 128; // px, matches h-32 container
+// Container is h-40 (160px); bars get 112px, leaving room for the weekday
+// label + gap-1 below each bar so the tallest bar doesn't overflow the card.
+const BAR_MAX_HEIGHT = 112;
 
 export function WeeklyActivityChart({ tasks }: Props) {
   const data = weeklyActivityCounts(tasks);
@@ -22,7 +24,7 @@ export function WeeklyActivityChart({ tasks }: Props) {
         <div
           role="img"
           aria-label={`요일별 완료 업무: ${data.map((d) => `${d.label} ${d.count}건`).join(", ")}`}
-          className="flex h-32 items-end justify-between gap-2"
+          className="flex h-40 items-end justify-between gap-2"
         >
           {data.map((d, i) => (
             <div

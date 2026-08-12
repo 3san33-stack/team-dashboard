@@ -31,7 +31,7 @@ export function MemberSelect({ onSelect }: Props) {
         aria-hidden
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
-        animate={reducedMotion ? undefined : { rotate: [-1, 1, -1], scale: [1, 1.02, 1] }}
+        animate={reducedMotion ? undefined : { rotate: [-1, 1, -1], scale: [1.05, 1.07, 1.05] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
       />
 
