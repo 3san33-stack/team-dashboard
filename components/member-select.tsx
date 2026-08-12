@@ -7,6 +7,13 @@ import { MEMBERS, type Member } from "@/lib/types";
 
 type Props = { onSelect: (member: Member) => void };
 
+// Tileable film-grain texture (SVG feTurbulence) layered over the background
+// video/photo at low opacity + overlay blend — masks the 720p source being
+// upscaled to fill large viewports, reads as an intentional misty grain
+// instead of visible softness.
+const GRAIN_SVG =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
+
 export function MemberSelect({ onSelect }: Props) {
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
@@ -46,6 +53,12 @@ export function MemberSelect({ onSelect }: Props) {
           <source src="/member-select-bg.mp4" type="video/mp4" />
         </video>
       )}
+
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
+        style={{ backgroundImage: `url("${GRAIN_SVG}")`, backgroundSize: "200px 200px" }}
+      />
 
       {hasMoved && (
         <motion.div
