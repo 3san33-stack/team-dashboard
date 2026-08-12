@@ -9,6 +9,8 @@ import {
   taskMatchesQuery,
   weeklyActivityCounts,
   upcomingDeadlines,
+  taskStatusEmoji,
+  dayStatusEmojis,
 } from "./derived";
 import type { Task } from "./types";
 import { CATEGORIES } from "./types";
@@ -200,5 +202,41 @@ describe("upcomingDeadlines", () => {
     );
     const result = upcomingDeadlines(tasks, 3);
     expect(result).toHaveLength(3);
+  });
+});
+
+describe("taskStatusEmoji", () => {
+  const today = new Date("2026-08-12T00:00:00");
+
+  it("returns ✅ for 완료 tasks", () => {
+    expect(taskStatusEmoji(makeTask({ status: "완료" }), today)).toBe("✅");
+  });
+
+  it("returns 🔴 for overdue, non-완료 tasks", () => {
+    const task = makeTask({ status: "진행중", due_date: "2026-08-01" });
+    expect(taskStatusEmoji(task, today)).toBe("🔴");
+  });
+
+  it("returns 🟡 for non-완료, non-overdue tasks", () => {
+    const task = makeTask({ status: "예정", due_date: "2026-08-20" });
+    expect(taskStatusEmoji(task, today)).toBe("🟡");
+  });
+});
+
+describe("dayStatusEmojis", () => {
+  const today = new Date("2026-08-12T00:00:00");
+
+  it("dedupes and caps at 3 emojis", () => {
+    const tasks = [
+      makeTask({ status: "완료" }),
+      makeTask({ status: "완료" }),
+      makeTask({ status: "진행중", due_date: "2026-08-01" }),
+      makeTask({ status: "예정", due_date: "2026-08-20" }),
+    ];
+    expect(dayStatusEmojis(tasks, today)).toEqual(["✅", "🔴", "🟡"]);
+  });
+
+  it("returns an empty array for no tasks", () => {
+    expect(dayStatusEmojis([], today)).toEqual([]);
   });
 });

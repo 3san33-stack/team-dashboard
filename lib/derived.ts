@@ -125,3 +125,14 @@ export function upcomingDeadlines(tasks: Task[], limit = 5): Task[] {
     .sort((a, b) => a.due_date!.localeCompare(b.due_date!))
     .slice(0, limit);
 }
+
+export function taskStatusEmoji(task: Task, today: Date = new Date()): "✅" | "🔴" | "🟡" {
+  if (task.status === "완료") return "✅";
+  if (isOverdue(task, today)) return "🔴";
+  return "🟡";
+}
+
+export function dayStatusEmojis(dayTasks: Task[], today: Date = new Date()): string[] {
+  const emojis = dayTasks.map((t) => taskStatusEmoji(t, today));
+  return Array.from(new Set(emojis)).slice(0, 3);
+}
