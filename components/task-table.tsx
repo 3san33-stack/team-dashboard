@@ -10,8 +10,10 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { MEMBERS, STATUSES, type Task } from "@/lib/types";
-import { isOverdue, priorityColor, statusColor } from "@/lib/derived";
+import { isOverdue, priorityColor, statusColor, taskMatchesQuery } from "@/lib/derived";
+import { downloadTasksAsCsv } from "@/lib/export-csv";
 
 type Props = {
   tasks: Task[];
@@ -22,16 +24,24 @@ type Props = {
 export function TaskTable({ tasks, onEdit, onDelete }: Props) {
   const [memberFilter, setMemberFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [query, setQuery] = useState("");
 
   const filtered = tasks.filter(
     (t) =>
       (memberFilter === "all" || t.member === memberFilter) &&
-      (statusFilter === "all" || t.status === statusFilter)
+      (statusFilter === "all" || t.status === statusFilter) &&
+      taskMatchesQuery(t, query)
   );
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="프로젝트/세부업무 검색"
+          className="w-48"
+        />
         <Select value={memberFilter} onValueChange={(v) => setMemberFilter(v ?? "all")}>
           <SelectTrigger className="w-40"><SelectValue placeholder="담당자" /></SelectTrigger>
           <SelectContent>
@@ -46,6 +56,14 @@ export function TaskTable({ tasks, onEdit, onDelete }: Props) {
             {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto"
+          onClick={() => downloadTasksAsCsv(filtered)}
+        >
+          엑셀로 내보내기
+        </Button>
       </div>
 
       <Table>

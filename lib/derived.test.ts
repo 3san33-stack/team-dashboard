@@ -6,6 +6,7 @@ import {
   priorityColor,
   monthCategoryContribution,
   teamCategoryDistribution,
+  taskMatchesQuery,
 } from "./derived";
 import type { Task } from "./types";
 import { CATEGORIES } from "./types";
@@ -130,5 +131,22 @@ describe("teamCategoryDistribution", () => {
     expect(result.find((r) => r.category === "제품개발")?.count).toBe(2);
     expect(result.find((r) => r.category === "기타업무")?.count).toBe(1);
     expect(result.find((r) => r.category === "OKR")?.count).toBe(0);
+  });
+});
+
+describe("taskMatchesQuery", () => {
+  it("matches everything when the query is blank", () => {
+    expect(taskMatchesQuery(makeTask({ project: "아무개" }), "")).toBe(true);
+    expect(taskMatchesQuery(makeTask({ project: "아무개" }), "   ")).toBe(true);
+  });
+
+  it("matches case-insensitively on project", () => {
+    expect(taskMatchesQuery(makeTask({ project: "Snoopy Beach" }), "snoopy")).toBe(true);
+    expect(taskMatchesQuery(makeTask({ project: "Snoopy Beach" }), "towel")).toBe(false);
+  });
+
+  it("matches on detail, and tolerates a null detail", () => {
+    expect(taskMatchesQuery(makeTask({ project: "p", detail: "극세사 원단" }), "원단")).toBe(true);
+    expect(taskMatchesQuery(makeTask({ project: "p", detail: null }), "원단")).toBe(false);
   });
 });

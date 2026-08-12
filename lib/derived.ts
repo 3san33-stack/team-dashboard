@@ -71,6 +71,17 @@ export function teamCategoryDistribution(
   }));
 }
 
+// Matches on 프로젝트(project) or 세부업무(detail), case-insensitive. Empty/blank
+// query matches everything (so the search box can double as a no-op filter).
+export function taskMatchesQuery(task: Task, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  return (
+    task.project.toLowerCase().includes(q) ||
+    (task.detail ?? "").toLowerCase().includes(q)
+  );
+}
+
 // Local Y/M/D key, NOT toISOString() — avoids a KST off-by-one bug (toISOString
 // converts to UTC first, which shifts the date back a day for timezones ahead
 // of UTC). Used by task-calendar.tsx for due-date lookups.
