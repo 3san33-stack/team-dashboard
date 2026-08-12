@@ -7,7 +7,6 @@ import {
   monthCategoryContribution,
   teamCategoryDistribution,
   taskMatchesQuery,
-  weeklyActivityCounts,
   upcomingDeadlines,
   taskStatusEmoji,
   dayStatusEmojis,
@@ -152,35 +151,6 @@ describe("taskMatchesQuery", () => {
   it("matches on detail, and tolerates a null detail", () => {
     expect(taskMatchesQuery(makeTask({ project: "p", detail: "극세사 원단" }), "원단")).toBe(true);
     expect(taskMatchesQuery(makeTask({ project: "p", detail: null }), "원단")).toBe(false);
-  });
-});
-
-describe("weeklyActivityCounts", () => {
-  const today = new Date("2026-08-12T00:00:00"); // 수요일
-
-  it("counts completed tasks per day for the last 7 days, oldest first", () => {
-    const tasks = [
-      makeTask({ status: "완료", updated_at: "2026-08-12T09:00:00" }), // 오늘(수)
-      makeTask({ status: "완료", updated_at: "2026-08-12T15:00:00" }), // 오늘(수), 2건째
-      makeTask({ status: "완료", updated_at: "2026-08-10T09:00:00" }), // 월요일
-    ];
-    const result = weeklyActivityCounts(tasks, today);
-    expect(result).toHaveLength(7);
-    expect(result[result.length - 1]).toEqual({ label: "수", count: 2 });
-    const monday = result.find((d) => d.label === "월");
-    expect(monday?.count).toBe(1);
-  });
-
-  it("ignores tasks that are not 완료", () => {
-    const tasks = [makeTask({ status: "진행중", updated_at: "2026-08-12T09:00:00" })];
-    const result = weeklyActivityCounts(tasks, today);
-    expect(result.every((d) => d.count === 0)).toBe(true);
-  });
-
-  it("ignores completions outside the 7-day window", () => {
-    const tasks = [makeTask({ status: "완료", updated_at: "2026-07-01T09:00:00" })];
-    const result = weeklyActivityCounts(tasks, today);
-    expect(result.every((d) => d.count === 0)).toBe(true);
   });
 });
 

@@ -9,7 +9,7 @@ import { TaskTable } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
 import { ContributionReport } from "@/components/contribution-report";
 import { TaskCalendar } from "@/components/task-calendar";
-import { WeeklyActivityChart } from "@/components/charts/weekly-activity-chart";
+import { PersonalTodo } from "@/components/personal-todo";
 import { UpcomingDeadlines } from "@/components/upcoming-deadlines";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
@@ -165,7 +165,7 @@ export default function DashboardPage() {
             <MemberProgressBars tasks={tasks} />
           </motion.div>
           <motion.div whileHover={{ y: -4 }}>
-            <WeeklyActivityChart tasks={tasks} />
+            <PersonalTodo member={member} />
           </motion.div>
           <motion.div whileHover={{ y: -4 }}>
             <UpcomingDeadlines tasks={tasks} />
