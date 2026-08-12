@@ -9,8 +9,8 @@ import { TaskTable } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
 import { ContributionReport } from "@/components/contribution-report";
 import { TaskCalendar } from "@/components/task-calendar";
-import { HeroBackground } from "@/components/hero-background";
-import { CountUpNumber } from "@/components/count-up-number";
+import { WeeklyActivityChart } from "@/components/charts/weekly-activity-chart";
+import { UpcomingDeadlines } from "@/components/upcoming-deadlines";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -120,101 +120,36 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen w-full space-y-6 bg-white p-3 sm:p-4 md:p-6">
-      {/* Hero — mirrors forma-landing's page anatomy: glass navbar, big headline, floating card,
-          plus a mouse-reactive blob background for extra motion. */}
-      <HeroBackground className="p-4 sm:p-6 md:p-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 rounded-2xl bg-white/60 px-4 py-2 shadow-sm backdrop-blur-md">
-            <svg width="24" height="24" viewBox="0 0 256 256">
-              <path d="M 256 256 L 128 256 L 0 128 L 128 128 Z" fill="black" />
-              <path d="M 256 128 L 128 128 L 0 0 L 128 0 Z" fill="black" />
-            </svg>
-            <span className="text-sm font-medium text-gray-800">디자인R&D</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <motion.button
-              type="button"
-              onClick={switchMember}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.96 }}
-              className="rounded-xl bg-white/60 px-4 py-2 text-sm font-medium text-gray-800 shadow-sm backdrop-blur-md"
-            >
-              {member}님 · 전환
-            </motion.button>
-            <TaskFormDialog
-              member={member}
-              trigger={
-                <motion.button
-                  type="button"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.96 }}
-                  className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white sm:px-5"
-                >
-                  업무 추가
-                </motion.button>
-              }
-              onSubmit={handleCreate}
-            />
-          </div>
-        </div>
-
-        <div className="mt-16 flex flex-col gap-6 sm:mt-24 lg:flex-row lg:items-end lg:justify-between">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="shrink-0 text-3xl font-medium leading-tight text-white drop-shadow-lg sm:text-4xl xl:max-w-xl xl:text-5xl"
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-semibold text-black sm:text-3xl">
+          {member}님, 안녕하세요
+        </h1>
+        <div className="flex items-center gap-2">
+          <motion.button
+            type="button"
+            onClick={switchMember}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            className="rounded-xl bg-zinc-100 px-4 py-2 text-sm font-medium text-gray-800"
           >
-            {member}님, 안녕하세요
-            <br />
-            오늘도 함께{" "}
-            <span
-              style={{ fontFamily: "var(--font-serif-accent)", fontStyle: "italic" }}
-            >
-              성장
-            </span>
-            해봐요
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            whileHover={{ y: -4 }}
-            className="w-full shrink-0 overflow-hidden rounded-2xl bg-white p-4 shadow-2xl sm:rounded-3xl sm:p-6 lg:w-[380px]"
-          >
-            <h2 className="text-lg font-semibold text-black sm:text-xl">
-              오늘의 현황
-            </h2>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
-                <div className="text-xs text-gray-500">전체 업무</div>
-                <div className="text-xl font-semibold text-black">
-                  <CountUpNumber value={total} />
-                </div>
-              </div>
-              <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
-                <div className="text-xs text-gray-500">진행중</div>
-                <div className="text-xl font-semibold text-black">
-                  <CountUpNumber value={inProgress} />
-                </div>
-              </div>
-              <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
-                <div className="text-xs text-gray-500">완료</div>
-                <div className="text-xl font-semibold text-black">
-                  <CountUpNumber value={completed} />
-                </div>
-              </div>
-              <div className="rounded-2xl bg-gray-50 px-4 py-2.5">
-                <div className="text-xs text-gray-500">지연</div>
-                <div className="text-xl font-semibold text-black">
-                  <CountUpNumber value={overdue} />
-                </div>
-              </div>
-            </div>
-          </motion.div>
+            {member}님 · 전환
+          </motion.button>
+          <TaskFormDialog
+            member={member}
+            trigger={
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.96 }}
+                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white sm:px-5"
+              >
+                업무 추가
+              </motion.button>
+            }
+            onSubmit={handleCreate}
+          />
         </div>
-      </HeroBackground>
+      </div>
 
       <main className="w-full space-y-8 px-1 sm:px-2 md:px-4">
         {actionError && (
@@ -226,21 +161,27 @@ export default function DashboardPage() {
         <SummaryCards total={total} inProgress={inProgress} completed={completed} overdue={overdue} />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-1">
+          <motion.div whileHover={{ y: -4 }}>
             <MemberProgressBars tasks={tasks} />
-          </div>
-          <div className="lg:col-span-2">
-            <TaskTable
-              tasks={tasks}
-              onEdit={setEditingTask}
-              onDelete={handleDelete}
-            />
-          </div>
+          </motion.div>
+          <motion.div whileHover={{ y: -4 }}>
+            <WeeklyActivityChart tasks={tasks} />
+          </motion.div>
+          <motion.div whileHover={{ y: -4 }}>
+            <UpcomingDeadlines tasks={tasks} />
+          </motion.div>
         </div>
 
-        <ContributionReport tasks={tasks} />
+        <TaskTable tasks={tasks} onEdit={setEditingTask} onDelete={handleDelete} />
 
-        <TaskCalendar tasks={tasks} />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <motion.div whileHover={{ y: -4 }}>
+            <ContributionReport tasks={tasks} />
+          </motion.div>
+          <motion.div whileHover={{ y: -4 }}>
+            <TaskCalendar tasks={tasks} />
+          </motion.div>
+        </div>
 
         {editingTask && (
           <TaskFormDialog
