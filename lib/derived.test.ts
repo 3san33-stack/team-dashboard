@@ -154,6 +154,24 @@ describe("taskMatchesQuery", () => {
   });
 });
 
+describe("monthCategoryContribution date fallback", () => {
+  it("falls back to due_date when start_date is missing", () => {
+    const tasks = [
+      makeTask({ member: "구민석", category: "제품개발", start_date: null, due_date: "2026-08-20" }),
+      makeTask({ member: "구민석", category: "조직연구", start_date: null, due_date: "2026-08-25" }),
+    ];
+    expect(monthCategoryContribution(tasks, "구민석", "제품개발", 2026, 8)).toBe(50);
+  });
+
+  it("still prefers start_date when both exist", () => {
+    const tasks = [
+      makeTask({ member: "구민석", category: "제품개발", start_date: "2026-07-01", due_date: "2026-08-20" }),
+    ];
+    expect(monthCategoryContribution(tasks, "구민석", "제품개발", 2026, 8)).toBe(0);
+    expect(monthCategoryContribution(tasks, "구민석", "제품개발", 2026, 7)).toBe(100);
+  });
+});
+
 describe("upcomingDeadlines", () => {
   it("returns non-완료 tasks with a due date, soonest first", () => {
     const tasks = [

@@ -112,7 +112,7 @@ export function TaskCalendar({ tasks }: Props) {
                     key={toLocalDateKey(day)}
                     onClick={() => setSelectedDay(day)}
                     aria-label={`${day.getDate()}일${dayTasks.length > 0 ? `, 업무 ${dayTasks.length}건` : ""}`}
-                    className={`h-20 overflow-hidden rounded-md border p-1 text-left text-xs transition-colors hover:bg-accent ${
+                    className={`h-14 overflow-hidden rounded-md border p-1 text-left text-xs transition-colors hover:bg-accent sm:h-16 ${
                       inMonth ? "bg-card" : "bg-transparent opacity-40"
                     }`}
                   >

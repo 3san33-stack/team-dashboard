@@ -124,6 +124,17 @@ export default function DashboardPage() {
       {/* Night-sky panel — same navy family as the member-select scene,
           so the dashboard opens with a piece of the same world. */}
       <div className="space-y-6 rounded-3xl bg-gradient-to-br from-[#0b1220] via-[#101b33] to-[#1a2947] p-4 shadow-lg sm:p-6">
+        <div className="flex items-center gap-3">
+          {/* Official logo is dark-on-transparent; brightness-0 invert renders it white on navy. */}
+          <img
+            src="/songwol-logo.png"
+            alt="송월"
+            className="h-5 w-auto brightness-0 invert sm:h-6"
+          />
+          <span aria-hidden className="h-5 w-px bg-white/25" />
+          <span className="text-sm font-medium tracking-wide text-white/80">R&D 다이어리</span>
+        </div>
+
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-semibold text-white sm:text-3xl">
             {member}님, 안녕하세요
@@ -180,13 +191,14 @@ export default function DashboardPage() {
 
         <TaskTable tasks={tasks} onEdit={setEditingTask} onDelete={handleDelete} />
 
-        <motion.div whileHover={{ y: -4 }}>
-          <ContributionReport tasks={tasks} />
-        </motion.div>
-
-        <motion.div whileHover={{ y: -4 }}>
-          <TaskCalendar tasks={tasks} />
-        </motion.div>
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+          <motion.div whileHover={{ y: -4 }}>
+            <ContributionReport tasks={tasks} />
+          </motion.div>
+          <motion.div whileHover={{ y: -4 }}>
+            <TaskCalendar tasks={tasks} />
+          </motion.div>
+        </div>
 
         {editingTask && (
           <TaskFormDialog

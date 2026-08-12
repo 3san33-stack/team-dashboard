@@ -33,18 +33,18 @@ export function ContributionReport({ tasks }: Props) {
     }));
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>업무구분별 분포 (전체)</CardTitle>
         </CardHeader>
-        <CardContent className="h-80">
+        <CardContent>
           {total === 0 ? (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex h-40 items-center justify-center">
               <p className="text-sm text-muted-foreground">표시할 데이터가 없습니다</p>
             </div>
           ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-4">
+            <div className="flex flex-col items-center gap-4">
               <PieChart data={pieData} innerRadius={60} padAngle={0.02} size={180}>
                 {pieData.map((_, i) => (
                   <PieSlice key={pieData[i]!.label} index={i} />
@@ -72,7 +72,7 @@ export function ContributionReport({ tasks }: Props) {
         <CardHeader>
           <CardTitle>팀원별 이번 달 기여율</CardTitle>
         </CardHeader>
-        <CardContent className="h-80 space-y-4 overflow-y-auto">
+        <CardContent className="space-y-4">
           {MEMBERS.map((member) => {
             const rows = CATEGORIES.map((category) => ({
               category,

@@ -43,7 +43,9 @@ export function priorityColor(priority: Priority): string {
 /**
  * Reproduces the original spreadsheet's "제품개발 기여율" formula, generalized to any category:
  * (member's tasks in that category, in that month) / (member's total tasks in that month).
- * Buckets by `start_date` (the spreadsheet used its "시작일" column the same way).
+ * Buckets by `start_date` (the spreadsheet used its "시작일" column the same way), falling
+ * back to `due_date` — in practice the team fills 마감일 and often skips 시작일, which used
+ * to make every month read as "no tasks".
  */
 export function monthCategoryContribution(
   tasks: Task[],
@@ -53,8 +55,9 @@ export function monthCategoryContribution(
   month: number // 1-12
 ): number {
   const inMonth = tasks.filter((t) => {
-    if (t.member !== member || !t.start_date) return false;
-    const d = new Date(`${t.start_date}T00:00:00`);
+    const bucketDate = t.start_date ?? t.due_date;
+    if (t.member !== member || !bucketDate) return false;
+    const d = new Date(`${bucketDate}T00:00:00`);
     return d.getFullYear() === year && d.getMonth() + 1 === month;
   });
   if (inMonth.length === 0) return 0;
