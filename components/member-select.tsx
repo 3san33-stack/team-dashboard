@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type MouseEvent } from "react";
-import { motion, useMotionValue, useSpring } from "motion/react";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MEMBERS, type Member } from "@/lib/types";
 
@@ -13,6 +13,7 @@ export function MemberSelect({ onSelect }: Props) {
   const glowX = useSpring(rawX, { stiffness: 100, damping: 20, mass: 0.4 });
   const glowY = useSpring(rawY, { stiffness: 100, damping: 20, mass: 0.4 });
   const [hasMoved, setHasMoved] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -30,7 +31,7 @@ export function MemberSelect({ onSelect }: Props) {
         aria-hidden
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
-        animate={{ rotate: [-1, 1, -1], scale: [1, 1.02, 1] }}
+        animate={reducedMotion ? undefined : { rotate: [-1, 1, -1], scale: [1, 1.02, 1] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
       />
 
