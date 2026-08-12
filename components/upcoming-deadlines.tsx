@@ -40,7 +40,7 @@ export function UpcomingDeadlines({ tasks }: Props) {
                     type="button"
                     onClick={() => toggle(task.id)}
                     aria-pressed={isChecked}
-                    aria-label={`${task.project} 체크`}
+                    aria-label={`${task.project} ${isChecked ? "확인 표시됨" : "확인 표시"} (완료 처리 아님, 업무 목록에서 처리하세요)`}
                     className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-muted-foreground/40"
                   >
                     <motion.span
