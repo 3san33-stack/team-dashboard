@@ -119,7 +119,7 @@ export default function DashboardPage() {
   const overdue = tasks.filter((t) => isOverdue(t)).length;
 
   return (
-    <div className="min-h-screen w-full space-y-6 bg-white p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen w-full space-y-6 bg-background p-3 sm:p-4 md:p-6">
       {/* Night-sky panel — same navy family as the member-select scene,
           so the dashboard opens with a piece of the same world. */}
       <div className="space-y-6 rounded-3xl bg-gradient-to-br from-[#0b1220] via-[#101b33] to-[#1a2947] p-4 shadow-lg sm:p-6">

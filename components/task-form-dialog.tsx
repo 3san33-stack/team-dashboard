@@ -64,15 +64,15 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
         <DialogHeader>
           <DialogTitle>{task ? "업무 수정" : "업무 추가"}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-3">
-          <div>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
             <Label>프로젝트</Label>
             <Input
               value={form.project}
               onChange={(e) => setForm({ ...form, project: e.target.value })}
             />
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label>업무구분</Label>
             <Select
               value={form.category}
@@ -84,7 +84,7 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label>우선순위</Label>
             <Select
               value={form.priority}
@@ -96,7 +96,7 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label>마감일</Label>
             <Input
               type="date"
@@ -104,7 +104,7 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
               onChange={(e) => setForm({ ...form, due_date: e.target.value || null })}
             />
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label>진행률 (%)</Label>
             <Input
               type="number"
@@ -114,7 +114,7 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
               onChange={(e) => setForm({ ...form, progress: Number(e.target.value) })}
             />
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label>상태</Label>
             <Select
               value={form.status}
@@ -126,14 +126,14 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label>팀장코멘트</Label>
             <Textarea
               value={form.comment ?? ""}
               onChange={(e) => setForm({ ...form, comment: e.target.value })}
             />
           </div>
-          <Button className="w-full" onClick={handleSubmit}>저장</Button>
+          <Button className="mt-2 w-full" onClick={handleSubmit}>저장</Button>
         </div>
       </DialogContent>
     </Dialog>
