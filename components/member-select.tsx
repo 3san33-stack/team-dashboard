@@ -67,7 +67,7 @@ export function MemberSelect({ onSelect }: Props) {
             variants={heroContainer}
             initial="hidden"
             animate="show"
-            className="w-full max-w-xs space-y-8"
+            className="w-full max-w-md space-y-8"
           >
             <motion.div variants={heroItem} className="flex items-center gap-2">
               <Circle className="h-5 w-5 fill-white text-white" />
