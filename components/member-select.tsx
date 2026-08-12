@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MEMBERS, type Member } from "@/lib/types";
 
@@ -15,29 +14,14 @@ const GRAIN_SVG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
 
 export function MemberSelect({ onSelect }: Props) {
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const glowX = useSpring(rawX, { stiffness: 100, damping: 20, mass: 0.4 });
-  const glowY = useSpring(rawY, { stiffness: 100, damping: 20, mass: 0.4 });
-  const [hasMoved, setHasMoved] = useState(false);
   const reducedMotion = useReducedMotion();
 
-  function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    rawX.set(e.clientX - rect.left);
-    rawY.set(e.clientY - rect.top);
-    if (!hasMoved) setHasMoved(true);
-  }
-
   return (
-    <div
-      onMouseMove={handleMouseMove}
-      className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden bg-black"
-    >
+    <div className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden bg-black">
       {reducedMotion === true ? (
         <div
           aria-hidden
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 scale-110 bg-cover bg-center blur-xl"
           style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
         />
       ) : (
@@ -48,7 +32,7 @@ export function MemberSelect({ onSelect }: Props) {
           muted
           playsInline
           poster="/member-select-bg.jpg"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl"
         >
           <source src="/member-select-bg.mp4" type="video/mp4" />
         </video>
@@ -59,20 +43,6 @@ export function MemberSelect({ onSelect }: Props) {
         className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
         style={{ backgroundImage: `url("${GRAIN_SVG}")`, backgroundSize: "200px 200px" }}
       />
-
-      {hasMoved && (
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute left-0 top-0 h-[360px] w-[360px] rounded-full bg-white/40 blur-3xl"
-          style={{
-            x: glowX,
-            y: glowY,
-            translateX: "-50%",
-            translateY: "-50%",
-            mixBlendMode: "screen",
-          }}
-        />
-      )}
 
       <h1 className="relative z-10 text-2xl font-semibold text-white drop-shadow-lg">
         누구신가요?
