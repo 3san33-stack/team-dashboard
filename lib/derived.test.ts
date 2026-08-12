@@ -8,6 +8,7 @@ import {
   teamCategoryDistribution,
   taskMatchesQuery,
   weeklyActivityCounts,
+  upcomingDeadlines,
 } from "./derived";
 import type { Task } from "./types";
 import { CATEGORIES } from "./types";
@@ -178,5 +179,26 @@ describe("weeklyActivityCounts", () => {
     const tasks = [makeTask({ status: "완료", updated_at: "2026-07-01T09:00:00" })];
     const result = weeklyActivityCounts(tasks, today);
     expect(result.every((d) => d.count === 0)).toBe(true);
+  });
+});
+
+describe("upcomingDeadlines", () => {
+  it("returns non-완료 tasks with a due date, soonest first", () => {
+    const tasks = [
+      makeTask({ id: "a", due_date: "2026-08-20", status: "진행중" }),
+      makeTask({ id: "b", due_date: "2026-08-13", status: "예정" }),
+      makeTask({ id: "c", due_date: "2026-08-15", status: "완료" }),
+      makeTask({ id: "d", due_date: null, status: "진행중" }),
+    ];
+    const result = upcomingDeadlines(tasks);
+    expect(result.map((t) => t.id)).toEqual(["b", "a"]);
+  });
+
+  it("limits to the given count", () => {
+    const tasks = Array.from({ length: 8 }, (_, i) =>
+      makeTask({ id: String(i), due_date: `2026-08-${10 + i}`, status: "예정" })
+    );
+    const result = upcomingDeadlines(tasks, 3);
+    expect(result).toHaveLength(3);
   });
 });

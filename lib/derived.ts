@@ -118,3 +118,10 @@ export function weeklyActivityCounts(
     return { label: WEEKDAY_LABELS[day.getDay()]!, count };
   });
 }
+
+export function upcomingDeadlines(tasks: Task[], limit = 5): Task[] {
+  return tasks
+    .filter((t) => t.due_date !== null && t.status !== "완료")
+    .sort((a, b) => a.due_date!.localeCompare(b.due_date!))
+    .slice(0, limit);
+}
