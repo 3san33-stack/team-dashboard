@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "motion/react";
-import { Circle } from "lucide-react";
+import { ChevronRight, Circle } from "lucide-react";
 import { MEMBERS, type Member } from "@/lib/types";
 
 type Props = { onSelect: (member: Member) => void };
@@ -32,7 +32,7 @@ export function MemberSelect({ onSelect }: Props) {
         {reducedMotion === true ? (
           <div
             aria-hidden
-            className="absolute inset-0 scale-110 bg-cover bg-center blur-xl"
+            className="absolute inset-0 scale-105 bg-cover bg-center blur-md"
             style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
           />
         ) : (
@@ -43,7 +43,7 @@ export function MemberSelect({ onSelect }: Props) {
             muted
             playsInline
             poster="/member-select-bg.jpg"
-            className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl"
+            className="absolute inset-0 h-full w-full scale-105 object-cover blur-md"
           >
             <source src="/member-select-bg.mp4" type="video/mp4" />
           </video>
@@ -53,6 +53,11 @@ export function MemberSelect({ onSelect }: Props) {
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay"
           style={{ backgroundImage: `url("${GRAIN_SVG}")`, backgroundSize: "200px 200px" }}
+        />
+
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
         />
 
         <motion.div
@@ -85,7 +90,7 @@ export function MemberSelect({ onSelect }: Props) {
             <h2 className="text-3xl font-medium tracking-tight text-white">누구신가요?</h2>
             <p className="mt-2 text-sm text-white/40">이름을 선택해 주세요.</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-3">
             {MEMBERS.map((member, i) => (
               <MemberCard key={member} member={member} index={i} onSelect={onSelect} />
             ))}
@@ -108,9 +113,13 @@ function MemberCard({ member, index, onSelect }: MemberCardProps) {
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onSelect(member)}
-      className="flex h-24 flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#1A1A1A] text-white transition-colors hover:bg-white/5"
+      className="group flex w-full items-center gap-4 rounded-xl border border-white/10 bg-[#1A1A1A] p-4 text-left text-white shadow-lg shadow-black/40 transition-colors hover:border-white/25 hover:bg-white/5"
     >
-      <span className="text-lg font-medium">{member}</span>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/10 text-base font-semibold">
+        {member[0]}
+      </span>
+      <span className="flex-1 text-lg font-medium">{member}</span>
+      <ChevronRight className="h-5 w-5 shrink-0 text-white/30 transition-transform group-hover:translate-x-1 group-hover:text-white/60" />
     </motion.button>
   );
 }
