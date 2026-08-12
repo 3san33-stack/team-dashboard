@@ -27,7 +27,7 @@ export function MemberSelect({ onSelect }: Props) {
   const reducedMotion = useReducedMotion();
 
   return (
-    <main className="relative flex min-h-screen w-full overflow-hidden bg-black p-2 lg:h-screen lg:p-4">
+    <main className="relative flex min-h-screen w-full overflow-hidden bg-black lg:h-screen">
       {reducedMotion === true ? (
         <div
           aria-hidden
@@ -54,53 +54,54 @@ export function MemberSelect({ onSelect }: Props) {
         style={{ backgroundImage: `url("${GRAIN_SVG}")`, backgroundSize: "200px 200px" }}
       />
 
-      <div className="relative hidden h-full w-[52%] flex-col items-center justify-end overflow-hidden rounded-3xl px-12 pb-32 lg:flex">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
-        />
-
-        <motion.div
-          variants={heroContainer}
-          initial="hidden"
-          animate="show"
-          className="relative z-10 w-full max-w-xs space-y-8"
-        >
-          <motion.div variants={heroItem} className="flex items-center gap-2">
-            <Circle className="h-5 w-5 fill-white text-white" />
-            <span className="text-xl font-semibold tracking-tight text-white">디자인R&D</span>
-          </motion.div>
-          <motion.div variants={heroItem}>
-            <h1 className="text-4xl font-medium tracking-tight text-white">팀에 오신 걸 환영해요</h1>
-            <p className="mt-4 px-1 text-sm leading-relaxed text-white/60">
-              오른쪽에서 본인 이름을 선택하면 바로 대시보드로 이동합니다.
-            </p>
-          </motion.div>
-        </motion.div>
-      </div>
-
+      {/* One continuous scrim across the whole photo — darker toward the
+          bottom (hero text) and right (member cards), no panel edges. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 left-0 bg-black/35 lg:left-[52%]"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10 lg:bg-gradient-to-r"
       />
 
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-12 sm:px-12 lg:overflow-hidden lg:px-16 xl:px-24">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full max-w-xl space-y-8"
-        >
-          <div>
-            <h2 className="text-3xl font-medium tracking-tight text-white drop-shadow-md">누구신가요?</h2>
-            <p className="mt-2 text-sm text-white/60 drop-shadow-sm">이름을 선택해 주세요.</p>
-          </div>
-          <div className="space-y-3">
-            {MEMBERS.map((member, i) => (
-              <MemberCard key={member} member={member} index={i} onSelect={onSelect} />
-            ))}
-          </div>
-        </motion.div>
+      <div className="relative z-10 flex w-full flex-1 flex-col lg:flex-row">
+        <div className="hidden flex-col items-start justify-end px-12 pb-20 lg:flex lg:w-[52%] lg:pb-32">
+          <motion.div
+            variants={heroContainer}
+            initial="hidden"
+            animate="show"
+            className="w-full max-w-xs space-y-8"
+          >
+            <motion.div variants={heroItem} className="flex items-center gap-2">
+              <Circle className="h-5 w-5 fill-white text-white" />
+              <span className="text-xl font-semibold tracking-tight text-white">디자인R&D</span>
+            </motion.div>
+            <motion.div variants={heroItem}>
+              <h1 className="text-4xl font-medium tracking-tight text-white">팀에 오신 걸 환영해요</h1>
+              <p className="mt-4 px-1 text-sm leading-relaxed text-white/60">
+                오른쪽에서 본인 이름을 선택하면 바로 대시보드로 이동합니다.
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+
+        <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-12 sm:px-12 lg:overflow-hidden lg:px-16 xl:px-24">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="w-full max-w-xl space-y-8"
+          >
+            <div>
+              <h2 className="text-3xl font-medium tracking-tight text-white drop-shadow-md">
+                누구신가요?
+              </h2>
+              <p className="mt-2 text-sm text-white/60 drop-shadow-sm">이름을 선택해 주세요.</p>
+            </div>
+            <div className="space-y-3">
+              {MEMBERS.map((member, i) => (
+                <MemberCard key={member} member={member} index={i} onSelect={onSelect} />
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </div>
     </main>
   );
