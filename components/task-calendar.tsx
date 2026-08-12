@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { MEMBERS, type Task } from "@/lib/types";
-import { priorityColor, statusColor, toLocalDateKey } from "@/lib/derived";
+import { priorityColor, statusColor, dayStatusEmojis, toLocalDateKey } from "@/lib/derived";
 
 type Props = { tasks: Task[] };
 
@@ -91,9 +92,10 @@ export function TaskCalendar({ tasks }: Props) {
                 const inMonth = day.getMonth() === cursor.month;
                 const dayTasks = tasksOn(day);
                 return (
-                  <button
+                  <motion.button
                     type="button"
                     key={toLocalDateKey(day)}
+                    layoutId={`day-${toLocalDateKey(day)}`}
                     onClick={() => setSelectedDay(day)}
                     className={`h-20 overflow-hidden rounded-md border p-1 text-left text-xs transition-colors hover:bg-accent ${
                       inMonth ? "bg-card" : "bg-transparent opacity-40"
@@ -102,27 +104,14 @@ export function TaskCalendar({ tasks }: Props) {
                     <div className="flex items-center justify-between text-muted-foreground">
                       <span>{day.getDate()}</span>
                       {dayTasks.length > 0 && (
-                        <span className="rounded-full bg-primary/10 px-1.5 text-[10px] text-primary">
-                          {dayTasks.length}
+                        <span className="flex gap-0.5 text-[11px] leading-none">
+                          {dayStatusEmojis(dayTasks).map((emoji, i) => (
+                            <span key={i}>{emoji}</span>
+                          ))}
                         </span>
                       )}
                     </div>
-                    {dayTasks.length > 0 && (
-                      <div className="mt-1 flex flex-wrap items-center gap-1">
-                        {dayTasks.slice(0, 6).map((t) => (
-                          <span
-                            key={t.id}
-                            className={`h-1.5 w-1.5 rounded-full ${priorityColor(t.priority)}`}
-                          />
-                        ))}
-                        {dayTasks.length > 6 && (
-                          <span className="text-[10px] text-muted-foreground">
-                            +{dayTasks.length - 6}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -132,36 +121,38 @@ export function TaskCalendar({ tasks }: Props) {
 
       <Dialog open={!!selectedDay} onOpenChange={(open) => !open && setSelectedDay(null)}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {selectedDay &&
-                `${selectedDay.getFullYear()}년 ${selectedDay.getMonth() + 1}월 ${selectedDay.getDate()}일 업무`}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="max-h-96 space-y-2 overflow-y-auto">
-            {selectedDayTasks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">해당 날짜에 마감인 업무가 없습니다.</p>
-            ) : (
-              selectedDayTasks.map((t) => (
-                <div key={t.id} className="rounded-md border p-3 text-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium">{t.project}</span>
-                    <Badge className={statusColor(t.status)}>{t.status}</Badge>
+          <motion.div layoutId={selectedDay ? `day-${toLocalDateKey(selectedDay)}` : undefined}>
+            <DialogHeader>
+              <DialogTitle>
+                {selectedDay &&
+                  `${selectedDay.getFullYear()}년 ${selectedDay.getMonth() + 1}월 ${selectedDay.getDate()}일 업무`}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="max-h-96 space-y-2 overflow-y-auto">
+              {selectedDayTasks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">해당 날짜에 마감인 업무가 없습니다.</p>
+              ) : (
+                selectedDayTasks.map((t) => (
+                  <div key={t.id} className="rounded-md border p-3 text-sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{t.project}</span>
+                      <Badge className={statusColor(t.status)}>{t.status}</Badge>
+                    </div>
+                    <div className="mt-1 text-muted-foreground">
+                      {t.member} · {t.category}
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                      <Badge className={priorityColor(t.priority)}>{t.priority}</Badge>
+                      <span className="text-muted-foreground">진행률 {t.progress}%</span>
+                    </div>
+                    {t.comment && (
+                      <p className="mt-2 text-xs text-muted-foreground">{t.comment}</p>
+                    )}
                   </div>
-                  <div className="mt-1 text-muted-foreground">
-                    {t.member} · {t.category}
-                  </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <Badge className={priorityColor(t.priority)}>{t.priority}</Badge>
-                    <span className="text-muted-foreground">진행률 {t.progress}%</span>
-                  </div>
-                  {t.comment && (
-                    <p className="mt-2 text-xs text-muted-foreground">{t.comment}</p>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
+                ))
+              )}
+            </div>
+          </motion.div>
         </DialogContent>
       </Dialog>
     </Card>
