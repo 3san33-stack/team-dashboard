@@ -7,6 +7,7 @@ import {
   monthCategoryContribution,
   teamCategoryDistribution,
   taskMatchesQuery,
+  memberSummary,
   upcomingDeadlines,
   taskStatusEmoji,
   dayStatusEmojis,
@@ -169,6 +170,35 @@ describe("monthCategoryContribution date fallback", () => {
     ];
     expect(monthCategoryContribution(tasks, "구민석", "제품개발", 2026, 8)).toBe(0);
     expect(monthCategoryContribution(tasks, "구민석", "제품개발", 2026, 7)).toBe(100);
+  });
+});
+
+describe("memberSummary", () => {
+  const today = new Date("2026-08-12T00:00:00");
+
+  it("aggregates counts and average progress for one member, ignoring other members", () => {
+    const tasks = [
+      makeTask({ member: "구민석", status: "진행중", progress: 40 }),
+      makeTask({ member: "구민석", status: "완료", progress: 100, category: "제품개발" }),
+      makeTask({ member: "구민석", status: "예정", progress: 0, due_date: "2026-08-01" }), // overdue
+      makeTask({ member: "안도현", status: "완료", progress: 100, category: "제품개발" }), // 타인 제외
+    ];
+    const result = memberSummary(tasks, "구민석", today);
+    expect(result).toEqual({
+      total: 3,
+      inProgress: 1,
+      completed: 1,
+      overdue: 1,
+      avgProgress: 47, // (40+100+0)/3 rounded
+      completedProductDev: 1,
+    });
+  });
+
+  it("returns all-zero for a member with no tasks", () => {
+    const result = memberSummary([], "구민석", today);
+    expect(result).toEqual({
+      total: 0, inProgress: 0, completed: 0, overdue: 0, avgProgress: 0, completedProductDev: 0,
+    });
   });
 });
 

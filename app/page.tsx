@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion } from "motion/react";
 import { MemberSelect } from "@/components/member-select";
 import { SummaryCards } from "@/components/summary-cards";
@@ -141,6 +142,15 @@ export default function DashboardPage() {
           </h1>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <Link href="/report">
+              <motion.span
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-block rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
+              >
+                부서장님 보고
+              </motion.span>
+            </Link>
             <motion.button
               type="button"
               onClick={switchMember}

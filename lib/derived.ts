@@ -117,6 +117,29 @@ export function toLocalDateKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+export type MemberSummary = {
+  total: number;
+  inProgress: number;
+  completed: number;
+  overdue: number;
+  avgProgress: number;
+  completedProductDev: number;
+};
+
+// 부서장 보고 team-summary row: mirrors the spreadsheet's 전체업무/진행중/완료/
+// 지연/평균진행률/완료 제품개발 columns for one member.
+export function memberSummary(tasks: Task[], member: Member, today: Date = new Date()): MemberSummary {
+  const mine = tasks.filter((t) => t.member === member);
+  return {
+    total: mine.length,
+    inProgress: mine.filter((t) => t.status === "진행중").length,
+    completed: mine.filter((t) => t.status === "완료").length,
+    overdue: mine.filter((t) => isOverdue(t, today)).length,
+    avgProgress: averageProgress(tasks, member),
+    completedProductDev: mine.filter((t) => t.category === "제품개발" && t.status === "완료").length,
+  };
+}
+
 export function upcomingDeadlines(tasks: Task[], limit = 5): Task[] {
   return tasks
     .filter((t) => t.due_date !== null && t.status !== "완료")
