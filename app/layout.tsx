@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
@@ -18,7 +18,15 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "디자인R&D 팀 업무 대시보드",
   description: "디자인R&D 팀 업무 현황 대시보드",
+  manifest: "/manifest.json",
+  appleWebApp: { title: "R&D 다이어리", statusBarStyle: "black-translucent" },
+  icons: {
+    icon: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
 };
+
+export const viewport: Viewport = { themeColor: "#101b33" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
