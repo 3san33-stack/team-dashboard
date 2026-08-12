@@ -85,6 +85,28 @@ export function taskMatchesQuery(task: Task, query: string): boolean {
   );
 }
 
+// ponytail: fixed solar holidays only — lunar ones (설날, 추석, 석가탄신일) and
+// substitute holidays shift every year; add a per-year table or an API if
+// the team needs them exact.
+const KR_FIXED_HOLIDAYS = new Set([
+  "01-01", "03-01", "05-05", "06-06", "08-15", "10-03", "10-09", "12-25",
+]);
+
+export function isRedDay(day: Date): boolean {
+  const dow = day.getDay();
+  if (dow === 0 || dow === 6) return true;
+  const mmdd = `${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
+  return KR_FIXED_HOLIDAYS.has(mmdd);
+}
+
+// First cell of a Sunday-anchored 6-week month grid (may fall in the previous month).
+export function startOfMonthGrid(year: number, month: number): Date {
+  const first = new Date(year, month, 1);
+  const start = new Date(first);
+  start.setDate(start.getDate() - start.getDay());
+  return start;
+}
+
 // Local Y/M/D key, NOT toISOString() — avoids a KST off-by-one bug (toISOString
 // converts to UTC first, which shifts the date back a day for timezones ahead
 // of UTC). Used by task-calendar.tsx for due-date lookups.
