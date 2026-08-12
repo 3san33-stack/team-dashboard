@@ -27,13 +27,25 @@ export function MemberSelect({ onSelect }: Props) {
       onMouseMove={handleMouseMove}
       className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden bg-black"
     >
-      <motion.div
-        aria-hidden
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
-        animate={reducedMotion ? undefined : { rotate: [-1, 1, -1], scale: [1.05, 1.07, 1.05] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {reducedMotion === true ? (
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url(/member-select-bg.jpg)" }}
+        />
+      ) : (
+        <video
+          aria-hidden
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="/member-select-bg.jpg"
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source src="/member-select-bg.mp4" type="video/mp4" />
+        </video>
+      )}
 
       {hasMoved && (
         <motion.div
