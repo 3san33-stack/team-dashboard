@@ -19,9 +19,17 @@ export function WeeklyActivityChart({ tasks }: Props) {
         <CardTitle>이번 주 완료 업무</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex h-32 items-end justify-between gap-2">
+        <div
+          role="img"
+          aria-label={`요일별 완료 업무: ${data.map((d) => `${d.label} ${d.count}건`).join(", ")}`}
+          className="flex h-32 items-end justify-between gap-2"
+        >
           {data.map((d, i) => (
-            <div key={`${d.label}-${i}`} className="flex flex-1 flex-col items-center gap-1">
+            <div
+              key={`${d.label}-${i}`}
+              aria-hidden
+              className="flex flex-1 flex-col items-center gap-1"
+            >
               <motion.div
                 className="w-full rounded-t-md bg-primary"
                 initial={{ height: 0 }}
