@@ -130,7 +130,7 @@ export default function DashboardPage() {
             onClick={switchMember}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.96 }}
-            className="rounded-xl bg-zinc-100 px-4 py-2 text-sm font-medium text-gray-800"
+            className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-sm font-medium text-gray-800"
           >
             {member}님 · 전환
           </motion.button>
