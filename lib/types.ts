@@ -29,3 +29,11 @@ export type Task = {
 };
 
 export type TaskInput = Omit<Task, "id" | "created_at" | "updated_at">;
+
+export type PersonalTodoItem = {
+  id: string;
+  member: Member;
+  text: string;
+  done: boolean;
+  created_at: string;
+};

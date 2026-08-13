@@ -6,43 +6,50 @@ import { CheckIcon, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Member } from "@/lib/types";
-
-type TodoItem = { id: string; text: string; done: boolean };
+import {
+  listPersonalTodos, createPersonalTodo, togglePersonalTodo, deletePersonalTodo,
+} from "@/lib/supabase";
+import type { Member, PersonalTodoItem } from "@/lib/types";
 
 type Props = { member: Member };
 
-function storageKey(member: Member) {
-  return `team-dashboard:todo:${member}`;
-}
-
 export function PersonalTodo({ member }: Props) {
-  const [items, setItems] = useState<TodoItem[]>([]);
+  const [items, setItems] = useState<PersonalTodoItem[]>([]);
   const [text, setText] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const raw = localStorage.getItem(storageKey(member));
-    setItems(raw ? JSON.parse(raw) : []);
+    setLoaded(false);
+    listPersonalTodos(member)
+      .then(setItems)
+      .catch(() => setItems([]))
+      .finally(() => setLoaded(true));
   }, [member]);
 
-  function persist(next: TodoItem[]) {
-    setItems(next);
-    localStorage.setItem(storageKey(member), JSON.stringify(next));
-  }
-
-  function add() {
+  async function add() {
     const trimmed = text.trim();
     if (!trimmed) return;
-    persist([...items, { id: crypto.randomUUID(), text: trimmed, done: false }]);
     setText("");
+    try {
+      const created = await createPersonalTodo(member, trimmed);
+      setItems((prev) => [...prev, created]);
+      setError(null);
+    } catch {
+      setText(trimmed);
+      setError("저장하지 못했습니다. 다시 시도해 주세요.");
+    }
   }
 
-  function toggle(id: string) {
-    persist(items.map((i) => (i.id === id ? { ...i, done: !i.done } : i)));
+  async function toggle(item: PersonalTodoItem) {
+    const nextDone = !item.done;
+    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, done: nextDone } : i)));
+    await togglePersonalTodo(item.id, nextDone);
   }
 
-  function remove(id: string) {
-    persist(items.filter((i) => i.id !== id));
+  async function remove(id: string) {
+    setItems((prev) => prev.filter((i) => i.id !== id));
+    await deletePersonalTodo(id);
   }
 
   return (
@@ -63,7 +70,10 @@ export function PersonalTodo({ member }: Props) {
             추가
           </Button>
         </div>
-        {items.length === 0 ? (
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        {!loaded ? (
+          <p className="text-sm text-muted-foreground">불러오는 중...</p>
+        ) : items.length === 0 ? (
           <p className="text-sm text-muted-foreground">할 일이 없습니다</p>
         ) : (
           <ul className="space-y-1">
@@ -71,7 +81,7 @@ export function PersonalTodo({ member }: Props) {
               <li key={item.id} className="flex items-center gap-2 rounded-md border p-2">
                 <button
                   type="button"
-                  onClick={() => toggle(item.id)}
+                  onClick={() => toggle(item)}
                   aria-pressed={item.done}
                   aria-label={`${item.text} ${item.done ? "완료됨" : "완료 표시"}`}
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-muted-foreground/40"
