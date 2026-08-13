@@ -58,11 +58,11 @@ export function TaskCalendar({ tasks }: Props) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle>
+      <CardHeader className="flex flex-col gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
+        <CardTitle className="whitespace-nowrap">
           {cursor.year}년 {cursor.month + 1}월 업무 캘린더
         </CardTitle>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select value={memberFilter} onValueChange={(v) => setMemberFilter(v ?? "all")}>
             <SelectTrigger className="w-32"><SelectValue placeholder="담당자" /></SelectTrigger>
             <SelectContent>
@@ -70,8 +70,8 @@ export function TaskCalendar({ tasks }: Props) {
               {MEMBERS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" onClick={() => changeMonth(-1)}>이전</Button>
-          <Button variant="outline" size="sm" onClick={() => changeMonth(1)}>다음</Button>
+          <Button variant="outline" size="sm" className="whitespace-nowrap" onClick={() => changeMonth(-1)}>이전</Button>
+          <Button variant="outline" size="sm" className="whitespace-nowrap" onClick={() => changeMonth(1)}>다음</Button>
           <FullCalendarDialog tasks={tasks} />
         </div>
       </CardHeader>

@@ -141,14 +141,14 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-semibold text-white sm:text-3xl">
             {member}님, 안녕하세요
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <PushNotificationToggle member={member} />
             <ThemeToggle />
             <Link href="/report">
               <motion.span
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.96 }}
-                className="inline-block rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
+                className="inline-block rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium whitespace-nowrap text-white backdrop-blur-sm"
               >
                 부서장님 보고
               </motion.span>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
               onClick={switchMember}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.96 }}
-              className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm"
+              className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium whitespace-nowrap text-white backdrop-blur-sm"
             >
               {member}님 · 전환
             </motion.button>
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                   type="button"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.96 }}
-                  className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#101b33] sm:px-5"
+                  className="rounded-xl bg-white px-4 py-2 text-sm font-semibold whitespace-nowrap text-[#101b33] sm:px-5"
                 >
                   업무 추가
                 </motion.button>
