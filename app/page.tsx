@@ -12,6 +12,7 @@ import { ContributionReport } from "@/components/contribution-report";
 import { TaskCalendar } from "@/components/task-calendar";
 import { PersonalTodo } from "@/components/personal-todo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { PushNotificationToggle } from "@/components/push-notification-toggle";
 import { UpcomingDeadlines } from "@/components/upcoming-deadlines";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
@@ -141,6 +142,7 @@ export default function DashboardPage() {
             {member}님, 안녕하세요
           </h1>
           <div className="flex items-center gap-2">
+            <PushNotificationToggle member={member} />
             <ThemeToggle />
             <Link href="/report">
               <motion.span
