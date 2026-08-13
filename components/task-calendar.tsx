@@ -10,16 +10,16 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { MEMBERS, type Task } from "@/lib/types";
+import { MEMBERS, type Member, type Task } from "@/lib/types";
 import {
   priorityColor, statusColor, dayStatusEmojis, isRedDay, startOfMonthGrid, toLocalDateKey,
 } from "@/lib/derived";
 import { FullCalendarDialog } from "@/components/full-calendar-dialog";
 
-type Props = { tasks: Task[] };
+type Props = { tasks: Task[]; member: Member };
 
-export function TaskCalendar({ tasks }: Props) {
-  const [memberFilter, setMemberFilter] = useState<string>("all");
+export function TaskCalendar({ tasks, member }: Props) {
+  const [memberFilter, setMemberFilter] = useState<string>(member);
   const [cursor, setCursor] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() }; // month: 0-11
@@ -72,7 +72,7 @@ export function TaskCalendar({ tasks }: Props) {
           </Select>
           <Button variant="outline" size="sm" className="whitespace-nowrap" onClick={() => changeMonth(-1)}>이전</Button>
           <Button variant="outline" size="sm" className="whitespace-nowrap" onClick={() => changeMonth(1)}>다음</Button>
-          <FullCalendarDialog tasks={tasks} />
+          <FullCalendarDialog tasks={tasks} member={member} />
         </div>
       </CardHeader>
       <CardContent>

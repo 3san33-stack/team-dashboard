@@ -11,18 +11,19 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { MEMBERS, STATUSES, type Task } from "@/lib/types";
+import { MEMBERS, STATUSES, type Member, type Task } from "@/lib/types";
 import { isOverdue, priorityColor, statusColor, taskMatchesQuery } from "@/lib/derived";
 import { downloadTasksAsCsv } from "@/lib/export-csv";
 
 type Props = {
   tasks: Task[];
+  member: Member;
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
 };
 
-export function TaskTable({ tasks, onEdit, onDelete }: Props) {
-  const [memberFilter, setMemberFilter] = useState<string>("all");
+export function TaskTable({ tasks, member, onEdit, onDelete }: Props) {
+  const [memberFilter, setMemberFilter] = useState<string>(member);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
 

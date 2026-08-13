@@ -201,14 +201,14 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        <TaskTable tasks={tasks} onEdit={setEditingTask} onDelete={handleDelete} />
+        <TaskTable tasks={tasks} member={member} onEdit={setEditingTask} onDelete={handleDelete} />
 
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <motion.div whileHover={{ y: -4 }}>
             <ContributionReport tasks={tasks} />
           </motion.div>
           <motion.div whileHover={{ y: -4 }}>
-            <TaskCalendar tasks={tasks} />
+            <TaskCalendar tasks={tasks} member={member} />
           </motion.div>
         </div>
 

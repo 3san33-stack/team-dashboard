@@ -10,15 +10,15 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { MEMBERS, type Task } from "@/lib/types";
+import { MEMBERS, type Member, type Task } from "@/lib/types";
 import {
   isRedDay, priorityColor, startOfMonthGrid, statusColor, toLocalDateKey,
 } from "@/lib/derived";
 
-type Props = { tasks: Task[] };
+type Props = { tasks: Task[]; member: Member };
 
-export function FullCalendarDialog({ tasks }: Props) {
-  const [memberFilter, setMemberFilter] = useState<string>("all");
+export function FullCalendarDialog({ tasks, member }: Props) {
+  const [memberFilter, setMemberFilter] = useState<string>(member);
   const [cursor, setCursor] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() }; // month: 0-11
