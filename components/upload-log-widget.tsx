@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Card, CardContent, CardHeader, CardTitle,
 } from "@/components/ui/card";
@@ -19,6 +19,7 @@ export function UploadLogWidget() {
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [range, setRange] = useState<"week" | "month">("week");
+  const tempIdRef = useRef(0);
 
   useEffect(() => {
     listUploadLogs()
@@ -38,7 +39,7 @@ export function UploadLogWidget() {
   }
 
   async function handleLog(member: Weaver, category: UploadLogCategory) {
-    const tempId = `temp-${Date.now()}`;
+    const tempId = `temp-${tempIdRef.current++}`;
     const optimistic: UploadLog = { id: tempId, member, category, created_at: new Date().toISOString() };
     setLogs((prev) => [optimistic, ...prev]);
     try {
