@@ -13,6 +13,7 @@ import {
   dayStatusEmojis,
   summarizeUploadLogs,
   uploadCountOnDay,
+  monthlyUploadHistory,
 } from "./derived";
 import type { Task, UploadLog } from "./types";
 import { CATEGORIES } from "./types";
@@ -321,5 +322,24 @@ describe("uploadCountOnDay", () => {
 
   it("returns 0 for a day with no logs", () => {
     expect(uploadCountOnDay([], new Date("2026-08-11T00:00:00"))).toBe(0);
+  });
+});
+
+describe("monthlyUploadHistory", () => {
+  it("groups logs by calendar month, newest first", () => {
+    const logs = [
+      makeLog({ id: "1", member: "구민석", category: "신규", created_at: "2026-07-05T00:00:00Z" }),
+      makeLog({ id: "2", member: "구민석", category: "신규", created_at: "2026-08-01T00:00:00Z" }),
+      makeLog({ id: "3", member: "안도현", category: "수정", created_at: "2026-08-15T00:00:00Z" }),
+    ];
+    const result = monthlyUploadHistory(logs);
+    expect(result.map((r) => r.month)).toEqual(["2026-08", "2026-07"]);
+    expect(result[0]!.counts.구민석.신규).toBe(1);
+    expect(result[0]!.counts.안도현.수정).toBe(1);
+    expect(result[1]!.counts.구민석.신규).toBe(1);
+  });
+
+  it("returns an empty array for no logs", () => {
+    expect(monthlyUploadHistory([])).toEqual([]);
   });
 });
