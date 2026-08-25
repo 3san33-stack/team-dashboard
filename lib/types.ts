@@ -58,3 +58,13 @@ export type SampleRequest = {
 };
 
 export type SampleRequestInput = Omit<SampleRequest, "id" | "created_at" | "updated_at">;
+
+export const UPLOAD_LOG_CATEGORIES = ["신규", "수정", "동일"] as const;
+export type UploadLogCategory = (typeof UPLOAD_LOG_CATEGORIES)[number];
+
+export type UploadLog = {
+  id: string;
+  member: Weaver;
+  category: UploadLogCategory;
+  created_at: string;
+};
