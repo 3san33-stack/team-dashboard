@@ -36,13 +36,15 @@ export function SampleRequestBoard({ member }: Props) {
   }
 
   async function handleStatusChange(id: string, status: SampleRequestStatus) {
-    const prev = requests;
+    const target = requests.find((r) => r.id === id);
+    if (!target) return;
+    const prevStatus = target.status;
     setRequests((r) => r.map((req) => (req.id === id ? { ...req, status } : req)));
     try {
       await updateSampleRequestStatus(id, status);
       setError(null);
     } catch {
-      setRequests(prev);
+      setRequests((r) => r.map((req) => (req.id === id ? { ...req, status: prevStatus } : req)));
       setError("상태를 변경하지 못했습니다. 다시 시도해 주세요.");
     }
   }
@@ -110,7 +112,7 @@ export function SampleRequestBoard({ member }: Props) {
                             value={req.status}
                             onValueChange={(v) => v && handleStatusChange(req.id, v as SampleRequestStatus)}
                           >
-                            <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="h-8 text-xs" aria-label={`${req.title} 상태 변경`}><SelectValue /></SelectTrigger>
                             <SelectContent>
                               {SAMPLE_REQUEST_STATUSES.map((s) => (
                                 <SelectItem key={s} value={s}>{s}</SelectItem>
