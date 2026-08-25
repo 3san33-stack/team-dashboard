@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type {
   Member, PersonalTodoItem, SampleRequest, SampleRequestInput, Task, TaskInput,
+  UploadLog, UploadLogCategory, Weaver,
 } from "./types";
 
 export const supabase = createClient(
@@ -98,4 +99,45 @@ export async function updateSampleRequestStatus(
 export async function deleteSampleRequest(id: string): Promise<void> {
   const { error } = await supabase.from("sample_requests").delete().eq("id", id);
   if (error) throw error;
+}
+
+export async function listUploadLogs(): Promise<UploadLog[]> {
+  const { data, error } = await supabase
+    .from("upload_logs")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as UploadLog[];
+}
+
+export async function createUploadLog(
+  member: Weaver,
+  category: UploadLogCategory
+): Promise<UploadLog> {
+  const { data, error } = await supabase
+    .from("upload_logs")
+    .insert({ member, category })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as UploadLog;
+}
+
+export async function deleteUploadLog(id: string): Promise<void> {
+  const { error } = await supabase.from("upload_logs").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateSampleRequest(
+  id: string,
+  input: SampleRequestInput
+): Promise<SampleRequest> {
+  const { data, error } = await supabase
+    .from("sample_requests")
+    .update({ ...input, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as SampleRequest;
 }
