@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { uploadSampleRequestImage } from "@/lib/image-upload";
 import { MEMBERS, WEAVERS, type Member, type SampleRequestInput } from "@/lib/types";
 
 type Props = {
@@ -34,8 +35,11 @@ function buildDefaultForm(defaultRequester: Member): SampleRequestInput {
 export function SampleRequestFormDialog({ trigger, defaultRequester, onSubmit }: Props) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<SampleRequestInput>(buildDefaultForm(defaultRequester));
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const canSubmit = form.requester && form.weaver && form.title.trim().length > 0;
+  const canSubmit = form.requester && form.weaver && form.title.trim().length > 0 && !uploading;
 
   async function handleSubmit() {
     try {
@@ -45,6 +49,22 @@ export function SampleRequestFormDialog({ trigger, defaultRequester, onSubmit }:
     } catch {
       // onSubmit already surfaces the error to the user; keep the dialog
       // open with the user's input so they can retry.
+    }
+  }
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file later
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const url = await uploadSampleRequestImage(file);
+      setForm((f) => ({ ...f, reference_link: url }));
+    } catch {
+      setUploadError("이미지 업로드에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -97,12 +117,39 @@ export function SampleRequestFormDialog({ trigger, defaultRequester, onSubmit }:
             />
           </div>
           <div className="space-y-1.5">
-            <Label>참고 일러스트 파일 위치 링크</Label>
-            <Input
-              value={form.reference_link ?? ""}
-              onChange={(e) => setForm({ ...form, reference_link: e.target.value })}
-              placeholder="공유 폴더 경로 또는 URL"
-            />
+            <Label>참고 일러스트</Label>
+            <div className="flex gap-2">
+              <Input
+                value={form.reference_link ?? ""}
+                onChange={(e) => setForm({ ...form, reference_link: e.target.value })}
+                placeholder="이미지를 업로드하거나 링크를 붙여넣으세요"
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                disabled={uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploading ? "업로드 중..." : "이미지 업로드"}
+              </Button>
+            </div>
+            {uploadError && <p className="text-xs text-destructive">{uploadError}</p>}
+            {form.reference_link && form.reference_link.startsWith("http") && (
+              // eslint-disable-next-line @next/next/no-img-element -- external, unpredictable source
+              <img
+                src={form.reference_link}
+                alt="참고 이미지 미리보기"
+                className="h-24 w-24 rounded-md border object-cover"
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
+            )}
           </div>
           <div className="space-y-1.5">
             <Label>희망 완료일</Label>

@@ -15,6 +15,7 @@ import { SampleRequestDetailDialog } from "@/components/sample-request-detail-di
 import {
   listSampleRequests, createSampleRequest, updateSampleRequestStatus, deleteSampleRequest,
 } from "@/lib/supabase";
+import { deleteSampleRequestImage } from "@/lib/image-upload";
 import { SAMPLE_REQUEST_STATUSES, type Member, type SampleRequest, type SampleRequestStatus } from "@/lib/types";
 
 type Props = { member: Member };
@@ -130,10 +131,12 @@ export function SampleRequestBoard({ member }: Props) {
 
   async function handleDelete(id: string) {
     const prev = requests;
+    const target = prev.find((req) => req.id === id);
     setRequests((r) => r.filter((req) => req.id !== id));
     try {
       await deleteSampleRequest(id);
       setError(null);
+      if (target?.reference_link) deleteSampleRequestImage(target.reference_link);
     } catch {
       setRequests(prev);
       setError("요청을 삭제하지 못했습니다. 다시 시도해 주세요.");
