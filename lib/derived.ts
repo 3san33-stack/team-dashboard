@@ -205,6 +205,21 @@ export function uploadCountOnDay(logs: UploadLog[], day: Date): number {
   return logs.filter((l) => toLocalDateKey(new Date(l.created_at)) === key).length;
 }
 
+// One member's count in one category on one calendar day — the per-cell
+// number in the log-widget's quick-add buttons (today) and the day-detail
+// dialog (any past day).
+export function uploadCountFor(
+  logs: UploadLog[],
+  day: Date,
+  member: Weaver,
+  category: UploadLogCategory
+): number {
+  const key = toLocalDateKey(day);
+  return logs.filter(
+    (l) => l.member === member && l.category === category && toLocalDateKey(new Date(l.created_at)) === key
+  ).length;
+}
+
 export type MonthlyUploadHistoryRow = {
   month: string; // "YYYY-MM"
   counts: Record<Weaver, Record<UploadLogCategory, number>>;

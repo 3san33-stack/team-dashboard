@@ -10,9 +10,10 @@ import {
 import { listUploadLogs, createUploadLog, deleteUploadLog } from "@/lib/supabase";
 import {
   monthlyUploadHistory, startOfMonthGrid, startOfWeek, summarizeUploadLogs, toLocalDateKey,
-  uploadCountOnDay,
+  uploadCountFor, uploadCountOnDay,
 } from "@/lib/derived";
 import { downloadUploadLogsAsCsv } from "@/lib/export-csv";
+import { UploadLogDayDialog } from "@/components/upload-log-day-dialog";
 import {
   UPLOAD_LOG_CATEGORIES, WEAVERS, type UploadLog, type UploadLogCategory, type Weaver,
 } from "@/lib/types";
@@ -43,22 +44,13 @@ export function UploadLogWidget() {
       .finally(() => setLoaded(true));
   }, []);
 
-  function todayCount(member: Weaver, category: UploadLogCategory): number {
-    const todayKey = toLocalDateKey(new Date());
-    return logs.filter(
-      (l) =>
-        l.member === member &&
-        l.category === category &&
-        toLocalDateKey(new Date(l.created_at)) === todayKey
-    ).length;
-  }
-
-  async function handleLog(member: Weaver, category: UploadLogCategory) {
+  async function handleLog(member: Weaver, category: UploadLogCategory, date: Date = new Date()) {
     const tempId = `temp-${tempIdRef.current++}`;
-    const optimistic: UploadLog = { id: tempId, member, category, created_at: new Date().toISOString() };
+    const optimistic: UploadLog = { id: tempId, member, category, created_at: date.toISOString() };
     setLogs((prev) => [optimistic, ...prev]);
     try {
-      const created = await createUploadLog(member, category);
+      const isToday = toLocalDateKey(date) === toLocalDateKey(new Date());
+      const created = await createUploadLog(member, category, isToday ? undefined : date);
       setLogs((prev) => prev.map((l) => (l.id === tempId ? created : l)));
       setError(null);
     } catch {
@@ -67,17 +59,17 @@ export function UploadLogWidget() {
     }
   }
 
-  async function handleUndo(member: Weaver, category: UploadLogCategory) {
-    const todayKey = toLocalDateKey(new Date());
-    const todays = logs
+  async function handleUndo(member: Weaver, category: UploadLogCategory, date: Date = new Date()) {
+    const dateKey = toLocalDateKey(date);
+    const onDate = logs
       .filter(
         (l) =>
           l.member === member &&
           l.category === category &&
-          toLocalDateKey(new Date(l.created_at)) === todayKey
+          toLocalDateKey(new Date(l.created_at)) === dateKey
       )
       .sort((a, b) => b.created_at.localeCompare(a.created_at));
-    const latest = todays[0];
+    const latest = onDate[0];
     if (!latest) return;
     const prev = logs;
     setLogs((ls) => ls.filter((l) => l.id !== latest.id));
@@ -151,7 +143,7 @@ export function UploadLogWidget() {
                   <div key={member} className="flex flex-wrap items-center gap-2">
                     <span className="w-14 shrink-0 text-sm font-medium">{member}</span>
                     {UPLOAD_LOG_CATEGORIES.map((category) => {
-                      const count = todayCount(member, category);
+                      const count = uploadCountFor(logs, now, member, category);
                       return (
                         <div key={category} className="flex items-center gap-1">
                           <button
@@ -244,17 +236,31 @@ export function UploadLogWidget() {
                   </button>
                 </div>
 
+                <p className="text-xs text-muted-foreground">날짜를 클릭하면 그날 기록을 담당자·분류별로 보고 고칠 수 있어요.</p>
+
                 {range === "week" ? (
                   <div className="grid grid-cols-7 gap-1">
                     {weekDays.map((d, i) => {
                       const count = uploadCountOnDay(logs, d);
                       return (
-                        <div key={toLocalDateKey(d)} className="rounded-md border p-2 text-center">
-                          <p className="text-[10px] text-muted-foreground">
-                            {WEEKDAY_LABELS[i]} {d.getDate()}
-                          </p>
-                          <p className="text-lg font-semibold">{count}</p>
-                        </div>
+                        <UploadLogDayDialog
+                          key={toLocalDateKey(d)}
+                          date={d}
+                          logs={logs}
+                          onAdd={handleLog}
+                          onUndo={handleUndo}
+                          trigger={
+                            <button
+                              type="button"
+                              className="w-full rounded-md border p-2 text-center hover:bg-muted"
+                            >
+                              <p className="text-[10px] text-muted-foreground">
+                                {WEEKDAY_LABELS[i]} {d.getDate()}
+                              </p>
+                              <p className="text-lg font-semibold">{count}</p>
+                            </button>
+                          }
+                        />
                       );
                     })}
                   </div>
@@ -264,13 +270,22 @@ export function UploadLogWidget() {
                       const count = uploadCountOnDay(logs, d);
                       const inMonth = d.getMonth() === now.getMonth();
                       return (
-                        <div
+                        <UploadLogDayDialog
                           key={toLocalDateKey(d)}
-                          className={`rounded-md border p-1 text-center ${inMonth ? "" : "opacity-30"}`}
-                        >
-                          <p className="text-[10px] text-muted-foreground">{d.getDate()}</p>
-                          <p className="text-sm font-semibold">{count}</p>
-                        </div>
+                          date={d}
+                          logs={logs}
+                          onAdd={handleLog}
+                          onUndo={handleUndo}
+                          trigger={
+                            <button
+                              type="button"
+                              className={`w-full rounded-md border p-1 text-center hover:bg-muted ${inMonth ? "" : "opacity-30"}`}
+                            >
+                              <p className="text-[10px] text-muted-foreground">{d.getDate()}</p>
+                              <p className="text-sm font-semibold">{count}</p>
+                            </button>
+                          }
+                        />
                       );
                     })}
                   </div>

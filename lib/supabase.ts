@@ -112,11 +112,12 @@ export async function listUploadLogs(): Promise<UploadLog[]> {
 
 export async function createUploadLog(
   member: Weaver,
-  category: UploadLogCategory
+  category: UploadLogCategory,
+  at?: Date
 ): Promise<UploadLog> {
   const { data, error } = await supabase
     .from("upload_logs")
-    .insert({ member, category })
+    .insert(at ? { member, category, created_at: at.toISOString() } : { member, category })
     .select()
     .single();
   if (error) throw error;
