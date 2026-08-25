@@ -12,11 +12,14 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { uploadSampleRequestImage } from "@/lib/image-upload";
-import { MEMBERS, WEAVERS, type Member, type SampleRequestInput } from "@/lib/types";
+import { MEMBERS, WEAVERS, type Member, type SampleRequest, type SampleRequestInput } from "@/lib/types";
 
 type Props = {
-  trigger: React.ReactElement;
+  trigger?: React.ReactElement;
   defaultRequester: Member;
+  request?: SampleRequest;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   onSubmit: (input: SampleRequestInput) => Promise<void>;
 };
 
@@ -32,9 +35,27 @@ function buildDefaultForm(defaultRequester: Member): SampleRequestInput {
   };
 }
 
-export function SampleRequestFormDialog({ trigger, defaultRequester, onSubmit }: Props) {
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<SampleRequestInput>(buildDefaultForm(defaultRequester));
+function toFormInput(request: SampleRequest): SampleRequestInput {
+  return {
+    requester: request.requester,
+    weaver: request.weaver,
+    title: request.title,
+    spec_note: request.spec_note,
+    reference_link: request.reference_link,
+    desired_date: request.desired_date,
+    status: request.status,
+  };
+}
+
+export function SampleRequestFormDialog({
+  trigger, defaultRequester, request, open: openProp, onOpenChange, onSubmit,
+}: Props) {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = onOpenChange ?? setOpenState;
+  const [form, setForm] = useState<SampleRequestInput>(
+    request ? toFormInput(request) : buildDefaultForm(defaultRequester)
+  );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +66,7 @@ export function SampleRequestFormDialog({ trigger, defaultRequester, onSubmit }:
     try {
       await onSubmit(form);
       setOpen(false);
-      setForm(buildDefaultForm(defaultRequester));
+      if (!request) setForm(buildDefaultForm(defaultRequester));
     } catch {
       // onSubmit already surfaces the error to the user; keep the dialog
       // open with the user's input so they can retry.
@@ -70,10 +91,10 @@ export function SampleRequestFormDialog({ trigger, defaultRequester, onSubmit }:
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={trigger} />
+      {trigger && <DialogTrigger render={trigger} />}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>샘플 제직 요청</DialogTitle>
+          <DialogTitle>{request ? "샘플 제직 요청 수정" : "샘플 제직 요청"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
@@ -160,7 +181,7 @@ export function SampleRequestFormDialog({ trigger, defaultRequester, onSubmit }:
             />
           </div>
           <Button className="mt-2 w-full" disabled={!canSubmit} onClick={handleSubmit}>
-            요청하기
+            {request ? "수정하기" : "요청하기"}
           </Button>
         </div>
       </DialogContent>
