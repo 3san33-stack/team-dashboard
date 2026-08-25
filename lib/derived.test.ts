@@ -12,6 +12,7 @@ import {
   taskStatusEmoji,
   dayStatusEmojis,
   summarizeUploadLogs,
+  uploadCountOnDay,
 } from "./derived";
 import type { Task, UploadLog } from "./types";
 import { CATEGORIES } from "./types";
@@ -304,5 +305,21 @@ describe("summarizeUploadLogs", () => {
     ];
     const result = summarizeUploadLogs(logs, "month", now);
     expect(result.안도현.수정).toBe(2);
+  });
+});
+
+describe("uploadCountOnDay", () => {
+  it("counts all members/categories logged on the given local day", () => {
+    const day = new Date("2026-08-11T00:00:00");
+    const logs = [
+      makeLog({ id: "1", member: "구민석", category: "신규", created_at: "2026-08-11T01:00:00" }),
+      makeLog({ id: "2", member: "안도현", category: "동일", created_at: "2026-08-11T23:59:00" }),
+      makeLog({ id: "3", member: "구민석", category: "수정", created_at: "2026-08-12T00:00:01" }), // next day
+    ];
+    expect(uploadCountOnDay(logs, day)).toBe(2);
+  });
+
+  it("returns 0 for a day with no logs", () => {
+    expect(uploadCountOnDay([], new Date("2026-08-11T00:00:00"))).toBe(0);
   });
 });

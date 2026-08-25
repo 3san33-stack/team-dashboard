@@ -162,7 +162,7 @@ export function dayStatusEmojis(dayTasks: Task[], today: Date = new Date()): str
   return Array.from(new Set(emojis)).slice(0, 3);
 }
 
-function startOfWeek(now: Date): Date {
+export function startOfWeek(now: Date): Date {
   const day = now.getDay(); // 0=Sun..6=Sat
   const diffToMonday = day === 0 ? -6 : 1 - day;
   return new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday);
@@ -195,4 +195,12 @@ export function summarizeUploadLogs(
     summary[log.member][log.category] += 1;
   }
   return summary;
+}
+
+// Total upload_logs rows (all members/categories) on one calendar day.
+// Used by the bar chart (7 calls, this week) and mini calendar (up to 42
+// calls, one per grid cell) in upload-log-widget.tsx.
+export function uploadCountOnDay(logs: UploadLog[], day: Date): number {
+  const key = toLocalDateKey(day);
+  return logs.filter((l) => toLocalDateKey(new Date(l.created_at)) === key).length;
 }
