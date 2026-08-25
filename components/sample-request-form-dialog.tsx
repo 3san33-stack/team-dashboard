@@ -11,17 +11,17 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { MEMBERS, WEAVERS, type SampleRequestInput } from "@/lib/types";
+import { MEMBERS, WEAVERS, type Member, type SampleRequestInput } from "@/lib/types";
 
 type Props = {
   trigger: React.ReactElement;
-  defaultRequester: string;
+  defaultRequester: Member;
   onSubmit: (input: SampleRequestInput) => Promise<void>;
 };
 
-function buildDefaultForm(defaultRequester: string): SampleRequestInput {
+function buildDefaultForm(defaultRequester: Member): SampleRequestInput {
   return {
-    requester: defaultRequester as SampleRequestInput["requester"],
+    requester: defaultRequester,
     weaver: WEAVERS[0],
     title: "",
     spec_note: "",
