@@ -9,6 +9,7 @@ import { MemberProgressBars } from "@/components/member-progress-bars";
 import { TaskTable } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
 import { ContributionReport } from "@/components/contribution-report";
+import { CategoryDistribution } from "@/components/category-distribution";
 import { TaskCalendar } from "@/components/task-calendar";
 import { PersonalTodo } from "@/components/personal-todo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -195,22 +196,26 @@ export default function DashboardPage() {
 
         <TaskTable tasks={tasks} member={member} onEdit={setEditingTask} onDelete={handleDelete} />
 
-        <motion.div whileHover={{ y: -4 }}>
-          <PersonalTodo member={member} />
-        </motion.div>
-
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <motion.div whileHover={{ y: -4 }}>
-            <ContributionReport tasks={tasks} />
+            <PersonalTodo member={member} />
           </motion.div>
           <motion.div whileHover={{ y: -4 }}>
             <TaskCalendar tasks={tasks} member={member} />
           </motion.div>
         </div>
 
-        <motion.div whileHover={{ y: -4 }}>
-          <MemberProgressBars tasks={tasks} />
-        </motion.div>
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+          <motion.div whileHover={{ y: -4 }}>
+            <CategoryDistribution tasks={tasks} />
+          </motion.div>
+          <motion.div whileHover={{ y: -4 }}>
+            <ContributionReport tasks={tasks} />
+          </motion.div>
+          <motion.div whileHover={{ y: -4 }}>
+            <MemberProgressBars tasks={tasks} />
+          </motion.div>
+        </div>
 
         {editingTask && (
           <TaskFormDialog
