@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { CheckIcon } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bell, CheckIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { upcomingDeadlines } from "@/lib/derived";
 import type { Task } from "@/lib/types";
 
@@ -23,11 +23,28 @@ export function UpcomingDeadlines({ tasks }: Props) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>마감임박 업무</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <Popover>
+      <PopoverTrigger
+        render={
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            aria-label={`마감임박 업무 알림, ${items.length}건`}
+            title="마감임박 업무"
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white backdrop-blur-sm"
+          />
+        }
+      >
+        <Bell className="h-4 w-4" />
+        {items.length > 0 && (
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+            {items.length}
+          </span>
+        )}
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-80 text-foreground">
+        <p className="text-sm font-medium">마감임박 업무</p>
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground">마감임박 업무가 없습니다</p>
         ) : (
@@ -71,7 +88,7 @@ export function UpcomingDeadlines({ tasks }: Props) {
             </p>
           </>
         )}
-      </CardContent>
-    </Card>
+      </PopoverContent>
+    </Popover>
   );
 }

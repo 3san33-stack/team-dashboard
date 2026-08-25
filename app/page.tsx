@@ -143,6 +143,7 @@ export default function DashboardPage() {
             {member}님, 안녕하세요
           </h1>
           <div className="flex flex-wrap items-center gap-2">
+            <UpcomingDeadlines tasks={tasks} />
             <PushNotificationToggle member={member} />
             <ThemeToggle />
             <Link href="/report">
@@ -190,21 +191,13 @@ export default function DashboardPage() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <motion.div whileHover={{ y: -4 }}>
-            <MemberProgressBars tasks={tasks} />
-          </motion.div>
-          <motion.div whileHover={{ y: -4 }}>
-            <PersonalTodo member={member} />
-          </motion.div>
-          <motion.div whileHover={{ y: -4 }}>
-            <UpcomingDeadlines tasks={tasks} />
-          </motion.div>
-        </div>
-
         <SampleRequestBoard member={member} />
 
         <TaskTable tasks={tasks} member={member} onEdit={setEditingTask} onDelete={handleDelete} />
+
+        <motion.div whileHover={{ y: -4 }}>
+          <PersonalTodo member={member} />
+        </motion.div>
 
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <motion.div whileHover={{ y: -4 }}>
@@ -214,6 +207,10 @@ export default function DashboardPage() {
             <TaskCalendar tasks={tasks} member={member} />
           </motion.div>
         </div>
+
+        <motion.div whileHover={{ y: -4 }}>
+          <MemberProgressBars tasks={tasks} />
+        </motion.div>
 
         {editingTask && (
           <TaskFormDialog
