@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { listUploadLogs, createUploadLog, deleteUploadLog } from "@/lib/supabase";
 import {
-  monthlyUploadHistory, startOfMonthGrid, startOfWeek, summarizeUploadLogs, toLocalDateKey,
+  startOfMonthGrid, startOfWeek, summarizeUploadLogs, toLocalDateKey,
   uploadCountFor, uploadCountOnDay,
 } from "@/lib/derived";
 import { downloadUploadLogsAsCsv } from "@/lib/export-csv";
@@ -33,7 +33,6 @@ export function UploadLogWidget() {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
   const [range, setRange] = useState<"week" | "month">("week");
   const tempIdRef = useRef(0);
 
@@ -83,7 +82,6 @@ export function UploadLogWidget() {
   }
 
   const summary = summarizeUploadLogs(logs, range);
-  const history = monthlyUploadHistory(logs);
 
   const now = new Date();
   const weekStart = startOfWeek(now);
@@ -114,13 +112,6 @@ export function UploadLogWidget() {
             className="text-xs text-primary underline disabled:pointer-events-none disabled:text-muted-foreground disabled:no-underline"
           >
             엑셀로 내보내기
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowHistory((v) => !v)}
-            className="text-xs text-primary underline"
-          >
-            {showHistory ? "숨기기" : "전체 기록 보기"}
           </button>
           <button
             type="button"
@@ -313,45 +304,6 @@ export function UploadLogWidget() {
                     })}
                   </TableBody>
                 </Table>
-              </div>
-            )}
-
-            {showHistory && (
-              <div className="space-y-3 border-t pt-4">
-                {history.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">기록이 없습니다.</p>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>월</TableHead>
-                        <TableHead>담당자</TableHead>
-                        {UPLOAD_LOG_CATEGORIES.map((c) => <TableHead key={c}>{c}</TableHead>)}
-                        <TableHead>합계</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {history.map((row) =>
-                        WEAVERS.map((member, i) => {
-                          const counts = row.counts[member];
-                          const total = UPLOAD_LOG_CATEGORIES.reduce((sum, c) => sum + counts[c], 0);
-                          return (
-                            <TableRow key={`${row.month}-${member}`}>
-                              {i === 0 && (
-                                <TableCell rowSpan={WEAVERS.length} className="align-top font-medium">
-                                  {row.month}
-                                </TableCell>
-                              )}
-                              <TableCell>{member}</TableCell>
-                              {UPLOAD_LOG_CATEGORIES.map((c) => <TableCell key={c}>{counts[c]}</TableCell>)}
-                              <TableCell className="font-medium">{total}</TableCell>
-                            </TableRow>
-                          );
-                        })
-                      )}
-                    </TableBody>
-                  </Table>
-                )}
               </div>
             )}
           </>

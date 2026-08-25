@@ -219,33 +219,3 @@ export function uploadCountFor(
     (l) => l.member === member && l.category === category && toLocalDateKey(new Date(l.created_at)) === key
   ).length;
 }
-
-export type MonthlyUploadHistoryRow = {
-  month: string; // "YYYY-MM"
-  counts: Record<Weaver, Record<UploadLogCategory, number>>;
-};
-
-// One row per calendar month that has at least one log, newest first —
-// the "전체 기록" table in upload-log-widget.tsx, as opposed to
-// summarizeUploadLogs' single current week/month snapshot.
-export function monthlyUploadHistory(logs: UploadLog[]): MonthlyUploadHistoryRow[] {
-  const byMonth = new Map<string, Record<Weaver, Record<UploadLogCategory, number>>>();
-
-  for (const log of logs) {
-    const created = new Date(log.created_at);
-    const month = `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(2, "0")}`;
-    if (!byMonth.has(month)) {
-      byMonth.set(
-        month,
-        Object.fromEntries(
-          WEAVERS.map((w) => [w, Object.fromEntries(UPLOAD_LOG_CATEGORIES.map((c) => [c, 0]))])
-        ) as Record<Weaver, Record<UploadLogCategory, number>>
-      );
-    }
-    byMonth.get(month)![log.member][log.category] += 1;
-  }
-
-  return Array.from(byMonth.entries())
-    .map(([month, counts]) => ({ month, counts }))
-    .sort((a, b) => b.month.localeCompare(a.month));
-}
