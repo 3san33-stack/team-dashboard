@@ -37,3 +37,24 @@ export type PersonalTodoItem = {
   done: boolean;
   created_at: string;
 };
+
+export const WEAVERS = ["구민석", "안도현"] as const;
+export type Weaver = (typeof WEAVERS)[number];
+
+export const SAMPLE_REQUEST_STATUSES = ["요청됨", "확인함", "제직중", "완료"] as const;
+export type SampleRequestStatus = (typeof SAMPLE_REQUEST_STATUSES)[number];
+
+export type SampleRequest = {
+  id: string;
+  requester: Member;
+  weaver: Weaver;
+  title: string;
+  spec_note: string | null;
+  reference_link: string | null;
+  desired_date: string | null;
+  status: SampleRequestStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SampleRequestInput = Omit<SampleRequest, "id" | "created_at" | "updated_at">;
