@@ -1,21 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { SampleRequestFormDialog } from "@/components/sample-request-form-dialog";
+import { SampleRequestDetailDialog } from "@/components/sample-request-detail-dialog";
 import { listSampleRequests, createSampleRequest, updateSampleRequestStatus } from "@/lib/supabase";
 import { SAMPLE_REQUEST_STATUSES, type Member, type SampleRequest, type SampleRequestStatus } from "@/lib/types";
 
 type Props = { member: Member };
 
+const ARCHIVE_STATUS: SampleRequestStatus = "완료";
+
 export function SampleRequestBoard({ member }: Props) {
   const [requests, setRequests] = useState<SampleRequest[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showArchive, setShowArchive] = useState(false);
 
   useEffect(() => {
     listSampleRequests()
@@ -74,40 +77,49 @@ export function SampleRequestBoard({ member }: Props) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {SAMPLE_REQUEST_STATUSES.map((status) => {
               const cards = requests.filter((r) => r.status === status);
+              const isArchiveColumn = status === ARCHIVE_STATUS;
+              const collapsed = isArchiveColumn && !showArchive;
+
               return (
                 <div key={status} className="space-y-2">
-                  <h4 className="text-sm font-semibold text-muted-foreground">
-                    {status} ({cards.length})
-                  </h4>
-                  <div className="space-y-2">
-                    {cards.length === 0 ? (
-                      <p className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
-                        없음
-                      </p>
-                    ) : (
-                      cards.map((req) => (
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm font-semibold text-muted-foreground">
+                      {status} ({cards.length})
+                    </h4>
+                    {isArchiveColumn && cards.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowArchive((v) => !v)}
+                        className="text-xs text-primary underline"
+                      >
+                        {showArchive ? "숨기기" : "보관함 보기"}
+                      </button>
+                    )}
+                  </div>
+
+                  {cards.length === 0 ? (
+                    <p className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+                      없음
+                    </p>
+                  ) : collapsed ? (
+                    <p className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
+                      보관함에 {cards.length}건 있습니다
+                    </p>
+                  ) : (
+                    <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
+                      {cards.map((req) => (
                         <div key={req.id} className="space-y-2 rounded-md border p-3">
-                          <p className="text-sm font-medium">{req.title}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {req.requester} → {req.weaver}
-                          </p>
-                          {req.desired_date && (
-                            <p className="text-xs text-muted-foreground">희망일 {req.desired_date}</p>
-                          )}
-                          {req.reference_link && (
-                            req.reference_link.startsWith("http") ? (
-                              <a
-                                href={req.reference_link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-xs text-primary underline"
-                              >
-                                <ExternalLink className="h-3 w-3" /> 참고 파일
-                              </a>
-                            ) : (
-                              <p className="truncate text-xs text-muted-foreground">{req.reference_link}</p>
-                            )
-                          )}
+                          <SampleRequestDetailDialog
+                            request={req}
+                            trigger={
+                              <button type="button" className="block w-full text-left">
+                                <p className="truncate text-sm font-medium">{req.title}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {req.requester} → {req.weaver}
+                                </p>
+                              </button>
+                            }
+                          />
                           <Select
                             value={req.status}
                             onValueChange={(v) => v && handleStatusChange(req.id, v as SampleRequestStatus)}
@@ -120,9 +132,9 @@ export function SampleRequestBoard({ member }: Props) {
                             </SelectContent>
                           </Select>
                         </div>
-                      ))
-                    )}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
