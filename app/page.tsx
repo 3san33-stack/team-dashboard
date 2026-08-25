@@ -14,6 +14,7 @@ import { PersonalTodo } from "@/components/personal-todo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PushNotificationToggle } from "@/components/push-notification-toggle";
 import { UpcomingDeadlines } from "@/components/upcoming-deadlines";
+import { SampleRequestBoard } from "@/components/sample-request-board";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -200,6 +201,8 @@ export default function DashboardPage() {
             <UpcomingDeadlines tasks={tasks} />
           </motion.div>
         </div>
+
+        <SampleRequestBoard member={member} />
 
         <TaskTable tasks={tasks} member={member} onEdit={setEditingTask} onDelete={handleDelete} />
 
