@@ -124,7 +124,7 @@ export function UploadLogWidget() {
           <p className="text-sm text-muted-foreground">불러오는 중...</p>
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
               <div className="space-y-3">
                 {WEAVERS.map((member) => (
                   <div key={member} className="flex flex-wrap items-center gap-2">
@@ -156,15 +156,15 @@ export function UploadLogWidget() {
                 ))}
               </div>
 
-              <div className="space-y-4">
+              <div className="flex flex-wrap items-start gap-6">
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">이번 주</p>
-                  <div className="flex h-16 items-end gap-1">
+                  <div className="flex h-10 items-end gap-1">
                     {weekDays.map((d, i) => {
                       const count = weekCounts[i];
                       const pct = Math.round((count / maxWeekCount) * 100);
                       return (
-                        <div key={toLocalDateKey(d)} className="flex flex-1 flex-col items-center gap-1">
+                        <div key={toLocalDateKey(d)} className="flex w-4 flex-col items-center gap-1">
                           <div
                             title={`${WEEKDAY_LABELS[i]} ${count}건`}
                             className="min-h-[2px] w-full rounded-t bg-primary/70"
@@ -179,7 +179,7 @@ export function UploadLogWidget() {
 
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">{now.getMonth() + 1}월</p>
-                  <div className="grid grid-cols-7 gap-1">
+                  <div className="grid grid-cols-7 gap-0.5">
                     {monthDays.map((d) => {
                       const count = uploadCountOnDay(logs, d);
                       const inMonth = d.getMonth() === now.getMonth();
@@ -187,7 +187,7 @@ export function UploadLogWidget() {
                         <div
                           key={toLocalDateKey(d)}
                           title={`${d.getMonth() + 1}/${d.getDate()} ${count}건`}
-                          className={`aspect-square rounded-sm ${intensityClass(count)} ${inMonth ? "" : "opacity-30"}`}
+                          className={`h-3.5 w-3.5 rounded-sm ${intensityClass(count)} ${inMonth ? "" : "opacity-30"}`}
                         />
                       );
                     })}
