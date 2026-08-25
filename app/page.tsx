@@ -16,6 +16,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { PushNotificationToggle } from "@/components/push-notification-toggle";
 import { UpcomingDeadlines } from "@/components/upcoming-deadlines";
 import { SampleRequestBoard } from "@/components/sample-request-board";
+import { UploadLogWidget } from "@/components/upload-log-widget";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -216,6 +217,8 @@ export default function DashboardPage() {
             <MemberProgressBars tasks={tasks} />
           </motion.div>
         </div>
+
+        <UploadLogWidget />
 
         {editingTask && (
           <TaskFormDialog
