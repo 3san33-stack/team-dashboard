@@ -12,6 +12,7 @@ type Props = {
   request: SampleRequest;
   trigger: React.ReactElement;
   onDelete: (id: string) => void;
+  onEdit: (request: SampleRequest) => void;
 };
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -23,7 +24,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function SampleRequestDetailDialog({ request, trigger, onDelete }: Props) {
+export function SampleRequestDetailDialog({ request, trigger, onDelete, onEdit }: Props) {
   const [open, setOpen] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
 
@@ -87,6 +88,16 @@ export function SampleRequestDetailDialog({ request, trigger, onDelete }: Props)
             </div>
           )}
 
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              setOpen(false);
+              onEdit(request);
+            }}
+          >
+            수정
+          </Button>
           <Button variant="destructive" className="w-full" onClick={handleDelete}>
             요청 삭제
           </Button>
