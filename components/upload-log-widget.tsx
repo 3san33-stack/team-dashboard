@@ -243,6 +243,39 @@ export function UploadLogWidget() {
                     이번 달
                   </button>
                 </div>
+
+                {range === "week" ? (
+                  <div className="grid grid-cols-7 gap-1">
+                    {weekDays.map((d, i) => {
+                      const count = uploadCountOnDay(logs, d);
+                      return (
+                        <div key={toLocalDateKey(d)} className="rounded-md border p-2 text-center">
+                          <p className="text-[10px] text-muted-foreground">
+                            {WEEKDAY_LABELS[i]} {d.getDate()}
+                          </p>
+                          <p className="text-lg font-semibold">{count}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-7 gap-1">
+                    {monthDays.map((d) => {
+                      const count = uploadCountOnDay(logs, d);
+                      const inMonth = d.getMonth() === now.getMonth();
+                      return (
+                        <div
+                          key={toLocalDateKey(d)}
+                          className={`rounded-md border p-1 text-center ${inMonth ? "" : "opacity-30"}`}
+                        >
+                          <p className="text-[10px] text-muted-foreground">{d.getDate()}</p>
+                          <p className="text-sm font-semibold">{count}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
                 <Table>
                   <TableHeader>
                     <TableRow>
