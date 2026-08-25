@@ -13,19 +13,24 @@ import {
 import { SampleRequestFormDialog } from "@/components/sample-request-form-dialog";
 import { SampleRequestDetailDialog } from "@/components/sample-request-detail-dialog";
 import {
-  listSampleRequests, createSampleRequest, updateSampleRequestStatus, deleteSampleRequest,
+  listSampleRequests, createSampleRequest, updateSampleRequestStatus, updateSampleRequest,
+  deleteSampleRequest,
 } from "@/lib/supabase";
 import { deleteSampleRequestImage } from "@/lib/image-upload";
-import { SAMPLE_REQUEST_STATUSES, type Member, type SampleRequest, type SampleRequestStatus } from "@/lib/types";
+import {
+  SAMPLE_REQUEST_STATUSES, type Member, type SampleRequest, type SampleRequestInput,
+  type SampleRequestStatus,
+} from "@/lib/types";
 
 type Props = { member: Member };
 
 const ARCHIVE_STATUS: SampleRequestStatus = "완료";
 
-function RequestCard({ req, onStatusChange, onDelete }: {
+function RequestCard({ req, onStatusChange, onDelete, onEdit }: {
   req: SampleRequest;
   onStatusChange: (id: string, status: SampleRequestStatus) => void;
   onDelete: (id: string) => void;
+  onEdit: (request: SampleRequest) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: req.id });
 
@@ -47,6 +52,7 @@ function RequestCard({ req, onStatusChange, onDelete }: {
         <SampleRequestDetailDialog
           request={req}
           onDelete={onDelete}
+          onEdit={onEdit}
           trigger={
             <button type="button" className="block w-full text-left">
               <p className="truncate text-sm font-medium">{req.title}</p>
@@ -91,6 +97,7 @@ export function SampleRequestBoard({ member }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [showArchive, setShowArchive] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [editingRequest, setEditingRequest] = useState<SampleRequest | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -140,6 +147,18 @@ export function SampleRequestBoard({ member }: Props) {
     } catch {
       setRequests(prev);
       setError("요청을 삭제하지 못했습니다. 다시 시도해 주세요.");
+    }
+  }
+
+  async function handleUpdate(id: string, input: SampleRequestInput) {
+    try {
+      const updated = await updateSampleRequest(id, input);
+      setRequests((prev) => prev.map((req) => (req.id === id ? updated : req)));
+      setError(null);
+      setEditingRequest(null);
+    } catch {
+      setError("요청을 수정하지 못했습니다. 다시 시도해 주세요.");
+      throw new Error("update failed");
     }
   }
 
@@ -218,6 +237,7 @@ export function SampleRequestBoard({ member }: Props) {
                             req={req}
                             onStatusChange={handleStatusChange}
                             onDelete={handleDelete}
+                            onEdit={setEditingRequest}
                           />
                         ))}
                       </div>
@@ -239,6 +259,16 @@ export function SampleRequestBoard({ member }: Props) {
           </DndContext>
         )}
       </CardContent>
+      {editingRequest && (
+        <SampleRequestFormDialog
+          key={editingRequest.id}
+          defaultRequester={editingRequest.requester}
+          request={editingRequest}
+          open={true}
+          onOpenChange={(open) => !open && setEditingRequest(null)}
+          onSubmit={(input) => handleUpdate(editingRequest.id, input)}
+        />
+      )}
     </Card>
   );
 }
