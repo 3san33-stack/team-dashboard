@@ -94,3 +94,8 @@ export async function updateSampleRequestStatus(
     .eq("id", id);
   if (error) throw error;
 }
+
+export async function deleteSampleRequest(id: string): Promise<void> {
+  const { error } = await supabase.from("sample_requests").delete().eq("id", id);
+  if (error) throw error;
+}

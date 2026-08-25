@@ -12,16 +12,19 @@ import {
 } from "@/components/ui/select";
 import { SampleRequestFormDialog } from "@/components/sample-request-form-dialog";
 import { SampleRequestDetailDialog } from "@/components/sample-request-detail-dialog";
-import { listSampleRequests, createSampleRequest, updateSampleRequestStatus } from "@/lib/supabase";
+import {
+  listSampleRequests, createSampleRequest, updateSampleRequestStatus, deleteSampleRequest,
+} from "@/lib/supabase";
 import { SAMPLE_REQUEST_STATUSES, type Member, type SampleRequest, type SampleRequestStatus } from "@/lib/types";
 
 type Props = { member: Member };
 
 const ARCHIVE_STATUS: SampleRequestStatus = "완료";
 
-function RequestCard({ req, onStatusChange }: {
+function RequestCard({ req, onStatusChange, onDelete }: {
   req: SampleRequest;
   onStatusChange: (id: string, status: SampleRequestStatus) => void;
+  onDelete: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: req.id });
 
@@ -42,6 +45,7 @@ function RequestCard({ req, onStatusChange }: {
       <div className="min-w-0 flex-1 space-y-2">
         <SampleRequestDetailDialog
           request={req}
+          onDelete={onDelete}
           trigger={
             <button type="button" className="block w-full text-left">
               <p className="truncate text-sm font-medium">{req.title}</p>
@@ -124,6 +128,18 @@ export function SampleRequestBoard({ member }: Props) {
     }
   }
 
+  async function handleDelete(id: string) {
+    const prev = requests;
+    setRequests((r) => r.filter((req) => req.id !== id));
+    try {
+      await deleteSampleRequest(id);
+      setError(null);
+    } catch {
+      setRequests(prev);
+      setError("요청을 삭제하지 못했습니다. 다시 시도해 주세요.");
+    }
+  }
+
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
   }
@@ -194,7 +210,12 @@ export function SampleRequestBoard({ member }: Props) {
                     ) : (
                       <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
                         {cards.map((req) => (
-                          <RequestCard key={req.id} req={req} onStatusChange={handleStatusChange} />
+                          <RequestCard
+                            key={req.id}
+                            req={req}
+                            onStatusChange={handleStatusChange}
+                            onDelete={handleDelete}
+                          />
                         ))}
                       </div>
                     )}
