@@ -124,7 +124,7 @@ export function UploadLogWidget() {
           <p className="text-sm text-muted-foreground">불러오는 중...</p>
         ) : (
           <>
-            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+            <div className="flex flex-wrap items-start gap-8">
               <div className="space-y-3">
                 {WEAVERS.map((member) => (
                   <div key={member} className="flex flex-wrap items-center gap-2">
@@ -159,16 +159,20 @@ export function UploadLogWidget() {
               <div className="flex flex-wrap items-start gap-6">
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">이번 주</p>
-                  <div className="flex h-10 items-end gap-1">
+                  <div className="flex items-end gap-1.5">
                     {weekDays.map((d, i) => {
                       const count = weekCounts[i];
-                      const pct = Math.round((count / maxWeekCount) * 100);
+                      // Pixel height, not %: the column div below sizes to its
+                      // content (flex items-end doesn't stretch it), so a
+                      // percentage height here has no containing block to
+                      // resolve against and silently renders as 0px.
+                      const barPx = count > 0 ? Math.max(Math.round((count / maxWeekCount) * 48), 12) : 2;
                       return (
-                        <div key={toLocalDateKey(d)} className="flex w-4 flex-col items-center gap-1">
+                        <div key={toLocalDateKey(d)} className="flex w-5 flex-col items-center gap-1">
                           <div
                             title={`${WEEKDAY_LABELS[i]} ${count}건`}
-                            className="min-h-[2px] w-full rounded-t bg-primary/70"
-                            style={{ height: `${count > 0 ? Math.max(pct, 8) : 0}%` }}
+                            className="w-full rounded-t bg-primary/70"
+                            style={{ height: `${barPx}px` }}
                           />
                           <span className="text-[10px] text-muted-foreground">{WEEKDAY_LABELS[i]}</span>
                         </div>
