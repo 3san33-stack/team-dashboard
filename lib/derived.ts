@@ -1,4 +1,8 @@
-import { CATEGORIES, type Category, type Member, type Priority, type Status, type Task } from "./types";
+import {
+  CATEGORIES, UPLOAD_LOG_CATEGORIES, WEAVERS,
+  type Category, type Member, type Priority, type Status, type Task,
+  type UploadLog, type UploadLogCategory, type Weaver,
+} from "./types";
 
 // Assumes both dates are interpreted in the server/browser's local timezone (KST for this team).
 // A UTC-pinned deployment (e.g. some serverless runtimes) could shift "today" by a day near midnight.
@@ -156,4 +160,39 @@ export function taskStatusEmoji(task: Task, today: Date = new Date()): "✅" | "
 export function dayStatusEmojis(dayTasks: Task[], today: Date = new Date()): string[] {
   const emojis = dayTasks.map((t) => taskStatusEmoji(t, today));
   return Array.from(new Set(emojis)).slice(0, 3);
+}
+
+function startOfWeek(now: Date): Date {
+  const day = now.getDay(); // 0=Sun..6=Sat
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday);
+}
+
+function dateRangeFor(range: "week" | "month", now: Date): [Date, Date] {
+  if (range === "week") {
+    const start = startOfWeek(now);
+    const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6, 23, 59, 59, 999);
+    return [start, end];
+  }
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  return [start, end];
+}
+
+export function summarizeUploadLogs(
+  logs: UploadLog[],
+  range: "week" | "month",
+  now: Date = new Date()
+): Record<Weaver, Record<UploadLogCategory, number>> {
+  const [start, end] = dateRangeFor(range, now);
+  const summary = Object.fromEntries(
+    WEAVERS.map((w) => [w, Object.fromEntries(UPLOAD_LOG_CATEGORIES.map((c) => [c, 0]))])
+  ) as Record<Weaver, Record<UploadLogCategory, number>>;
+
+  for (const log of logs) {
+    const created = new Date(log.created_at);
+    if (created < start || created > end) continue;
+    summary[log.member][log.category] += 1;
+  }
+  return summary;
 }

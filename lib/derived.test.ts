@@ -11,9 +11,20 @@ import {
   upcomingDeadlines,
   taskStatusEmoji,
   dayStatusEmojis,
+  summarizeUploadLogs,
 } from "./derived";
-import type { Task } from "./types";
+import type { Task, UploadLog } from "./types";
 import { CATEGORIES } from "./types";
+
+function makeLog(overrides: Partial<UploadLog>): UploadLog {
+  return {
+    id: "1",
+    member: "구민석",
+    category: "신규",
+    created_at: "2026-08-11T00:00:00Z",
+    ...overrides,
+  };
+}
 
 function makeTask(overrides: Partial<Task>): Task {
   return {
@@ -256,5 +267,42 @@ describe("dayStatusEmojis", () => {
 
   it("returns an empty array for no tasks", () => {
     expect(dayStatusEmojis([], today)).toEqual([]);
+  });
+});
+
+describe("summarizeUploadLogs", () => {
+  // 2026-08-11 is a Tuesday. That week runs Mon 2026-08-10 ~ Sun 2026-08-16.
+  const now = new Date("2026-08-11T12:00:00");
+
+  it("counts logs within the current week per member/category", () => {
+    const logs = [
+      makeLog({ id: "1", member: "구민석", category: "신규", created_at: "2026-08-10T00:00:01" }), // Mon, in range
+      makeLog({ id: "2", member: "구민석", category: "신규", created_at: "2026-08-16T23:59:59" }), // Sun, in range
+      makeLog({ id: "3", member: "구민석", category: "수정", created_at: "2026-08-11T09:00:00" }),
+      makeLog({ id: "4", member: "안도현", category: "동일", created_at: "2026-08-12T09:00:00" }),
+    ];
+    const result = summarizeUploadLogs(logs, "week", now);
+    expect(result.구민석.신규).toBe(2);
+    expect(result.구민석.수정).toBe(1);
+    expect(result.구민석.동일).toBe(0);
+    expect(result.안도현.동일).toBe(1);
+  });
+
+  it("excludes logs from the previous week", () => {
+    const logs = [
+      makeLog({ id: "1", member: "구민석", category: "신규", created_at: "2026-08-09T23:59:59" }), // Sun, previous week
+    ];
+    const result = summarizeUploadLogs(logs, "week", now);
+    expect(result.구민석.신규).toBe(0);
+  });
+
+  it("counts logs within the current month, including the last day", () => {
+    const logs = [
+      makeLog({ id: "1", member: "안도현", category: "수정", created_at: "2026-08-01T00:00:01" }),
+      makeLog({ id: "2", member: "안도현", category: "수정", created_at: "2026-08-31T23:59:59" }),
+      makeLog({ id: "3", member: "안도현", category: "수정", created_at: "2026-09-01T00:00:00" }), // next month, excluded
+    ];
+    const result = summarizeUploadLogs(logs, "month", now);
+    expect(result.안도현.수정).toBe(2);
   });
 });
