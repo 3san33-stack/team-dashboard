@@ -46,10 +46,12 @@ export function ExcelImportButton({ tasks, onImported }: Props) {
             await updateTask(existingId, row.input);
             updated++;
           } else {
-            await createTask(row.input);
+            const createdTask = await createTask(row.input);
+            existingByKey.set(key, createdTask.id);
             created++;
           }
-        } catch {
+        } catch (err) {
+          console.error(`엑셀 업로드 실패 (행 ${row.rowNumber}):`, err);
           failed++;
         }
       }
