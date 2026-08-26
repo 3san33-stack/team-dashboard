@@ -1,3 +1,4 @@
+import * as XLSX from "xlsx";
 import {
   CATEGORIES, MEMBERS, PRIORITIES, STATUSES,
   type Category, type Member, type Priority, type Status, type TaskInput,
@@ -59,4 +60,53 @@ export function mapImportRow(
       comment: toTextOrNull(row["팀장코멘트"]),
     },
   };
+}
+
+const REQUIRED_HEADERS = [
+  "담당자", "프로젝트", "업무구분", "세부업무", "우선순위",
+  "시작일", "마감일", "진행률", "상태", "팀장코멘트",
+] as const;
+
+export type ParsedImportRow = { input: TaskInput; rowNumber: number };
+export type ImportParseResult = {
+  rows: ParsedImportRow[];
+  skipped: { rowNumber: number; reason: string }[];
+};
+
+export async function parseTaskImportFile(file: File): Promise<ImportParseResult> {
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
+  const sheet = workbook.Sheets["통합DB"];
+  if (!sheet) throw new Error("통합DB 시트를 찾을 수 없습니다");
+
+  const grid = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: null });
+  const [header, ...dataRows] = grid;
+  if (!header) throw new Error("통합DB 시트에 헤더 행이 없습니다");
+
+  for (const required of REQUIRED_HEADERS) {
+    if (!header.includes(required)) {
+      throw new Error(`통합DB 시트에 "${required}" 열이 없습니다`);
+    }
+  }
+
+  const rows: ParsedImportRow[] = [];
+  const skipped: ImportParseResult["skipped"] = [];
+
+  dataRows.forEach((dataRow, i) => {
+    const rowNumber = i + 2; // header is row 1
+    const record: Record<string, unknown> = {};
+    header.forEach((h, colIdx) => {
+      record[h as string] = dataRow[colIdx];
+    });
+    if (record["담당자"] == null && record["프로젝트"] == null) return; // blank row
+
+    const result = mapImportRow(record);
+    if ("skipReason" in result) {
+      skipped.push({ rowNumber, reason: result.skipReason });
+    } else {
+      rows.push({ input: result.input, rowNumber });
+    }
+  });
+
+  return { rows, skipped };
 }
