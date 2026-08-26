@@ -17,6 +17,7 @@ import { PushNotificationToggle } from "@/components/push-notification-toggle";
 import { UpcomingDeadlines } from "@/components/upcoming-deadlines";
 import { SampleRequestBoard } from "@/components/sample-request-board";
 import { UploadLogWidget } from "@/components/upload-log-widget";
+import { ExcelImportButton } from "@/components/excel-import-button";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -166,6 +167,7 @@ export default function DashboardPage() {
             >
               {member}님 · 전환
             </motion.button>
+            <ExcelImportButton tasks={tasks} onImported={refresh} />
             <TaskFormDialog
               member={member}
               trigger={
