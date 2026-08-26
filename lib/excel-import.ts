@@ -20,9 +20,17 @@ function toStatus(value: unknown): Status {
   return (STATUSES as readonly unknown[]).includes(value) ? (value as Status) : "예정";
 }
 
+// Excel stores multi-line cell text with \r\n; normalize to \n so the same
+// project name matches consistently regardless of which tool last wrote a
+// given task row (a \r\n vs \n mismatch alone was enough to make the
+// import's dedupe key treat one real task as two).
+function normalizeLineEndings(value: string): string {
+  return value.replace(/\r\n/g, "\n");
+}
+
 function toTextOrNull(value: unknown): string | null {
   if (value === null || value === undefined || value === 0 || value === "") return null;
-  return String(value);
+  return normalizeLineEndings(String(value));
 }
 
 export function mapImportRow(
@@ -42,6 +50,7 @@ export function mapImportRow(
   if (typeof project !== "string" || project.trim() === "") {
     return { skipReason: "프로젝트 이름이 없습니다" };
   }
+  const normalizedProject = normalizeLineEndings(project);
 
   const progressRaw = row["진행률"];
   const progress = typeof progressRaw === "number" ? Math.round(progressRaw * 100) : 0;
@@ -49,7 +58,7 @@ export function mapImportRow(
   return {
     input: {
       member: member as Member,
-      project,
+      project: normalizedProject,
       category: category as Category,
       detail: toTextOrNull(row["세부업무"]),
       priority: toPriority(row["우선순위"]),
@@ -98,7 +107,11 @@ export async function parseTaskImportFile(file: File): Promise<ImportParseResult
     header.forEach((h, colIdx) => {
       record[h as string] = dataRow[colIdx];
     });
-    if (record["담당자"] == null && record["프로젝트"] == null) return; // blank row
+    const memberCell = record["담당자"];
+    const projectCell = record["프로젝트"];
+    const memberBlank = memberCell == null || memberCell === "";
+    const projectBlank = projectCell == null || projectCell === "";
+    if (memberBlank && projectBlank) return; // blank row (including formula-filled "" cells)
 
     const result = mapImportRow(record);
     if ("skipReason" in result) {

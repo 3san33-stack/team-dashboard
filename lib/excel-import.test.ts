@@ -81,4 +81,15 @@ describe("mapImportRow", () => {
     const result = mapImportRow(makeRow({ 진행률: null }));
     expect("input" in result && result.input.progress).toBe(0);
   });
+
+  it("normalizes \\r\\n to \\n in multi-line project/detail/comment text", () => {
+    const result = mapImportRow(makeRow({
+      프로젝트: "행거치프 손수건 디자인\r\n비나 샘플요청",
+      세부업무: "1차\r\n2차",
+      팀장코멘트: "코멘트1\r\n코멘트2",
+    }));
+    expect("input" in result && result.input.project).toBe("행거치프 손수건 디자인\n비나 샘플요청");
+    expect("input" in result && result.input.detail).toBe("1차\n2차");
+    expect("input" in result && result.input.comment).toBe("코멘트1\n코멘트2");
+  });
 });
