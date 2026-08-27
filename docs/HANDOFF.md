@@ -76,18 +76,17 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
 - `components/excel-import-button.tsx` — 헤더의 "엑셀 업로드" 버튼. 통합DB
   시트를 읽어 담당자+프로젝트+업무구분 일치 시 갱신, 없으면 신규 추가
 - `components/ui/popover.tsx` — shadcn CLI로 추가된 Popover(마감임박 알림에 사용)
-- `components/side-rail.tsx` — **`min-[1700px]`에서만** 보이는 우측 여백의 얇은
-  스티키 레일. 오늘 날짜·팀 현황(전체/진행중/완료/지연)·마감 임박/지연 목록·
-  부서장님 보고 링크. Card가 아니라 hairline divider만 써서 위젯과 구분됨.
-  순수 파생 데이터만 사용(추가 Supabase 호출 없음). `app/page.tsx` 루트는
-  `min-[1700px]`에서 `grid-cols-[1fr_1200px_1fr]`(max-w 1760)로 바뀌어 컨텐츠는
-  페이지 정중앙 유지, 레일은 오른쪽 1fr 트랙에 위치. 그보다 좁으면 평범한
-  가운데 정렬 1열 + 레일 숨김(헤더의 마감임박 벨·부서장님 보고가 `min-[1700px]:hidden`
-  으로 그때만 다시 나타남)
-- `components/left-rail.tsx` — 왼쪽 여백 레일(side-rail과 동일 스타일). 오른쪽=팀,
-  왼쪽=로그인한 본인: 내 진행중/지연/완료/평균진행률 + 내 마감 임박·지연 5건.
-  `memberSummary`, `upcomingDeadlines(tasks, limit, member)` 사용. `min-[1700px]`에서
-  grid 왼쪽 1fr 트랙에 `justify-self-end`로 배치
+- `components/side-rail.tsx` / `components/left-rail.tsx` — **`min-[1700px]`에서만**
+  보이는 좌우 여백 레일. `app/page.tsx` 루트가 그 폭에서 `grid-cols-[1fr_1200px_1fr]`
+  (max-w 1760)로 바뀌어 **컨텐츠는 페이지 정중앙 유지**, 레일은 양옆 1fr 트랙에
+  `justify-self-end`(왼쪽)/기본(오른쪽)로 컨텐츠에 붙음. 둘 다 `sticky top-[22vh]`.
+  Card 아님(hairline만) — 위젯과 구분되는 chrome.
+  - **왼쪽 = 섹션 바로가기 네비**: `#samples #tasks #planner #analytics #uploads`
+    앵커(page.tsx의 `<section id>`/`<div id>` + `scroll-mt-6`, `<html scroll-smooth>`).
+    IntersectionObserver로 현재 섹션 하이라이트. 여기 없으면 다른 데 없는 정보.
+  - **오른쪽 = 오늘 + 마감 임박·지연 목록 + 부서장님 보고 링크**. (팀 현황 4숫자는
+    상단 요약카드와 중복이라 뺌.) `min-[1700px]:hidden`으로 헤더의 마감임박 벨·
+    보고 링크가 그보다 좁을 때만 다시 나타남.
 
 ### 페이지 / API
 

@@ -132,7 +132,7 @@ export default function DashboardPage() {
   // Below that it's a plain centered column and the rail/spacer are hidden.
   return (
     <div className="mx-auto min-h-screen w-full max-w-[1200px] space-y-6 bg-background p-3 sm:p-4 md:p-6 min-[1700px]:grid min-[1700px]:max-w-[1760px] min-[1700px]:grid-cols-[1fr_1200px_1fr] min-[1700px]:gap-6 min-[1700px]:space-y-0">
-      <LeftRail tasks={tasks} member={member} />
+      <LeftRail />
       <div className="w-full min-w-0 space-y-6">
       {/* Night-sky panel — same navy family as the member-select scene,
           so the dashboard opens with a piece of the same world. */}
@@ -205,11 +205,15 @@ export default function DashboardPage() {
           </p>
         )}
 
-        <SampleRequestBoard member={member} />
+        <section id="samples" className="scroll-mt-6">
+          <SampleRequestBoard member={member} />
+        </section>
 
-        <TaskTable tasks={tasks} member={member} onEdit={setEditingTask} onDelete={handleDelete} />
+        <section id="tasks" className="scroll-mt-6">
+          <TaskTable tasks={tasks} member={member} onEdit={setEditingTask} onDelete={handleDelete} />
+        </section>
 
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+        <div id="planner" className="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <motion.div whileHover={{ y: -4 }}>
             <PersonalTodo member={member} />
           </motion.div>
@@ -218,7 +222,7 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+        <div id="analytics" className="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-3">
           <motion.div whileHover={{ y: -4 }}>
             <CategoryDistribution tasks={tasks} />
           </motion.div>
@@ -230,7 +234,9 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        <UploadLogWidget />
+        <section id="uploads" className="scroll-mt-6">
+          <UploadLogWidget />
+        </section>
 
         {editingTask && (
           <TaskFormDialog

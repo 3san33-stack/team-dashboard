@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { isOverdue, isRedDay, upcomingDeadlines } from "@/lib/derived";
+import { isRedDay, upcomingDeadlines } from "@/lib/derived";
 import type { Task } from "@/lib/types";
 
 type Props = { tasks: Task[] };
@@ -26,13 +26,6 @@ export function SideRail({ tasks }: Props) {
   const dateText = `${now.getMonth() + 1}월 ${now.getDate()}일 (${WEEKDAYS[now.getDay()]})`;
   const holiday = isRedDay(now);
 
-  const stats: [string, number, string][] = [
-    ["전체", tasks.length, ""],
-    ["진행중", tasks.filter((t) => t.status === "진행중").length, "text-blue-500"],
-    ["완료", tasks.filter((t) => t.status === "완료").length, "text-green-600"],
-    ["지연", tasks.filter((t) => isOverdue(t)).length, "text-red-500"],
-  ];
-
   const deadlines = upcomingDeadlines(tasks, 6);
 
   return (
@@ -42,17 +35,6 @@ export function SideRail({ tasks }: Props) {
         <p className={`text-xs ${holiday ? "text-red-500" : "text-muted-foreground"}`}>
           {holiday ? "휴일" : "근무일"}
         </p>
-      </Section>
-
-      <Section title="팀 현황">
-        <dl className="space-y-1">
-          {stats.map(([label, value, color]) => (
-            <div key={label} className="flex items-baseline justify-between">
-              <dt className="text-xs text-muted-foreground">{label}</dt>
-              <dd className={`tabular-nums font-medium ${color}`}>{value}</dd>
-            </div>
-          ))}
-        </dl>
       </Section>
 
       <Section title="마감 임박·지연">

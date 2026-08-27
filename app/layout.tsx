@@ -32,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${inter.variable} ${instrumentSerif.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/* Apply the saved theme before first paint so a dark-mode user
