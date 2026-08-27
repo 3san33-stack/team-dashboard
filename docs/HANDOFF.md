@@ -76,6 +76,11 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
 - `components/excel-import-button.tsx` — 헤더의 "엑셀 업로드" 버튼. 통합DB
   시트를 읽어 담당자+프로젝트+업무구분 일치 시 갱신, 없으면 신규 추가
 - `components/ui/popover.tsx` — shadcn CLI로 추가된 Popover(마감임박 알림에 사용)
+- `components/side-rail.tsx` — **2xl(1536px+)에서만** 보이는 좌우 여백의 스티키
+  사이드레일. 오늘 날짜·팀 현황(전체/진행중/완료/지연)·마감 임박/지연 목록·
+  부서장님 보고 링크. 순수 파생 데이터만 사용(추가 Supabase 호출 없음).
+  `app/page.tsx` 루트가 flex로 바뀜: 안쪽 `max-w-[1200px]` 컨텐츠 + `aside`,
+  바깥은 `2xl:max-w-[1480px]`
 
 ### 페이지 / API
 
@@ -131,6 +136,11 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   세부업무/우선순위/시작일/마감일/진행률/상태/팀장코멘트)에 의존 — 시트
   이름이나 헤더가 바뀌면 에러 메시지로 알려주지만 자동 대응은 안 함
 - `public/member-select-bg-original.mp4`가 아직 커밋 안 된 채 남아있음(위 참고)
+- **`tasks` 테이블에 마감일이 `1899-12-30`(엑셀 빈 날짜 serial 0)으로 들어간
+  레거시 행 몇 개 있음** — 과거 수동 이전분. `upcomingDeadlines`에서
+  `>= "2000-01-01"` 필터로 가려놨지만 캘린더/보고 화면엔 아직 노출됨.
+  정리하려면 사용자가 SQL Editor에서:
+  `UPDATE tasks SET due_date = NULL WHERE due_date < '2000-01-01';`
 
 ## 세션 규칙/선호 (기억해둘 것)
 

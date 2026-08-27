@@ -227,6 +227,14 @@ describe("upcomingDeadlines", () => {
     expect(result.map((t) => t.id)).toEqual(["b", "a"]);
   });
 
+  it("drops legacy Excel-epoch (1899) due dates", () => {
+    const tasks = [
+      makeTask({ id: "old", due_date: "1899-12-30", status: "진행중" }),
+      makeTask({ id: "real", due_date: "2026-08-20", status: "진행중" }),
+    ];
+    expect(upcomingDeadlines(tasks).map((t) => t.id)).toEqual(["real"]);
+  });
+
   it("limits to the given count", () => {
     const tasks = Array.from({ length: 8 }, (_, i) =>
       makeTask({ id: String(i), due_date: `2026-08-${10 + i}`, status: "예정" })

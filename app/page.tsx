@@ -18,6 +18,7 @@ import { UpcomingDeadlines } from "@/components/upcoming-deadlines";
 import { SampleRequestBoard } from "@/components/sample-request-board";
 import { UploadLogWidget } from "@/components/upload-log-widget";
 import { ExcelImportButton } from "@/components/excel-import-button";
+import { SideRail } from "@/components/side-rail";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -126,7 +127,8 @@ export default function DashboardPage() {
   const overdue = tasks.filter((t) => isOverdue(t)).length;
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[1200px] space-y-6 bg-background p-3 sm:p-4 md:p-6">
+    <div className="mx-auto flex min-h-screen w-full max-w-[1200px] justify-center gap-6 bg-background p-3 sm:p-4 md:p-6 2xl:max-w-[1480px]">
+      <div className="w-full min-w-0 max-w-[1200px] space-y-6">
       {/* Night-sky panel — same navy family as the member-select scene,
           so the dashboard opens with a piece of the same world. */}
       <div className="space-y-6 rounded-3xl bg-gradient-to-br from-[#0b1220] via-[#101b33] to-[#1a2947] p-4 shadow-lg sm:p-6">
@@ -233,6 +235,8 @@ export default function DashboardPage() {
           />
         )}
       </main>
+      </div>
+      <SideRail tasks={tasks} />
     </div>
   );
 }
