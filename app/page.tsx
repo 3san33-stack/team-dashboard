@@ -126,9 +126,13 @@ export default function DashboardPage() {
   const completed = tasks.filter((t) => t.status === "완료").length;
   const overdue = tasks.filter((t) => isOverdue(t)).length;
 
+  // ≥1700px: 3-track grid ([1fr] [1200px] [1fr]) keeps the content column
+  // dead-centered on the page while the rail sits in the right-hand margin.
+  // Below that it's a plain centered column and the rail/spacer are hidden.
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[1200px] justify-center gap-6 bg-background p-3 sm:p-4 md:p-6 2xl:max-w-[1480px]">
-      <div className="w-full min-w-0 max-w-[1200px] space-y-6">
+    <div className="mx-auto min-h-screen w-full max-w-[1200px] space-y-6 bg-background p-3 sm:p-4 md:p-6 min-[1700px]:grid min-[1700px]:max-w-[1760px] min-[1700px]:grid-cols-[1fr_1200px_1fr] min-[1700px]:gap-6 min-[1700px]:space-y-0">
+      <div aria-hidden className="hidden min-[1700px]:block" />
+      <div className="w-full min-w-0 space-y-6">
       {/* Night-sky panel — same navy family as the member-select scene,
           so the dashboard opens with a piece of the same world. */}
       <div className="space-y-6 rounded-3xl bg-gradient-to-br from-[#0b1220] via-[#101b33] to-[#1a2947] p-4 shadow-lg sm:p-6">
@@ -148,13 +152,13 @@ export default function DashboardPage() {
             {member}님, 안녕하세요
           </h1>
           <div className="flex flex-wrap items-center gap-2">
-            {/* 마감임박 벨 + 부서장님 보고는 넓은 화면에선 사이드레일이 대신하므로 숨김 */}
-            <div className="2xl:hidden">
+            {/* 마감임박 벨 + 부서장님 보고는 사이드레일(≥1700px)이 대신하므로 그때 숨김 */}
+            <div className="min-[1700px]:hidden">
               <UpcomingDeadlines tasks={tasks} />
             </div>
             <PushNotificationToggle member={member} />
             <ThemeToggle />
-            <Link href="/report" className="2xl:hidden">
+            <Link href="/report" className="min-[1700px]:hidden">
               <motion.span
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.96 }}

@@ -76,11 +76,14 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
 - `components/excel-import-button.tsx` — 헤더의 "엑셀 업로드" 버튼. 통합DB
   시트를 읽어 담당자+프로젝트+업무구분 일치 시 갱신, 없으면 신규 추가
 - `components/ui/popover.tsx` — shadcn CLI로 추가된 Popover(마감임박 알림에 사용)
-- `components/side-rail.tsx` — **2xl(1536px+)에서만** 보이는 좌우 여백의 스티키
-  사이드레일. 오늘 날짜·팀 현황(전체/진행중/완료/지연)·마감 임박/지연 목록·
-  부서장님 보고 링크. 순수 파생 데이터만 사용(추가 Supabase 호출 없음).
-  `app/page.tsx` 루트가 flex로 바뀜: 안쪽 `max-w-[1200px]` 컨텐츠 + `aside`,
-  바깥은 `2xl:max-w-[1480px]`
+- `components/side-rail.tsx` — **`min-[1700px]`에서만** 보이는 우측 여백의 얇은
+  스티키 레일. 오늘 날짜·팀 현황(전체/진행중/완료/지연)·마감 임박/지연 목록·
+  부서장님 보고 링크. Card가 아니라 hairline divider만 써서 위젯과 구분됨.
+  순수 파생 데이터만 사용(추가 Supabase 호출 없음). `app/page.tsx` 루트는
+  `min-[1700px]`에서 `grid-cols-[1fr_1200px_1fr]`(max-w 1760)로 바뀌어 컨텐츠는
+  페이지 정중앙 유지, 레일은 오른쪽 1fr 트랙에 위치. 그보다 좁으면 평범한
+  가운데 정렬 1열 + 레일 숨김(헤더의 마감임박 벨·부서장님 보고가 `min-[1700px]:hidden`
+  으로 그때만 다시 나타남)
 
 ### 페이지 / API
 
