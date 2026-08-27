@@ -19,6 +19,7 @@ import { SampleRequestBoard } from "@/components/sample-request-board";
 import { UploadLogWidget } from "@/components/upload-log-widget";
 import { ExcelImportButton } from "@/components/excel-import-button";
 import { SideRail } from "@/components/side-rail";
+import { LeftRail } from "@/components/left-rail";
 import { Button } from "@/components/ui/button";
 import { listTasks, createTask, updateTask, deleteTask } from "@/lib/supabase";
 import { isOverdue } from "@/lib/derived";
@@ -131,7 +132,7 @@ export default function DashboardPage() {
   // Below that it's a plain centered column and the rail/spacer are hidden.
   return (
     <div className="mx-auto min-h-screen w-full max-w-[1200px] space-y-6 bg-background p-3 sm:p-4 md:p-6 min-[1700px]:grid min-[1700px]:max-w-[1760px] min-[1700px]:grid-cols-[1fr_1200px_1fr] min-[1700px]:gap-6 min-[1700px]:space-y-0">
-      <div aria-hidden className="hidden min-[1700px]:block" />
+      <LeftRail tasks={tasks} member={member} />
       <div className="w-full min-w-0 space-y-6">
       {/* Night-sky panel — same navy family as the member-select scene,
           so the dashboard opens with a piece of the same world. */}

@@ -235,6 +235,14 @@ describe("upcomingDeadlines", () => {
     expect(upcomingDeadlines(tasks).map((t) => t.id)).toEqual(["real"]);
   });
 
+  it("filters to one member when given", () => {
+    const tasks = [
+      makeTask({ id: "mine", member: "구민석", due_date: "2026-08-15", status: "진행중" }),
+      makeTask({ id: "theirs", member: "안도현", due_date: "2026-08-13", status: "진행중" }),
+    ];
+    expect(upcomingDeadlines(tasks, 5, "구민석").map((t) => t.id)).toEqual(["mine"]);
+  });
+
   it("limits to the given count", () => {
     const tasks = Array.from({ length: 8 }, (_, i) =>
       makeTask({ id: String(i), due_date: `2026-08-${10 + i}`, status: "예정" })

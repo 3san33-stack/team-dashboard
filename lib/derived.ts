@@ -144,11 +144,17 @@ export function memberSummary(tasks: Task[], member: Member, today: Date = new D
   };
 }
 
-export function upcomingDeadlines(tasks: Task[], limit = 5): Task[] {
+export function upcomingDeadlines(tasks: Task[], limit = 5, member?: Member): Task[] {
   return tasks
     // `>= "2000-01-01"` drops the handful of legacy rows whose 마감일 imported
     // as the Excel epoch (1899-12-30) — otherwise they sort to the very top.
-    .filter((t) => t.due_date !== null && t.due_date >= "2000-01-01" && t.status !== "완료")
+    .filter(
+      (t) =>
+        t.due_date !== null &&
+        t.due_date >= "2000-01-01" &&
+        t.status !== "완료" &&
+        (member === undefined || t.member === member)
+    )
     .sort((a, b) => a.due_date!.localeCompare(b.due_date!))
     .slice(0, limit);
 }

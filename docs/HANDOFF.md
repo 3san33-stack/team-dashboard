@@ -84,6 +84,10 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   페이지 정중앙 유지, 레일은 오른쪽 1fr 트랙에 위치. 그보다 좁으면 평범한
   가운데 정렬 1열 + 레일 숨김(헤더의 마감임박 벨·부서장님 보고가 `min-[1700px]:hidden`
   으로 그때만 다시 나타남)
+- `components/left-rail.tsx` — 왼쪽 여백 레일(side-rail과 동일 스타일). 오른쪽=팀,
+  왼쪽=로그인한 본인: 내 진행중/지연/완료/평균진행률 + 내 마감 임박·지연 5건.
+  `memberSummary`, `upcomingDeadlines(tasks, limit, member)` 사용. `min-[1700px]`에서
+  grid 왼쪽 1fr 트랙에 `justify-self-end`로 배치
 
 ### 페이지 / API
 
