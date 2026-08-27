@@ -29,7 +29,7 @@ export function LeftRail({ tasks, member }: Props) {
   ];
 
   return (
-    <aside className="sticky top-6 hidden h-fit w-56 shrink-0 flex-col divide-y divide-border/60 self-start justify-self-end rounded-2xl border border-border/50 bg-foreground/[0.02] px-4 text-sm min-[1700px]:flex">
+    <aside className="sticky top-[22vh] hidden h-fit w-56 shrink-0 flex-col divide-y divide-border/60 self-start justify-self-end rounded-2xl border border-border/50 bg-foreground/[0.02] px-4 text-sm min-[1700px]:flex">
       <div className="space-y-1.5 py-3">
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
           내 업무 · {member}
