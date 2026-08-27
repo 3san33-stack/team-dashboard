@@ -148,10 +148,13 @@ export default function DashboardPage() {
             {member}님, 안녕하세요
           </h1>
           <div className="flex flex-wrap items-center gap-2">
-            <UpcomingDeadlines tasks={tasks} />
+            {/* 마감임박 벨 + 부서장님 보고는 넓은 화면에선 사이드레일이 대신하므로 숨김 */}
+            <div className="2xl:hidden">
+              <UpcomingDeadlines tasks={tasks} />
+            </div>
             <PushNotificationToggle member={member} />
             <ThemeToggle />
-            <Link href="/report">
+            <Link href="/report" className="2xl:hidden">
               <motion.span
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.96 }}
