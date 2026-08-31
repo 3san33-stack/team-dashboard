@@ -37,18 +37,6 @@ export function LeftRail() {
 
   return (
     <div className="sticky top-8 hidden h-fit w-56 shrink-0 flex-col gap-3 self-start justify-self-end min-[1700px]:flex">
-      <TowelAnalysisDialog
-        trigger={
-          <button
-            type="button"
-            className="flex w-full items-center gap-2.5 rounded-2xl border border-border/50 bg-foreground/[0.02] px-3.5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-foreground/[0.06]"
-          >
-            <Ruler className="h-4 w-4 shrink-0" />
-            타월 사종분석
-          </button>
-        }
-      />
-
       <aside className="flex flex-col gap-0.5 rounded-2xl border border-border/50 bg-foreground/[0.02] p-2">
         <p className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
           바로가기
@@ -68,6 +56,18 @@ export function LeftRail() {
           </a>
         ))}
       </aside>
+
+      <TowelAnalysisDialog
+        trigger={
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-foreground/[0.04] px-4 py-5 text-[15px] font-semibold text-foreground transition-colors hover:bg-foreground/[0.08]"
+          >
+            <Ruler className="h-5 w-5 shrink-0" />
+            타월 사종분석
+          </button>
+        }
+      />
     </div>
   );
 }
