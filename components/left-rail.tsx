@@ -36,38 +36,38 @@ export function LeftRail() {
   }, []);
 
   return (
-    <aside className="sticky top-8 hidden h-fit w-56 shrink-0 flex-col gap-0.5 self-start justify-self-end rounded-2xl border border-border/50 bg-foreground/[0.02] p-2 min-[1700px]:flex">
-      <p className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
-        바로가기
-      </p>
-      {SECTIONS.map((s) => (
-        <a
-          key={s.id}
-          href={`#${s.id}`}
-          onClick={() => setActive(s.id)}
-          className={`rounded-lg px-2 py-1.5 text-xs transition-colors ${
-            active === s.id
-              ? "bg-foreground/[0.06] font-medium text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {s.label}
-        </a>
-      ))}
+    <div className="sticky top-8 hidden h-fit w-56 shrink-0 flex-col gap-3 self-start justify-self-end min-[1700px]:flex">
+      <TowelAnalysisDialog
+        trigger={
+          <button
+            type="button"
+            className="flex w-full items-center gap-2.5 rounded-2xl border border-border/50 bg-foreground/[0.02] px-3.5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-foreground/[0.06]"
+          >
+            <Ruler className="h-4 w-4 shrink-0" />
+            타월 사종분석
+          </button>
+        }
+      />
 
-      <div className="mt-1 border-t border-border/50 pt-1">
-        <TowelAnalysisDialog
-          trigger={
-            <button
-              type="button"
-              className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
-            >
-              <Ruler className="h-3.5 w-3.5 shrink-0" />
-              타월 사종분석
-            </button>
-          }
-        />
-      </div>
-    </aside>
+      <aside className="flex flex-col gap-0.5 rounded-2xl border border-border/50 bg-foreground/[0.02] p-2">
+        <p className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
+          바로가기
+        </p>
+        {SECTIONS.map((s) => (
+          <a
+            key={s.id}
+            href={`#${s.id}`}
+            onClick={() => setActive(s.id)}
+            className={`rounded-lg px-2 py-1.5 text-xs transition-colors ${
+              active === s.id
+                ? "bg-foreground/[0.06] font-medium text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {s.label}
+          </a>
+        ))}
+      </aside>
+    </div>
   );
 }

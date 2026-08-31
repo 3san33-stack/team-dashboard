@@ -36,6 +36,7 @@ export function TowelAnalysisDialog({ trigger }: Props) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<TowelAnalysis | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   async function refresh() {
     try {
@@ -123,10 +124,12 @@ export function TowelAnalysisDialog({ trigger }: Props) {
                       i === 1 ? (
                         <TableCell key="img">
                           {a.image_url?.startsWith("http") ? (
-                            // eslint-disable-next-line @next/next/no-img-element -- user-uploaded, unpredictable source
-                            <img src={a.image_url} alt={a.towel_name}
-                              className="h-12 w-12 rounded border object-cover"
-                              onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                            <button type="button" onClick={() => setPreview(a.image_url)} title="크게 보기">
+                              {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded, unpredictable source */}
+                              <img src={a.image_url} alt={a.towel_name}
+                                className="h-14 w-14 rounded border object-cover transition-opacity hover:opacity-80"
+                                onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                            </button>
                           ) : null}
                         </TableCell>
                       ) : (
@@ -162,6 +165,18 @@ export function TowelAnalysisDialog({ trigger }: Props) {
             </Table>
           )}
         </div>
+
+        {preview && (
+          <button
+            type="button"
+            onClick={() => setPreview(null)}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-6"
+            aria-label="이미지 닫기"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded, unpredictable source */}
+            <img src={preview} alt="타월 사진" className="max-h-full max-w-full rounded-lg object-contain" />
+          </button>
+        )}
       </DialogContent>
 
       {editing && (
