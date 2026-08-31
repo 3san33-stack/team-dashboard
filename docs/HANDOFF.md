@@ -52,6 +52,9 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   `public/member-select-bg.mp4`(정방향+역방향을 이어붙인 부메랑 영상, ffmpeg로
   제작) + `bg.jpg` 폴백. **`member-select-bg-original.mp4`가 백업용으로
   아직 커밋 안 된 채 워킹트리에 남아있음 — 필요 없으면 삭제, 필요하면 커밋할 것.**
+- `components/task-table.tsx` — 검색 + 담당자/상태 필터 + **"완료 숨기기" 체크박스
+  (기본 켜짐, 숨긴 완료 건수 표시, 상태 필터를 완료로 고르면 무시)**. 행 등장/
+  퇴장 애니메이션(AnimatePresence)은 `<tr>` exit가 유령 행을 남겨서 제거함
 - `components/summary-cards.tsx`, `member-progress-bars.tsx`("팀원별 업무 현황"
   — 팀원별 상태별(예정/진행중/검토중/완료/보류) 건수를 누적 막대로. 파일명은
   옛 "평균 진행률" 시절 그대로, `memberStatusCounts` 사용),
