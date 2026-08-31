@@ -29,7 +29,7 @@ export function SideRail({ tasks }: Props) {
   const deadlines = upcomingDeadlines(tasks, 6);
 
   return (
-    <aside className="sticky top-[22vh] hidden h-fit w-56 shrink-0 flex-col divide-y divide-border/60 self-start rounded-2xl border border-border/50 bg-foreground/[0.02] px-4 text-sm min-[1700px]:flex">
+    <aside className="sticky top-8 hidden h-fit w-56 shrink-0 flex-col divide-y divide-border/60 self-start rounded-2xl border border-border/50 bg-foreground/[0.02] px-4 text-sm min-[1700px]:flex">
       <Section title="오늘">
         <p className="font-medium">{dateText}</p>
         <p className={`text-xs ${holiday ? "text-red-500" : "text-muted-foreground"}`}>

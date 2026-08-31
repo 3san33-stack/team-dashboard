@@ -34,7 +34,7 @@ export function LeftRail() {
   }, []);
 
   return (
-    <aside className="sticky top-[22vh] hidden h-fit w-56 shrink-0 flex-col gap-0.5 self-start justify-self-end rounded-2xl border border-border/50 bg-foreground/[0.02] p-2 min-[1700px]:flex">
+    <aside className="sticky top-8 hidden h-fit w-56 shrink-0 flex-col gap-0.5 self-start justify-self-end rounded-2xl border border-border/50 bg-foreground/[0.02] p-2 min-[1700px]:flex">
       <p className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/70">
         바로가기
       </p>
