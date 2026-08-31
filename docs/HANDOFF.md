@@ -52,7 +52,9 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   `public/member-select-bg.mp4`(정방향+역방향을 이어붙인 부메랑 영상, ffmpeg로
   제작) + `bg.jpg` 폴백. **`member-select-bg-original.mp4`가 백업용으로
   아직 커밋 안 된 채 워킹트리에 남아있음 — 필요 없으면 삭제, 필요하면 커밋할 것.**
-- `components/summary-cards.tsx`, `member-progress-bars.tsx`,
+- `components/summary-cards.tsx`, `member-progress-bars.tsx`("팀원별 업무 현황"
+  — 팀원별 상태별(예정/진행중/검토중/완료/보류) 건수를 누적 막대로. 파일명은
+  옛 "평균 진행률" 시절 그대로, `memberStatusCounts` 사용),
   `task-table.tsx`, `task-form-dialog.tsx`, `contribution-report.tsx`(팀원별
   기여율만), `category-distribution.tsx`(업무구분 분포 파이차트, 원래
   contribution-report에서 분리됨), `task-calendar.tsx` + `full-calendar-dialog.tsx`
@@ -92,7 +94,7 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
 
 - `app/page.tsx` — 메인 대시보드. 헤더에 마감임박 알림 종·엑셀 업로드·업무
   추가 버튼. 순서: 샘플 제직 요청 → 업무테이블 → [개인할일|캘린더] →
-  [업무구분분포|기여율|팀원평균진행률] → 업로드 기록 위젯. 전체 폭
+  [업무구분분포|기여율|팀원업무현황] → 업로드 기록 위젯. 전체 폭
   `max-w-[1200px] mx-auto`로 넓은 모니터에서 여백 확보.
 - `app/report/page.tsx` — 부서장님 보고
 - `app/api/cron/daily-digest/route.ts` — 평일 09:00 KST Web Push 발송

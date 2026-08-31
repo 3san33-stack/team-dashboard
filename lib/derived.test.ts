@@ -3,6 +3,7 @@ import {
   isOverdue,
   averageProgress,
   statusColor,
+  memberStatusCounts,
   priorityColor,
   monthCategoryContribution,
   teamCategoryDistribution,
@@ -83,6 +84,20 @@ describe("averageProgress", () => {
       makeTask({ member: "김혜진", progress: 100 }),
     ];
     expect(averageProgress(tasks, "이은혜")).toBe(50);
+  });
+});
+
+describe("memberStatusCounts", () => {
+  it("counts a member's tasks by status, others zero", () => {
+    const tasks = [
+      makeTask({ member: "이은혜", status: "진행중" }),
+      makeTask({ member: "이은혜", status: "진행중" }),
+      makeTask({ member: "이은혜", status: "완료" }),
+      makeTask({ member: "김혜진", status: "예정" }),
+    ];
+    expect(memberStatusCounts(tasks, "이은혜")).toEqual({
+      예정: 0, 진행중: 2, 검토중: 0, 완료: 1, 보류: 0,
+    });
   });
 });
 

@@ -1,5 +1,5 @@
 import {
-  CATEGORIES, UPLOAD_LOG_CATEGORIES, WEAVERS,
+  CATEGORIES, STATUSES, UPLOAD_LOG_CATEGORIES, WEAVERS,
   type Category, type Member, type Priority, type Status, type Task,
   type UploadLog, type UploadLogCategory, type Weaver,
 } from "./types";
@@ -12,6 +12,15 @@ export function isOverdue(task: Task, today: Date = new Date()): boolean {
   const due = new Date(`${task.due_date}T00:00:00`);
   const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   return due.getTime() < todayMidnight.getTime();
+}
+
+// Per-member task count broken down by status (예정/진행중/검토중/완료/보류).
+export function memberStatusCounts(tasks: Task[], member: Member): Record<Status, number> {
+  const counts = Object.fromEntries(STATUSES.map((s) => [s, 0])) as Record<Status, number>;
+  for (const t of tasks) {
+    if (t.member === member) counts[t.status] += 1;
+  }
+  return counts;
 }
 
 export function averageProgress(tasks: Task[], member: Member): number {
