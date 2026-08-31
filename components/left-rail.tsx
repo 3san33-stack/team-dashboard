@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Ruler } from "lucide-react";
+import { PieChart, Ruler } from "lucide-react";
 import { TowelAnalysisDialog } from "@/components/towel-analysis-dialog";
+import { AnalyticsDialog } from "@/components/analytics-dialog";
+import type { Task } from "@/lib/types";
 
 // Section jump-nav for the long dashboard — genuinely additive (these links
 // exist nowhere else) and persists while you scroll. ≥1700px only, left margin.
@@ -10,11 +12,13 @@ const SECTIONS = [
   { id: "samples", label: "샘플 제직 요청" },
   { id: "tasks", label: "업무 테이블" },
   { id: "planner", label: "할 일 · 캘린더" },
-  { id: "analytics", label: "분포 · 기여율" },
   { id: "uploads", label: "업로드 기록" },
 ] as const;
 
-export function LeftRail() {
+const TRAY_BTN =
+  "flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-foreground/[0.04] px-4 py-5 text-[15px] font-semibold text-foreground transition-colors hover:bg-foreground/[0.08]";
+
+export function LeftRail({ tasks }: { tasks: Task[] }) {
   const [active, setActive] = useState<string>(SECTIONS[0].id);
 
   useEffect(() => {
@@ -57,12 +61,19 @@ export function LeftRail() {
         ))}
       </aside>
 
+      <AnalyticsDialog
+        tasks={tasks}
+        trigger={
+          <button type="button" className={TRAY_BTN}>
+            <PieChart className="h-5 w-5 shrink-0" />
+            팀 분석
+          </button>
+        }
+      />
+
       <TowelAnalysisDialog
         trigger={
-          <button
-            type="button"
-            className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-foreground/[0.04] px-4 py-5 text-[15px] font-semibold text-foreground transition-colors hover:bg-foreground/[0.08]"
-          >
+          <button type="button" className={TRAY_BTN}>
             <Ruler className="h-5 w-5 shrink-0" />
             타월 사종분석
           </button>

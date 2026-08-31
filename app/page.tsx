@@ -5,11 +5,8 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { MemberSelect } from "@/components/member-select";
 import { SummaryCards } from "@/components/summary-cards";
-import { MemberProgressBars } from "@/components/member-progress-bars";
 import { TaskTable } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
-import { ContributionReport } from "@/components/contribution-report";
-import { CategoryDistribution } from "@/components/category-distribution";
 import { TaskCalendar } from "@/components/task-calendar";
 import { PersonalTodo } from "@/components/personal-todo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -132,7 +129,7 @@ export default function DashboardPage() {
   // Below that it's a plain centered column and the rail/spacer are hidden.
   return (
     <div className="mx-auto min-h-screen w-full max-w-[1200px] space-y-6 bg-background p-3 sm:p-4 md:p-6 min-[1700px]:grid min-[1700px]:max-w-[1760px] min-[1700px]:grid-cols-[1fr_1200px_1fr] min-[1700px]:gap-6 min-[1700px]:space-y-0">
-      <LeftRail />
+      <LeftRail tasks={tasks} />
       <div className="w-full min-w-0 space-y-6">
       {/* Night-sky panel — same navy family as the member-select scene,
           so the dashboard opens with a piece of the same world. */}
@@ -219,18 +216,6 @@ export default function DashboardPage() {
           </motion.div>
           <motion.div whileHover={{ y: -4 }}>
             <TaskCalendar tasks={tasks} member={member} />
-          </motion.div>
-        </div>
-
-        <div id="analytics" className="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-3">
-          <motion.div whileHover={{ y: -4 }}>
-            <CategoryDistribution tasks={tasks} />
-          </motion.div>
-          <motion.div whileHover={{ y: -4 }}>
-            <ContributionReport tasks={tasks} />
-          </motion.div>
-          <motion.div whileHover={{ y: -4 }}>
-            <MemberProgressBars tasks={tasks} />
           </motion.div>
         </div>
 
