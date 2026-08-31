@@ -20,6 +20,15 @@ import {
 
 const WEEKDAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
 
+function buildMonthGrid(monthOf: Date): Date[] {
+  const start = startOfMonthGrid(monthOf.getFullYear(), monthOf.getMonth());
+  return Array.from({ length: 42 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+}
+
 function intensityClass(count: number): string {
   if (count === 0) return "bg-muted";
   if (count <= 2) return "bg-primary/25";
@@ -34,6 +43,8 @@ export function UploadLogWidget() {
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [range, setRange] = useState<"week" | "month">("week");
+  // Which month the expanded "월간" view is showing (1st of that month).
+  const [viewDate, setViewDate] = useState(() => new Date());
   const tempIdRef = useRef(0);
 
   useEffect(() => {
@@ -81,9 +92,12 @@ export function UploadLogWidget() {
     }
   }
 
-  const summary = summarizeUploadLogs(logs, range);
-
   const now = new Date();
+  const summary = summarizeUploadLogs(logs, range, range === "month" ? viewDate : now);
+  const isCurrentMonth =
+    viewDate.getFullYear() === now.getFullYear() && viewDate.getMonth() === now.getMonth();
+  const shiftMonth = (delta: number) =>
+    setViewDate((d) => new Date(d.getFullYear(), d.getMonth() + delta, 1));
   const weekStart = startOfWeek(now);
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
@@ -93,12 +107,9 @@ export function UploadLogWidget() {
   const weekCounts = weekDays.map((d) => uploadCountOnDay(logs, d));
   const maxWeekCount = Math.max(1, ...weekCounts);
 
-  const monthGridStart = startOfMonthGrid(now.getFullYear(), now.getMonth());
-  const monthDays = Array.from({ length: 42 }, (_, i) => {
-    const d = new Date(monthGridStart);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
+  const monthDays = buildMonthGrid(now);
+  // Expanded "월간" view follows viewDate so past months can be browsed.
+  const viewMonthDays = buildMonthGrid(viewDate);
 
   return (
     <Card>
@@ -206,7 +217,7 @@ export function UploadLogWidget() {
 
             {expanded && (
               <div className="space-y-3 border-t pt-4">
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setRange("week")}
@@ -223,8 +234,42 @@ export function UploadLogWidget() {
                       range === "month" ? "bg-primary text-primary-foreground" : "border"
                     }`}
                   >
-                    이번 달
+                    월간
                   </button>
+
+                  {range === "month" && (
+                    <div className="ml-2 flex items-center gap-1 text-sm">
+                      <button
+                        type="button"
+                        onClick={() => shiftMonth(-1)}
+                        aria-label="이전 달"
+                        className="rounded-md border px-2 py-1 text-xs hover:bg-muted"
+                      >
+                        ◀
+                      </button>
+                      <span className="min-w-[6.5rem] text-center font-medium">
+                        {viewDate.getFullYear()}년 {viewDate.getMonth() + 1}월
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => shiftMonth(1)}
+                        disabled={isCurrentMonth}
+                        aria-label="다음 달"
+                        className="rounded-md border px-2 py-1 text-xs hover:bg-muted disabled:opacity-30"
+                      >
+                        ▶
+                      </button>
+                      {!isCurrentMonth && (
+                        <button
+                          type="button"
+                          onClick={() => setViewDate(new Date())}
+                          className="ml-1 text-xs text-primary underline"
+                        >
+                          이번 달
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-xs text-muted-foreground">날짜를 클릭하면 그날 기록을 담당자·분류별로 보고 고칠 수 있어요.</p>
@@ -257,9 +302,9 @@ export function UploadLogWidget() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-7 gap-1">
-                    {monthDays.map((d) => {
+                    {viewMonthDays.map((d) => {
                       const count = uploadCountOnDay(logs, d);
-                      const inMonth = d.getMonth() === now.getMonth();
+                      const inMonth = d.getMonth() === viewDate.getMonth();
                       return (
                         <UploadLogDayDialog
                           key={toLocalDateKey(d)}
