@@ -68,3 +68,31 @@ export type UploadLog = {
   category: UploadLogCategory;
   created_at: string;
 };
+
+export const DYEINGS = ["선염", "후염"] as const;
+
+// 타월 사종분석 한 건 (완성품 + 생지상태 규격). 밀도·중량은 "56T", "0" 같은
+// 값도 들어와서 전부 text.
+export type TowelAnalysis = {
+  id: string;
+  analyzed_on: string | null;
+  towel_name: string;
+  image_url: string | null;
+  spec: string | null;
+  weight: string | null;
+  pile_yarn: string | null;
+  ground_yarn: string | null;
+  weft_yarn: string | null;
+  warp_density: string | null;
+  weft_density: string | null;
+  dyeing: string | null;
+  greige_spec: string | null;
+  greige_weight: string | null;
+  greige_warp_density: string | null;
+  greige_weft_density: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TowelAnalysisInput = Omit<TowelAnalysis, "id" | "created_at" | "updated_at">;

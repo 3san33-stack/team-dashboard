@@ -91,6 +91,10 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   - **오른쪽 = 오늘 + 마감 임박·지연 목록 + 부서장님 보고 링크**. (팀 현황 4숫자는
     상단 요약카드와 중복이라 뺌.) `min-[1700px]:hidden`으로 헤더의 마감임박 벨·
     보고 링크가 그보다 좁을 때만 다시 나타남.
+  - 왼쪽 레일 하단에 **타월 사종분석** 버튼(Ruler 아이콘) → `towel-analysis-dialog.tsx`
+    풀스크린 표(16컬럼) 열림. 처음 열 때 fetch. `towel-analysis-form-dialog.tsx`가
+    등록/수정 폼(사진 업로드 포함). ⚠️ 레일이 1700px 미만에서 안 보이므로 노트북
+    사용 시 헤더에도 진입점 추가 검토
 
 ### 페이지 / API
 
@@ -114,9 +118,10 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   `CRON_SECRET`
 - **Supabase 테이블** (전부 `supabase/*.sql` 마이그레이션 있고 실행 완료):
   `tasks`(68건, 엑셀 58건 포함), `push_subscriptions`, `personal_todos`,
-  `sample_requests`, `upload_logs`
+  `sample_requests`, `upload_logs`, `towel_analyses`(타월 사종분석 —
+  `supabase/towel_analyses.sql`에 CREATE + 엑셀 23건 INSERT 포함)
 - **Supabase Storage**: `sample-request-images` 버킷(공개, 샘플 요청 참고
-  이미지). `supabase/sample_request_images_bucket.sql`로 버킷+정책 생성 —
+  이미지 + **타월 사종분석 사진도 여기 재사용**). `supabase/sample_request_images_bucket.sql`로 버킷+정책 생성 —
   **버킷 생성 SQL은 storage.buckets/storage.objects insert/delete/**select**
   정책 3개 다 필요** (select 빠뜨리면 삭제가 내부적으로 조회 실패해서 안 됨,
   이번 세션에 실제로 겪은 이슈).

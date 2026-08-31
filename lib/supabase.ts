@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type {
   Member, PersonalTodoItem, SampleRequest, SampleRequestInput, Task, TaskInput,
-  UploadLog, UploadLogCategory, Weaver,
+  TowelAnalysis, TowelAnalysisInput, UploadLog, UploadLogCategory, Weaver,
 } from "./types";
 
 export const supabase = createClient(
@@ -141,4 +141,39 @@ export async function updateSampleRequest(
     .single();
   if (error) throw error;
   return data as SampleRequest;
+}
+
+export async function listTowelAnalyses(): Promise<TowelAnalysis[]> {
+  const { data, error } = await supabase
+    .from("towel_analyses")
+    .select("*")
+    .order("analyzed_on", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data as TowelAnalysis[];
+}
+
+export async function createTowelAnalysis(input: TowelAnalysisInput): Promise<TowelAnalysis> {
+  const { data, error } = await supabase.from("towel_analyses").insert(input).select().single();
+  if (error) throw error;
+  return data as TowelAnalysis;
+}
+
+export async function updateTowelAnalysis(
+  id: string,
+  input: TowelAnalysisInput
+): Promise<TowelAnalysis> {
+  const { data, error } = await supabase
+    .from("towel_analyses")
+    .update({ ...input, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as TowelAnalysis;
+}
+
+export async function deleteTowelAnalysis(id: string): Promise<void> {
+  const { error } = await supabase.from("towel_analyses").delete().eq("id", id);
+  if (error) throw error;
 }

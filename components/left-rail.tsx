@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Ruler } from "lucide-react";
+import { TowelAnalysisDialog } from "@/components/towel-analysis-dialog";
 
 // Section jump-nav for the long dashboard — genuinely additive (these links
 // exist nowhere else) and persists while you scroll. ≥1700px only, left margin.
@@ -52,6 +54,20 @@ export function LeftRail() {
           {s.label}
         </a>
       ))}
+
+      <div className="mt-1 border-t border-border/50 pt-1">
+        <TowelAnalysisDialog
+          trigger={
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
+            >
+              <Ruler className="h-3.5 w-3.5 shrink-0" />
+              타월 사종분석
+            </button>
+          }
+        />
+      </div>
     </aside>
   );
 }
