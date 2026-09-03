@@ -78,7 +78,8 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   테두리 있음 — 밝은 모니터 대비용), "주간/월간 보기"로 숫자 적힌 캘린더 확장.
   확장 후 "월간" 모드에는 ◀ ▶ 달 이동 + "이번 달" 리셋(과거 달 기록 조회·수정용,
   `viewDate` state). 상단 미니 캘린더·이번주 막대·일일 버튼은 항상 현재 기준 유지.
-  확장 맨 아래에 **월별 추이 막대(최근 6개월, `monthlyUploadTotals`)**
+  상단(항상 보임)에 이번주 막대·미니캘린더 옆으로 **월별 추이 꺾은선(SVG,
+  최근 6개월, `monthlyUploadTotals` + `MonthlyTrendChart`)**
 - `components/upload-log-day-dialog.tsx` — 캘린더 날짜 클릭 시 그날 담당자·
   분류별 건수 보기 + 과거 날짜도 +/− 로 수정 가능
 - `components/excel-import-button.tsx` — 헤더의 "엑셀 업로드" 버튼. 통합DB

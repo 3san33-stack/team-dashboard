@@ -29,6 +29,37 @@ function buildMonthGrid(monthOf: Date): Date[] {
   });
 }
 
+function MonthlyTrendChart({ data }: { data: { label: string; key: string; count: number }[] }) {
+  const w = 168, h = 60, pad = 6;
+  const max = Math.max(1, ...data.map((d) => d.count));
+  const pts = data.map((d, i) => ({
+    ...d,
+    x: pad + (i / Math.max(1, data.length - 1)) * (w - pad * 2),
+    y: h - pad - (d.count / max) * (h - pad * 2),
+  }));
+  return (
+    <div>
+      <p className="mb-1 text-xs font-medium text-muted-foreground">월별 추이</p>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-44 text-primary" role="img" aria-label="월별 업로드 추이">
+        <polyline
+          points={pts.map((p) => `${p.x},${p.y}`).join(" ")}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+        {pts.map((p) => (
+          <circle key={p.key} cx={p.x} cy={p.y} r="2.5" fill="currentColor">
+            <title>{p.label} {p.count}건</title>
+          </circle>
+        ))}
+      </svg>
+      <div className="flex w-44 justify-between text-[10px] text-muted-foreground">
+        {data.map((d) => <span key={d.key}>{d.label}</span>)}
+      </div>
+    </div>
+  );
+}
+
 function intensityClass(count: number): string {
   if (count === 0) return "bg-muted";
   if (count <= 2) return "bg-primary/25";
@@ -112,7 +143,6 @@ export function UploadLogWidget() {
   const viewMonthDays = buildMonthGrid(viewDate);
 
   const monthly = monthlyUploadTotals(logs, 6, now);
-  const maxMonthly = Math.max(1, ...monthly.map((m) => m.count));
 
   return (
     <Card>
@@ -215,6 +245,8 @@ export function UploadLogWidget() {
                     })}
                   </div>
                 </div>
+
+                <MonthlyTrendChart data={monthly} />
               </div>
             </div>
 
@@ -352,26 +384,6 @@ export function UploadLogWidget() {
                     })}
                   </TableBody>
                 </Table>
-
-                <div className="border-t pt-4">
-                  <p className="mb-2 text-xs font-medium text-muted-foreground">월별 추이 (최근 6개월)</p>
-                  <div className="flex items-end gap-2">
-                    {monthly.map((m) => {
-                      const barPx = m.count > 0 ? Math.max(Math.round((m.count / maxMonthly) * 64), 6) : 2;
-                      return (
-                        <div key={m.key} className="flex flex-1 flex-col items-center gap-1">
-                          <span className="text-[10px] text-muted-foreground">{m.count}</span>
-                          <div
-                            className="w-full rounded-t bg-primary/70"
-                            style={{ height: `${barPx}px` }}
-                            title={`${m.label} ${m.count}건`}
-                          />
-                          <span className="text-[10px] text-muted-foreground">{m.label}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
               </div>
             )}
           </>
