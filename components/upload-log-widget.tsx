@@ -10,7 +10,7 @@ import {
 import { listUploadLogs, createUploadLog, deleteUploadLog } from "@/lib/supabase";
 import {
   monthlyUploadTotals, startOfMonthGrid, startOfWeek, summarizeUploadLogs,
-  toLocalDateKey, uploadCountFor, uploadCountOnDay, type MonthlyUpload,
+  toLocalDateKey, uploadCountFor, uploadCountOnDay,
 } from "@/lib/derived";
 import { downloadUploadLogsAsCsv } from "@/lib/export-csv";
 import { UploadLogDayDialog } from "@/components/upload-log-day-dialog";
@@ -29,32 +29,34 @@ function buildMonthGrid(monthOf: Date): Date[] {
   });
 }
 
-function MonthlyTrendChart({ data }: { data: MonthlyUpload[] }) {
+type TrendPoint = { key: string; label: string; value: number; hint: React.ReactNode };
+
+function TrendLine({ title, points }: { title: string; points: TrendPoint[] }) {
   const [hover, setHover] = useState<number | null>(null);
   const w = 168, h = 60, pad = 6;
-  const max = Math.max(1, ...data.map((d) => d.count));
-  const band = (w - pad * 2) / Math.max(1, data.length - 1);
-  const pts = data.map((d, i) => ({
-    ...d,
+  const max = Math.max(1, ...points.map((p) => p.value));
+  const band = (w - pad * 2) / Math.max(1, points.length - 1);
+  const xy = points.map((p, i) => ({
+    ...p,
     x: pad + i * band,
-    y: h - pad - (d.count / max) * (h - pad * 2),
+    y: h - pad - (p.value / max) * (h - pad * 2),
   }));
-  const active = hover !== null ? data[hover] : null;
+  const active = hover !== null ? xy[hover] : null;
 
   return (
     <div className="relative">
-      <p className="mb-1 text-xs font-medium text-muted-foreground">월별 추이</p>
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-44 text-primary" role="img" aria-label="월별 업로드 추이">
+      <p className="mb-1 text-xs font-medium text-muted-foreground">{title}</p>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-48 text-primary" role="img" aria-label={title}>
         <polyline
-          points={pts.map((p) => `${p.x},${p.y}`).join(" ")}
+          points={xy.map((p) => `${p.x},${p.y}`).join(" ")}
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
         />
-        {pts.map((p, i) => (
+        {xy.map((p, i) => (
           <circle key={p.key} cx={p.x} cy={p.y} r={hover === i ? 3.5 : 2.5} fill="currentColor" />
         ))}
-        {pts.map((p, i) => (
+        {xy.map((p, i) => (
           <rect
             key={`hit-${p.key}`}
             x={p.x - band / 2}
@@ -67,29 +69,18 @@ function MonthlyTrendChart({ data }: { data: MonthlyUpload[] }) {
           />
         ))}
       </svg>
-      <div className="flex w-44 justify-between text-[10px] text-muted-foreground">
-        {data.map((d, i) => (
-          <span key={d.key} className={hover === i ? "font-medium text-foreground" : ""}>{d.label}</span>
+      <div className="flex w-48 justify-between text-[10px] text-muted-foreground">
+        {points.map((p, i) => (
+          <span key={p.key} className={hover === i ? "font-medium text-foreground" : ""}>{p.label}</span>
         ))}
       </div>
       {active && (
         <div className="pointer-events-none absolute bottom-full left-0 z-10 mb-1 w-max rounded-md border bg-popover px-2 py-1 text-[11px] leading-tight text-popover-foreground shadow-md">
-          <span className="font-medium">{active.label} 합 {active.count}건</span>
-          <span className="ml-1 text-muted-foreground">
-            ({UPLOAD_LOG_CATEGORIES.map((c) => `${c} ${active.byCategory[c]}`).join(" · ")})
-          </span>
+          {active.hint}
         </div>
       )}
     </div>
   );
-}
-
-function intensityClass(count: number): string {
-  if (count === 0) return "bg-muted";
-  if (count <= 2) return "bg-primary/25";
-  if (count <= 5) return "bg-primary/50";
-  if (count <= 9) return "bg-primary/75";
-  return "bg-primary";
 }
 
 export function UploadLogWidget() {
@@ -159,14 +150,38 @@ export function UploadLogWidget() {
     d.setDate(d.getDate() + i);
     return d;
   });
-  const weekCounts = weekDays.map((d) => uploadCountOnDay(logs, d));
-  const maxWeekCount = Math.max(1, ...weekCounts);
+  const monthly = monthlyUploadTotals(logs, 6, now);
 
-  const monthDays = buildMonthGrid(now);
+  const weekPoints: TrendPoint[] = weekDays.map((d, i) => {
+    const count = uploadCountOnDay(logs, d);
+    return {
+      key: toLocalDateKey(d),
+      label: `${WEEKDAY_LABELS[i]} ${d.getDate()}`,
+      value: count,
+      hint: (
+        <span className="font-medium">
+          {d.getMonth() + 1}/{d.getDate()} ({WEEKDAY_LABELS[i]}) {count}건
+        </span>
+      ),
+    };
+  });
+
+  const monthPoints: TrendPoint[] = monthly.map((m) => ({
+    key: m.key,
+    label: m.label,
+    value: m.count,
+    hint: (
+      <>
+        <span className="font-medium">{m.label} 합 {m.count}건</span>
+        <span className="ml-1 text-muted-foreground">
+          ({UPLOAD_LOG_CATEGORIES.map((c) => `${c} ${m.byCategory[c]}`).join(" · ")})
+        </span>
+      </>
+    ),
+  }));
+
   // Expanded "월간" view follows viewDate so past months can be browsed.
   const viewMonthDays = buildMonthGrid(viewDate);
-
-  const monthly = monthlyUploadTotals(logs, 6, now);
 
   return (
     <Card>
@@ -228,49 +243,9 @@ export function UploadLogWidget() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap items-start gap-6">
-                <div>
-                  <p className="mb-1 text-xs font-medium text-muted-foreground">이번 주</p>
-                  <div className="flex items-end gap-1.5">
-                    {weekDays.map((d, i) => {
-                      const count = weekCounts[i];
-                      // Pixel height, not %: the column div below sizes to its
-                      // content (flex items-end doesn't stretch it), so a
-                      // percentage height here has no containing block to
-                      // resolve against and silently renders as 0px.
-                      const barPx = count > 0 ? Math.max(Math.round((count / maxWeekCount) * 48), 12) : 2;
-                      return (
-                        <div key={toLocalDateKey(d)} className="flex w-5 flex-col items-center gap-1">
-                          <div
-                            title={`${WEEKDAY_LABELS[i]} ${count}건`}
-                            className="w-full rounded-t bg-primary/70"
-                            style={{ height: `${barPx}px` }}
-                          />
-                          <span className="text-[10px] text-muted-foreground">{WEEKDAY_LABELS[i]}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-1 text-xs font-medium text-muted-foreground">{now.getMonth() + 1}월</p>
-                  <div className="grid grid-cols-7 gap-0.5">
-                    {monthDays.map((d) => {
-                      const count = uploadCountOnDay(logs, d);
-                      const inMonth = d.getMonth() === now.getMonth();
-                      return (
-                        <div
-                          key={toLocalDateKey(d)}
-                          title={`${d.getMonth() + 1}/${d.getDate()} ${count}건`}
-                          className={`h-3.5 w-3.5 rounded-sm border border-border ${intensityClass(count)} ${inMonth ? "" : "opacity-30"}`}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <MonthlyTrendChart data={monthly} />
+              <div className="flex flex-wrap items-start gap-8">
+                <TrendLine title="이번 주" points={weekPoints} />
+                <TrendLine title="월별 추이" points={monthPoints} />
               </div>
             </div>
 
