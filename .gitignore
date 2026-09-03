@@ -42,3 +42,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# local data backups (contains real data — never commit, repo is public)
+backups/
