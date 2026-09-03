@@ -123,9 +123,12 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,
   `CRON_SECRET`
 - **Supabase 테이블** (전부 `supabase/*.sql` 마이그레이션 있고 실행 완료):
-  `tasks`(68건, 엑셀 58건 포함), `push_subscriptions`, `personal_todos`,
-  `sample_requests`, `upload_logs`, `towel_analyses`(타월 사종분석 —
-  `supabase/towel_analyses.sql`에 CREATE + 엑셀 23건 INSERT 포함)
+  `tasks`, `push_subscriptions`, `personal_todos`, `sample_requests`,
+  `upload_logs`, `towel_analyses`.
+  **2026-09-03 실운영 시작 전 tasks/sample_requests/personal_todos/upload_logs/
+  towel_analyses 전체 truncate 함** (테스트 데이터 정리). 직전 백업+복구 SQL은
+  `backups/`(gitignore). `towel_analyses.sql`의 INSERT 23건은 다시 넣고 싶을 때
+  참고.
 - **Supabase Storage**: `sample-request-images` 버킷(공개, 샘플 요청 참고
   이미지 + **타월 사종분석 사진도 여기 재사용**). `supabase/sample_request_images_bucket.sql`로 버킷+정책 생성 —
   **버킷 생성 SQL은 storage.buckets/storage.objects insert/delete/**select**
