@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/table";
 import { listUploadLogs, createUploadLog, deleteUploadLog } from "@/lib/supabase";
 import {
-  startOfMonthGrid, startOfWeek, summarizeUploadLogs, toLocalDateKey,
-  uploadCountFor, uploadCountOnDay,
+  monthlyUploadTotals, startOfMonthGrid, startOfWeek, summarizeUploadLogs,
+  toLocalDateKey, uploadCountFor, uploadCountOnDay,
 } from "@/lib/derived";
 import { downloadUploadLogsAsCsv } from "@/lib/export-csv";
 import { UploadLogDayDialog } from "@/components/upload-log-day-dialog";
@@ -110,6 +110,9 @@ export function UploadLogWidget() {
   const monthDays = buildMonthGrid(now);
   // Expanded "월간" view follows viewDate so past months can be browsed.
   const viewMonthDays = buildMonthGrid(viewDate);
+
+  const monthly = monthlyUploadTotals(logs, 6, now);
+  const maxMonthly = Math.max(1, ...monthly.map((m) => m.count));
 
   return (
     <Card>
@@ -349,6 +352,26 @@ export function UploadLogWidget() {
                     })}
                   </TableBody>
                 </Table>
+
+                <div className="border-t pt-4">
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">월별 추이 (최근 6개월)</p>
+                  <div className="flex items-end gap-2">
+                    {monthly.map((m) => {
+                      const barPx = m.count > 0 ? Math.max(Math.round((m.count / maxMonthly) * 64), 6) : 2;
+                      return (
+                        <div key={m.key} className="flex flex-1 flex-col items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">{m.count}</span>
+                          <div
+                            className="w-full rounded-t bg-primary/70"
+                            style={{ height: `${barPx}px` }}
+                            title={`${m.label} ${m.count}건`}
+                          />
+                          <span className="text-[10px] text-muted-foreground">{m.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             )}
           </>

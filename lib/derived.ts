@@ -214,6 +214,27 @@ export function summarizeUploadLogs(
   return summary;
 }
 
+// Upload-log totals per calendar month, oldest → newest, for the last
+// `months` months (including the current one). For the trend bar chart.
+export function monthlyUploadTotals(
+  logs: UploadLog[],
+  months = 6,
+  now: Date = new Date()
+): { label: string; key: string; count: number }[] {
+  const keyOf = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const buckets = Array.from({ length: months }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1);
+    return { label: `${d.getMonth() + 1}월`, key: keyOf(d), count: 0 };
+  });
+  const idx = new Map(buckets.map((b, i) => [b.key, i]));
+  for (const log of logs) {
+    const i = idx.get(keyOf(new Date(log.created_at)));
+    if (i !== undefined) buckets[i].count += 1;
+  }
+  return buckets;
+}
+
 // Total upload_logs rows (all members/categories) on one calendar day.
 // Used by the bar chart (7 calls, this week) and mini calendar (up to 42
 // calls, one per grid cell) in upload-log-widget.tsx.

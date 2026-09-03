@@ -15,6 +15,7 @@ import {
   summarizeUploadLogs,
   uploadCountOnDay,
   uploadCountFor,
+  monthlyUploadTotals,
 } from "./derived";
 import type { Task, UploadLog } from "./types";
 import { CATEGORIES } from "./types";
@@ -337,6 +338,21 @@ describe("summarizeUploadLogs", () => {
     ];
     const result = summarizeUploadLogs(logs, "month", now);
     expect(result.안도현.수정).toBe(2);
+  });
+});
+
+describe("monthlyUploadTotals", () => {
+  const now = new Date("2026-08-15T12:00:00");
+  it("buckets logs into the last N months, oldest first, zero-filled", () => {
+    const logs = [
+      makeLog({ created_at: "2026-08-02T00:00:00Z" }),
+      makeLog({ created_at: "2026-08-20T00:00:00Z" }),
+      makeLog({ created_at: "2026-06-10T00:00:00Z" }),
+      makeLog({ created_at: "2026-01-01T00:00:00Z" }), // outside window
+    ];
+    const r = monthlyUploadTotals(logs, 3, now);
+    expect(r.map((b) => b.label)).toEqual(["6월", "7월", "8월"]);
+    expect(r.map((b) => b.count)).toEqual([1, 0, 2]);
   });
 });
 
