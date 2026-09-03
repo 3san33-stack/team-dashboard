@@ -10,7 +10,7 @@ import {
 import { listUploadLogs, createUploadLog, deleteUploadLog } from "@/lib/supabase";
 import {
   monthlyUploadTotals, startOfMonthGrid, startOfWeek, summarizeUploadLogs,
-  toLocalDateKey, uploadCountFor, uploadCountOnDay,
+  toLocalDateKey, uploadCountFor, uploadCountOnDay, type MonthlyUpload,
 } from "@/lib/derived";
 import { downloadUploadLogsAsCsv } from "@/lib/export-csv";
 import { UploadLogDayDialog } from "@/components/upload-log-day-dialog";
@@ -29,16 +29,20 @@ function buildMonthGrid(monthOf: Date): Date[] {
   });
 }
 
-function MonthlyTrendChart({ data }: { data: { label: string; key: string; count: number }[] }) {
+function MonthlyTrendChart({ data }: { data: MonthlyUpload[] }) {
+  const [hover, setHover] = useState<number | null>(null);
   const w = 168, h = 60, pad = 6;
   const max = Math.max(1, ...data.map((d) => d.count));
+  const band = (w - pad * 2) / Math.max(1, data.length - 1);
   const pts = data.map((d, i) => ({
     ...d,
-    x: pad + (i / Math.max(1, data.length - 1)) * (w - pad * 2),
+    x: pad + i * band,
     y: h - pad - (d.count / max) * (h - pad * 2),
   }));
+  const active = hover !== null ? data[hover] : null;
+
   return (
-    <div>
+    <div className="relative">
       <p className="mb-1 text-xs font-medium text-muted-foreground">월별 추이</p>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-44 text-primary" role="img" aria-label="월별 업로드 추이">
         <polyline
@@ -47,15 +51,35 @@ function MonthlyTrendChart({ data }: { data: { label: string; key: string; count
           stroke="currentColor"
           strokeWidth="1.5"
         />
-        {pts.map((p) => (
-          <circle key={p.key} cx={p.x} cy={p.y} r="2.5" fill="currentColor">
-            <title>{p.label} {p.count}건</title>
-          </circle>
+        {pts.map((p, i) => (
+          <circle key={p.key} cx={p.x} cy={p.y} r={hover === i ? 3.5 : 2.5} fill="currentColor" />
+        ))}
+        {pts.map((p, i) => (
+          <rect
+            key={`hit-${p.key}`}
+            x={p.x - band / 2}
+            y={0}
+            width={band}
+            height={h}
+            fill="transparent"
+            onMouseEnter={() => setHover(i)}
+            onMouseLeave={() => setHover(null)}
+          />
         ))}
       </svg>
       <div className="flex w-44 justify-between text-[10px] text-muted-foreground">
-        {data.map((d) => <span key={d.key}>{d.label}</span>)}
+        {data.map((d, i) => (
+          <span key={d.key} className={hover === i ? "font-medium text-foreground" : ""}>{d.label}</span>
+        ))}
       </div>
+      {active && (
+        <div className="pointer-events-none absolute bottom-full left-0 z-10 mb-1 w-max rounded-md border bg-popover px-2 py-1 text-[11px] leading-tight text-popover-foreground shadow-md">
+          <span className="font-medium">{active.label} 합 {active.count}건</span>
+          <span className="ml-1 text-muted-foreground">
+            ({UPLOAD_LOG_CATEGORIES.map((c) => `${c} ${active.byCategory[c]}`).join(" · ")})
+          </span>
+        </div>
+      )}
     </div>
   );
 }

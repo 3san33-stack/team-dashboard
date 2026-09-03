@@ -216,21 +216,38 @@ export function summarizeUploadLogs(
 
 // Upload-log totals per calendar month, oldest → newest, for the last
 // `months` months (including the current one). For the trend bar chart.
+export type MonthlyUpload = {
+  label: string;
+  key: string;
+  count: number;
+  byCategory: Record<UploadLogCategory, number>;
+};
+
 export function monthlyUploadTotals(
   logs: UploadLog[],
   months = 6,
   now: Date = new Date()
-): { label: string; key: string; count: number }[] {
+): MonthlyUpload[] {
   const keyOf = (d: Date) =>
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-  const buckets = Array.from({ length: months }, (_, i) => {
+  const buckets: MonthlyUpload[] = Array.from({ length: months }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1);
-    return { label: `${d.getMonth() + 1}월`, key: keyOf(d), count: 0 };
+    return {
+      label: `${d.getMonth() + 1}월`,
+      key: keyOf(d),
+      count: 0,
+      byCategory: Object.fromEntries(
+        UPLOAD_LOG_CATEGORIES.map((c) => [c, 0])
+      ) as Record<UploadLogCategory, number>,
+    };
   });
   const idx = new Map(buckets.map((b, i) => [b.key, i]));
   for (const log of logs) {
     const i = idx.get(keyOf(new Date(log.created_at)));
-    if (i !== undefined) buckets[i].count += 1;
+    if (i !== undefined) {
+      buckets[i].count += 1;
+      buckets[i].byCategory[log.category] += 1;
+    }
   }
   return buckets;
 }

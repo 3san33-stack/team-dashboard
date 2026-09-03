@@ -354,6 +354,16 @@ describe("monthlyUploadTotals", () => {
     expect(r.map((b) => b.label)).toEqual(["6월", "7월", "8월"]);
     expect(r.map((b) => b.count)).toEqual([1, 0, 2]);
   });
+
+  it("breaks each month down by category", () => {
+    const logs = [
+      makeLog({ category: "신규", created_at: "2026-08-02T00:00:00Z" }),
+      makeLog({ category: "신규", created_at: "2026-08-05T00:00:00Z" }),
+      makeLog({ category: "수정", created_at: "2026-08-09T00:00:00Z" }),
+    ];
+    const aug = monthlyUploadTotals(logs, 1, now)[0];
+    expect(aug.byCategory).toEqual({ 신규: 2, 수정: 1, 동일: 0 });
+  });
 });
 
 describe("uploadCountOnDay", () => {
