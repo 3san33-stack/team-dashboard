@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PieChart, Ruler } from "lucide-react";
+import { CalendarCheck, PieChart, Ruler } from "lucide-react";
 import { TowelAnalysisDialog } from "@/components/towel-analysis-dialog";
 import { AnalyticsDialog } from "@/components/analytics-dialog";
+import { WeeklyReviewDialog } from "@/components/weekly-review-dialog";
 import type { Task } from "@/lib/types";
 
 // Section jump-nav for the long dashboard — genuinely additive (these links
@@ -60,6 +61,16 @@ export function LeftRail({ tasks }: { tasks: Task[] }) {
           </a>
         ))}
       </aside>
+
+      <WeeklyReviewDialog
+        tasks={tasks}
+        trigger={
+          <button type="button" className={TRAY_BTN}>
+            <CalendarCheck className="h-5 w-5 shrink-0" />
+            주간 팀 리뷰
+          </button>
+        }
+      />
 
       <AnalyticsDialog
         tasks={tasks}

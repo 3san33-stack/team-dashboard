@@ -1,5 +1,5 @@
 import {
-  CATEGORIES, STATUSES, UPLOAD_LOG_CATEGORIES, WEAVERS,
+  CATEGORIES, MEMBERS, STATUSES, UPLOAD_LOG_CATEGORIES, WEAVERS,
   type Category, type Member, type Priority, type Status, type Task,
   type UploadLog, type UploadLogCategory, type Weaver,
 } from "./types";
@@ -166,6 +166,48 @@ export function upcomingDeadlines(tasks: Task[], limit = 5, member?: Member): Ta
     )
     .sort((a, b) => a.due_date!.localeCompare(b.due_date!))
     .slice(0, limit);
+}
+
+export type WeeklyMemberReview = {
+  member: Member;
+  dueThisWeek: Task[];
+  doneThisWeek: Task[]; // due this week AND status 완료
+  overdue: Task[]; // 마감 지남, 미완료 (전체 기간, 이월분)
+  inProgress: Task[];
+  dueNextWeek: Task[];
+};
+
+// 주간 팀 리뷰: 이번 주(월~일) 기준으로 팀원별 마감/지연/진행 현황.
+// completed_at 컬럼이 없어 "이번 주 완료"는 "이번 주 마감이면서 상태가 완료"로 근사.
+export function weeklyReview(tasks: Task[], now: Date = new Date()) {
+  const ws = startOfWeek(now);
+  const key = (d: Date) => toLocalDateKey(d);
+  const addDays = (d: Date, n: number) => {
+    const x = new Date(d);
+    x.setDate(x.getDate() + n);
+    return x;
+  };
+  const weekStartKey = key(ws);
+  const weekEndKey = key(addDays(ws, 6));
+  const nextStartKey = key(addDays(ws, 7));
+  const nextEndKey = key(addDays(ws, 13));
+  const inRange = (t: Task, s: string, e: string) =>
+    t.due_date !== null && t.due_date >= s && t.due_date <= e;
+
+  const members: WeeklyMemberReview[] = MEMBERS.map((member) => {
+    const mine = tasks.filter((t) => t.member === member);
+    const dueThisWeek = mine.filter((t) => inRange(t, weekStartKey, weekEndKey));
+    return {
+      member,
+      dueThisWeek,
+      doneThisWeek: dueThisWeek.filter((t) => t.status === "완료"),
+      overdue: mine.filter((t) => isOverdue(t, now) && t.due_date! >= "2000-01-01"),
+      inProgress: mine.filter((t) => t.status === "진행중"),
+      dueNextWeek: mine.filter((t) => inRange(t, nextStartKey, nextEndKey)),
+    };
+  });
+
+  return { weekStartKey, weekEndKey, members };
 }
 
 export function taskStatusEmoji(task: Task, today: Date = new Date()): "✅" | "🔴" | "🟡" {

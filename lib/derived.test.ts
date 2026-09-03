@@ -16,6 +16,7 @@ import {
   uploadCountOnDay,
   uploadCountFor,
   monthlyUploadTotals,
+  weeklyReview,
 } from "./derived";
 import type { Task, UploadLog } from "./types";
 import { CATEGORIES } from "./types";
@@ -99,6 +100,26 @@ describe("memberStatusCounts", () => {
     expect(memberStatusCounts(tasks, "이은혜")).toEqual({
       예정: 0, 진행중: 2, 검토중: 0, 완료: 1, 보류: 0,
     });
+  });
+});
+
+describe("weeklyReview", () => {
+  // 2026-08-12 is a Wednesday → week Mon 08-10 ~ Sun 08-16.
+  const now = new Date("2026-08-12T12:00:00");
+  it("buckets a member's tasks by this-week / overdue / next-week", () => {
+    const tasks = [
+      makeTask({ member: "구민석", due_date: "2026-08-13", status: "진행중" }), // this week
+      makeTask({ member: "구민석", due_date: "2026-08-11", status: "완료" }),   // this week + done
+      makeTask({ member: "구민석", due_date: "2026-08-03", status: "진행중" }), // overdue
+      makeTask({ member: "구민석", due_date: "2026-08-19", status: "예정" }),   // next week
+      makeTask({ member: "이은혜", due_date: "2026-08-13", status: "예정" }),   // other member
+    ];
+    const r = weeklyReview(tasks, now);
+    const km = r.members.find((m) => m.member === "구민석")!;
+    expect(km.dueThisWeek.map((t) => t.due_date)).toEqual(["2026-08-13", "2026-08-11"]);
+    expect(km.doneThisWeek).toHaveLength(1);
+    expect(km.overdue.map((t) => t.due_date)).toEqual(["2026-08-03"]);
+    expect(km.dueNextWeek.map((t) => t.due_date)).toEqual(["2026-08-19"]);
   });
 });
 
