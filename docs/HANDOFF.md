@@ -42,6 +42,10 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   (`downloadTasksAsCsv`, `downloadUploadLogsAsCsv`)
 - `lib/image-upload.ts` — 샘플 요청 참고이미지 압축(캔버스, 최대 1600px·JPEG
   q0.8) 후 Supabase Storage 업로드/삭제
+- `lib/member-avatars.ts` — 팀원 프로필 사진(`member_avatars` 테이블, member→
+  avatar_url) 모듈 레벨 캐시+구독. `components/member-avatar.tsx`(읽기 전용,
+  사진 없으면 이니셜 원형 폴백)/`member-avatar-upload.tsx`(사이드바 프로필의
+  카메라 배지, 본인 사진만 변경 가능, `sample-request-images` 버킷 재사용)
 - `lib/excel-import.ts` — 엑셀 "통합DB" 시트 → `TaskInput[]` 변환
   (`mapImportRow` 순수 함수 + `parseTaskImportFile` xlsx 파싱)
 - `lib/category-colors.ts` — 업무구분별 색상(파이차트/기여율 공용)
@@ -63,6 +67,8 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
   contribution-report에서 분리됨), `task-calendar.tsx` + `full-calendar-dialog.tsx`
 - `components/personal-todo.tsx` — Supabase `personal_todos` 테이블 사용
 - `components/theme-toggle.tsx` — 라이트 기본, 다크는 토글로 전환·저장
+- `components/sidebar-quote.tsx` — 사이드바 하단 문구, 4.5초마다 슬라이드
+  전환으로 몇 개 문구를 순환(BETTER TOGETHER 등)
 - `components/push-notification-toggle.tsx` — 헤더 종 아이콘, Web Push 구독
 - `components/upcoming-deadlines.tsx` — **더 이상 카드가 아니라 헤더의 종
   아이콘 팝오버**(건수 배지 표시, 클릭하면 목록)
@@ -128,6 +134,9 @@ vitest(`lib/*.ts` 순수 함수만 테스트하는 컨벤션, 컴포넌트/페�
 - **Supabase 테이블** (전부 `supabase/*.sql` 마이그레이션 있고 실행 완료):
   `tasks`, `push_subscriptions`, `personal_todos`, `sample_requests`,
   `upload_logs`, `towel_analyses`.
+  **`member_avatars`는 `supabase/member_avatars.sql` 작성만 하고 아직 미실행**
+  — Supabase SQL Editor에서 한 번 실행해야 프로필 사진이 저장됨(실행 전엔
+  이니셜 원형으로 조용히 폴백, 에러 없음).
   **2026-09-03 실운영 시작 전 tasks/sample_requests/personal_todos/upload_logs/
   towel_analyses 전체 truncate 함** (테스트 데이터 정리). 직전 백업+복구 SQL은
   `backups/`(gitignore). `towel_analyses.sql`의 INSERT 23건은 다시 넣고 싶을 때
