@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion } from "motion/react";
 import { parseTaskImportFile, summarizeImport, taskMatchKey } from "@/lib/excel-import";
 import { createTask, updateTask } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
 import type { Task } from "@/lib/types";
 
 type Props = {
@@ -84,17 +84,16 @@ export function ExcelImportButton({ tasks, onImported }: Props) {
         className="hidden"
         onChange={handleFileSelect}
       />
-      <motion.button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         onClick={() => fileInputRef.current?.click()}
         disabled={busy}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.96 }}
-        className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium whitespace-nowrap text-white backdrop-blur-sm disabled:opacity-60"
       >
         {busy ? "가져오는 중..." : "엑셀 업로드"}
-      </motion.button>
-      {message && <p className="text-xs whitespace-nowrap text-white/70">{message}</p>}
+      </Button>
+      {message && <p className="text-xs whitespace-nowrap text-muted-foreground">{message}</p>}
     </div>
   );
 }
