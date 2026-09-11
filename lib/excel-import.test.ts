@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { mapImportRow } from "./excel-import";
+import { mapImportRow, taskMatchKey, summarizeImport } from "./excel-import";
+import type { Task } from "./types";
 
 function makeRow(overrides: Partial<Record<string, unknown>> = {}): Record<string, unknown> {
   return {
@@ -91,5 +92,46 @@ describe("mapImportRow", () => {
     expect("input" in result && result.input.project).toBe("행거치프 손수건 디자인\n비나 샘플요청");
     expect("input" in result && result.input.detail).toBe("1차\n2차");
     expect("input" in result && result.input.comment).toBe("코멘트1\n코멘트2");
+  });
+});
+
+describe("taskMatchKey", () => {
+  it("treats extra/leading/trailing whitespace as the same task", () => {
+    const a = taskMatchKey("구민석", "테스트 프로젝트", "제품개발");
+    const b = taskMatchKey("구민석", "  테스트   프로젝트  ", "제품개발");
+    expect(a).toBe(b);
+  });
+
+  it("treats different case as the same task", () => {
+    const a = taskMatchKey("구민석", "CJ Project", "제품개발");
+    const b = taskMatchKey("구민석", "cj project", "제품개발");
+    expect(a).toBe(b);
+  });
+
+  it("still distinguishes genuinely different projects", () => {
+    const a = taskMatchKey("구민석", "프로젝트 A", "제품개발");
+    const b = taskMatchKey("구민석", "프로젝트 B", "제품개발");
+    expect(a).not.toBe(b);
+  });
+});
+
+describe("summarizeImport", () => {
+  function makeTask(overrides: Partial<Task>): Task {
+    return {
+      id: "1", member: "구민석", project: "기존 업무", category: "제품개발",
+      detail: null, priority: "P3-보통", start_date: null, due_date: null,
+      progress: 0, status: "예정", comment: null,
+      created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:00:00Z",
+      ...overrides,
+    };
+  }
+
+  it("counts rows matching an existing task as updates, others as new", () => {
+    const existing = [makeTask({ id: "1", project: "기존 업무" })];
+    const rows = [
+      { rowNumber: 2, input: { member: "구민석" as const, project: "  기존   업무  ", category: "제품개발" as const, detail: null, priority: "P3-보통" as const, start_date: null, due_date: null, progress: 0, status: "예정" as const, comment: null } },
+      { rowNumber: 3, input: { member: "구민석" as const, project: "신규 업무", category: "제품개발" as const, detail: null, priority: "P3-보통" as const, start_date: null, due_date: null, progress: 0, status: "예정" as const, comment: null } },
+    ];
+    expect(summarizeImport(rows, existing)).toEqual({ toCreate: 1, toUpdate: 1 });
   });
 });

@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 import {
   CATEGORIES, MEMBERS, PRIORITIES, STATUSES,
-  type Category, type Member, type Priority, type Status, type TaskInput,
+  type Category, type Member, type Priority, type Status, type Task, type TaskInput,
 } from "./types";
 
 function toDateOrNull(value: unknown): string | null {
@@ -69,6 +69,37 @@ export function mapImportRow(
       comment: toTextOrNull(row["팀장코멘트"]),
     },
   };
+}
+
+// Collapses whitespace and case for dedupe matching ONLY (never applied to
+// the value actually saved) — a stray extra space, \n, or case difference
+// between two uploads of the same task used to make the importer treat it
+// as brand-new and create a duplicate instead of updating the original.
+function normalizeForMatch(value: string): string {
+  return value.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+export function taskMatchKey(member: string, project: string, category: string): string {
+  return `${member}|${normalizeForMatch(project)}|${category}`;
+}
+
+// Dry-run count (신규/갱신) shown to the user before committing an import,
+// using the same matching key the actual import applies.
+export function summarizeImport(
+  rows: ParsedImportRow[],
+  existingTasks: Task[]
+): { toCreate: number; toUpdate: number } {
+  const existingKeys = new Set(
+    existingTasks.map((t) => taskMatchKey(t.member, t.project, t.category))
+  );
+  let toCreate = 0;
+  let toUpdate = 0;
+  for (const row of rows) {
+    const key = taskMatchKey(row.input.member, row.input.project, row.input.category);
+    if (existingKeys.has(key)) toUpdate++;
+    else toCreate++;
+  }
+  return { toCreate, toUpdate };
 }
 
 const REQUIRED_HEADERS = [

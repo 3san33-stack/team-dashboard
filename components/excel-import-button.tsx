@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { motion } from "motion/react";
-import { parseTaskImportFile } from "@/lib/excel-import";
+import { parseTaskImportFile, summarizeImport, taskMatchKey } from "@/lib/excel-import";
 import { createTask, updateTask } from "@/lib/supabase";
 import type { Task } from "@/lib/types";
 
@@ -10,10 +10,6 @@ type Props = {
   tasks: Task[];
   onImported: () => void;
 };
-
-function keyFor(member: string, project: string, category: string): string {
-  return `${member}|${project}|${category}`;
-}
 
 export function ExcelImportButton({ tasks, onImported }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,8 +26,19 @@ export function ExcelImportButton({ tasks, onImported }: Props) {
     try {
       const { rows, skipped } = await parseTaskImportFile(file);
 
+      const { toCreate, toUpdate } = summarizeImport(rows, tasks);
+      const proceed = confirm(
+        `엑셀 ${rows.length}건 확인됨 — 신규 ${toCreate}건 추가, 기존 ${toUpdate}건 갱신됩니다.` +
+          (skipped.length > 0 ? `\n(${skipped.length}건은 형식 문제로 건너뜁니다)` : "") +
+          `\n\n계속할까요?`
+      );
+      if (!proceed) {
+        setBusy(false);
+        return;
+      }
+
       const existingByKey = new Map(
-        tasks.map((t) => [keyFor(t.member, t.project, t.category), t.id])
+        tasks.map((t) => [taskMatchKey(t.member, t.project, t.category), t.id])
       );
 
       let created = 0;
@@ -39,7 +46,7 @@ export function ExcelImportButton({ tasks, onImported }: Props) {
       let failed = 0;
 
       for (const row of rows) {
-        const key = keyFor(row.input.member, row.input.project, row.input.category);
+        const key = taskMatchKey(row.input.member, row.input.project, row.input.category);
         const existingId = existingByKey.get(key);
         try {
           if (existingId) {
