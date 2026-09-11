@@ -14,9 +14,9 @@ export function AnalyticsDialog({ tasks, trigger }: Props) {
   return (
     <Dialog>
       <DialogTrigger render={trigger} />
-      <DialogContent className="h-[90vh] w-[96vw] max-w-none grid-rows-[auto_minmax(0,1fr)] gap-4 sm:max-w-[1400px]">
+      <DialogContent className="studio-analytics-dialog h-[90vh] w-[96vw] max-w-none grid-rows-[auto_minmax(0,1fr)] gap-4 sm:max-w-[1400px]">
         <DialogHeader className="pr-10">
-          <DialogTitle className="text-lg">팀 분석</DialogTitle>
+          <span className="studio-eyebrow">TEAM INSIGHTS</span><DialogTitle className="text-lg">팀의 흐름, 한눈에.</DialogTitle><p className="text-sm text-muted-foreground">업무 구성과 팀원별 진행 현황을 함께 살펴보세요.</p>
         </DialogHeader>
         <div className="min-h-0 overflow-y-auto">
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">

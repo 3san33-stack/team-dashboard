@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { StudioShell } from "@/components/studio-shell";
 import { MemberSelect } from "@/components/member-select";
 import { DepartmentReport } from "@/components/department-report";
 import { Button } from "@/components/ui/button";
@@ -57,14 +58,14 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="min-h-screen w-full space-y-6 bg-background p-3 sm:p-4 md:p-6">
+    <StudioShell member={member} tasks={tasks} active="report"><div className="studio-report-content space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">부서장님 보고</h1>
+        <div><span className="studio-eyebrow">DEPARTMENT REPORT</span><h1 className="mt-2 text-2xl font-semibold">팀의 성과를 함께 읽다.</h1><p className="mt-2 text-sm text-muted-foreground">업무 현황과 제품개발 기여율을 확인하세요.</p></div>
         <Link href="/">
           <Button variant="outline" size="sm">대시보드로</Button>
         </Link>
       </div>
       <DepartmentReport tasks={tasks} />
-    </div>
+    </div></StudioShell>
   );
 }

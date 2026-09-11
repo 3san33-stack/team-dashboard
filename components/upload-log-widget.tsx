@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useId } from "react";
 import {
   Card, CardContent, CardHeader, CardTitle,
 } from "@/components/ui/card";
@@ -33,7 +33,8 @@ type TrendPoint = { key: string; label: string; value: number; hint: React.React
 
 function TrendLine({ title, points }: { title: string; points: TrendPoint[] }) {
   const [hover, setHover] = useState<number | null>(null);
-  const w = 168, h = 60, pad = 6;
+  const gradientId = useId();
+  const w = 320, h = 106, pad = 10;
   const max = Math.max(1, ...points.map((p) => p.value));
   const band = (w - pad * 2) / Math.max(1, points.length - 1);
   const xy = points.map((p, i) => ({
@@ -44,14 +45,17 @@ function TrendLine({ title, points }: { title: string; points: TrendPoint[] }) {
   const active = hover !== null ? xy[hover] : null;
 
   return (
-    <div className="relative">
+    <div className="studio-trend-chart relative">
       <p className="mb-1 text-xs font-medium text-muted-foreground">{title}</p>
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-48 text-primary" role="img" aria-label={title}>
+      <svg viewBox={`0 0 ${w} ${h}`} className="studio-trend-svg text-primary" role="img" aria-label={title}>
+        <defs><linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="currentColor" stopOpacity=".18"/><stop offset="100%" stopColor="currentColor" stopOpacity="0"/></linearGradient></defs>
+        {[25,55,85].map(y=><line key={y} x1={pad} x2={w-pad} y1={y} y2={y} stroke="var(--chart-grid)" strokeDasharray="3 5"/>)}
+        <path d={`M${pad},${h-pad} ${xy.map(p=>`L${p.x},${p.y}`).join(" ")} L${w-pad},${h-pad} Z`} fill={`url(#${gradientId})`}/>
         <polyline
           points={xy.map((p) => `${p.x},${p.y}`).join(" ")}
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.5"
+          strokeWidth="2.5"
         />
         {xy.map((p, i) => (
           <circle key={p.key} cx={p.x} cy={p.y} r={hover === i ? 3.5 : 2.5} fill="currentColor" />
@@ -64,12 +68,19 @@ function TrendLine({ title, points }: { title: string; points: TrendPoint[] }) {
             width={band}
             height={h}
             fill="transparent"
+            tabIndex={0}
+            role="button"
+            aria-label={`${p.label}, ${p.value}건`}
+            onFocus={() => setHover(i)}
+            onBlur={() => setHover(null)}
+            onClick={() => setHover(i)}
+            onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setHover(i); } }}
             onMouseEnter={() => setHover(i)}
             onMouseLeave={() => setHover(null)}
           />
         ))}
       </svg>
-      <div className="flex w-48 justify-between text-[10px] text-muted-foreground">
+      <div className="studio-trend-labels flex justify-between text-xs text-muted-foreground">
         {points.map((p, i) => (
           <span key={p.key} className={hover === i ? "font-medium text-foreground" : ""}>{p.label}</span>
         ))}
@@ -184,7 +195,7 @@ export function UploadLogWidget() {
   const viewMonthDays = buildMonthGrid(viewDate);
 
   return (
-    <Card>
+    <Card className="studio-upload-widget">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0">
         <CardTitle>업로드 기록</CardTitle>
         <div className="flex flex-wrap items-center gap-3">
@@ -211,7 +222,7 @@ export function UploadLogWidget() {
           <p className="text-sm text-muted-foreground">불러오는 중...</p>
         ) : (
           <>
-            <div className="flex flex-wrap items-start gap-8">
+            <div className="studio-upload-overview">
               <div className="space-y-3">
                 {WEAVERS.map((member) => (
                   <div key={member} className="flex flex-wrap items-center gap-2">
@@ -223,7 +234,8 @@ export function UploadLogWidget() {
                           <button
                             type="button"
                             onClick={() => handleLog(member, category)}
-                            className="rounded-md border px-2.5 py-1 text-xs font-medium hover:bg-muted"
+                            data-category={category}
+                            className="studio-upload-counter rounded-md border px-2.5 py-1 text-xs font-medium hover:bg-muted"
                           >
                             {category} {count}
                           </button>
@@ -243,7 +255,7 @@ export function UploadLogWidget() {
                 ))}
               </div>
 
-              <div className="flex flex-wrap items-start gap-8">
+              <div className="studio-trend-grid">
                 <TrendLine title="이번 주" points={weekPoints} />
                 <TrendLine title="월별 추이" points={monthPoints} />
               </div>

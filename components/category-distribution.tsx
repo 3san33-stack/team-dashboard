@@ -23,7 +23,7 @@ export function CategoryDistribution({ tasks }: Props) {
     }));
 
   return (
-    <Card>
+    <Card className="studio-category-chart">
       <CardHeader>
         <CardTitle>업무구분별 분포 (전체)</CardTitle>
       </CardHeader>

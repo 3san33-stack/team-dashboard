@@ -1,39 +1,8 @@
 "use client";
-
-import { motion } from "motion/react";
-import { Card, CardContent } from "@/components/ui/card";
-import { CountUpNumber } from "@/components/count-up-number";
-
-type Props = { total: number; inProgress: number; completed: number; overdue: number };
-
-export function SummaryCards({ total, inProgress, completed, overdue }: Props) {
-  const items = [
-    { label: "전체 업무", value: total },
-    { label: "진행중", value: inProgress },
-    { label: "완료", value: completed },
-    { label: "지연", value: overdue },
-  ];
-
-  return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-      {items.map((item, i) => (
-        <motion.div
-          key={item.label}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.06 }}
-          whileHover={{ y: -4 }}
-        >
-          <Card className="border-white/15 bg-white/10 text-white ring-white/15 backdrop-blur-sm">
-            <CardContent className="py-6">
-              <div className="text-sm text-white/60">{item.label}</div>
-              <div className="text-3xl font-semibold">
-                <CountUpNumber value={item.value} />
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      ))}
-    </div>
-  );
+import {ArrowUpRight,CheckCheck,Clock3,Layers3,LoaderCircle} from 'lucide-react';
+import {CountUpNumber} from '@/components/count-up-number';
+type Props={total:number;inProgress:number;completed:number;overdue:number;onSelect?:(status:string)=>void};
+export function SummaryCards({total,inProgress,completed,overdue,onSelect}:Props){
+ const items=[{label:'전체 업무',key:'전체',value:total,icon:Layers3,note:'팀에 등록된 모든 업무'},{label:'진행중',key:'진행중',value:inProgress,icon:LoaderCircle,note:'현재 진행 중인 작업'},{label:'완료',key:'완료',value:completed,icon:CheckCheck,note:total?`전체 업무의 ${Math.round(completed/total*100)}% 완료`:'등록된 업무가 없습니다'},{label:'지연',key:'지연',value:overdue,icon:Clock3,note:'마감일이 지난 미완료 업무'}];
+ return <div className="studio-summary">{items.map(item=><button key={item.key} className={`studio-stat ${item.key==='지연'?'is-warning':''}`} onClick={()=>onSelect?.(item.key)} disabled={!onSelect}><div className="studio-stat-label">{item.label}<item.icon size={19}/></div><div className="studio-stat-number"><CountUpNumber value={item.value}/><span>건</span></div><div className="studio-stat-note"><span>{item.note}</span><ArrowUpRight size={15}/></div></button>)}</div>
 }

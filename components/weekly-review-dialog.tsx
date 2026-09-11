@@ -26,9 +26,9 @@ export function WeeklyReviewDialog({ tasks, trigger }: Props) {
   return (
     <Dialog>
       <DialogTrigger render={trigger} />
-      <DialogContent className="h-[90vh] w-[96vw] max-w-none grid-rows-[auto_minmax(0,1fr)] gap-4 sm:max-w-[1100px]">
+      <DialogContent className="studio-review-dialog h-[90vh] w-[96vw] max-w-none grid-rows-[auto_minmax(0,1fr)] gap-4 sm:max-w-[1100px]">
         <DialogHeader className="pr-10">
-          <DialogTitle className="text-lg">
+          <span className="studio-eyebrow">WEEKLY REVIEW</span><DialogTitle className="text-lg">
             주간 팀 리뷰 · {fmtRange(weekStartKey, weekEndKey)}
           </DialogTitle>
         </DialogHeader>

@@ -31,11 +31,11 @@ export function averageProgress(tasks: Task[], member: Member): number {
 }
 
 const STATUS_COLORS: Record<Status, string> = {
-  예정: "bg-zinc-500",
-  진행중: "bg-blue-500",
-  검토중: "bg-purple-500",
-  완료: "bg-green-500",
-  보류: "bg-orange-500",
+  예정: "studio-status-planned",
+  진행중: "studio-status-progress",
+  검토중: "studio-status-review",
+  완료: "studio-status-done",
+  보류: "studio-status-hold",
 };
 
 export function statusColor(status: Status): string {
@@ -43,10 +43,10 @@ export function statusColor(status: Status): string {
 }
 
 const PRIORITY_COLORS: Record<Priority, string> = {
-  "P1-긴급": "bg-red-500",
-  "P2-높음": "bg-amber-500",
-  "P3-보통": "bg-zinc-400",
-  "P4-낮음": "bg-zinc-300",
+  "P1-긴급": "studio-priority-urgent",
+  "P2-높음": "studio-priority-high",
+  "P3-보통": "studio-priority-normal",
+  "P4-낮음": "studio-priority-low",
 };
 
 export function priorityColor(priority: Priority): string {

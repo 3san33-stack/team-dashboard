@@ -37,7 +37,7 @@ function RequestCard({ req, onStatusChange, onDelete, onEdit }: {
   return (
     <div
       ref={setNodeRef}
-      className={`flex gap-2 rounded-md border bg-card p-3 ${isDragging ? "opacity-30" : ""}`}
+      className={`studio-sample-card flex gap-2 rounded-md border bg-card p-3 ${isDragging ? "opacity-30" : ""}`}
     >
       <button
         type="button"
@@ -84,7 +84,8 @@ function StatusColumn({ status, children }: { status: SampleRequestStatus; child
   return (
     <div
       ref={setNodeRef}
-      className={`space-y-2 rounded-lg p-1 transition-colors ${isOver ? "bg-accent" : ""}`}
+      data-status={status}
+      className={`studio-sample-column space-y-2 rounded-lg p-1 transition-colors ${isOver ? "bg-accent" : ""}`}
     >
       {children}
     </div>

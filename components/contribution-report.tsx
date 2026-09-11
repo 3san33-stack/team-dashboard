@@ -11,7 +11,7 @@ export function ContributionReport({ tasks }: Props) {
   const now = new Date();
 
   return (
-    <Card>
+    <Card className="studio-contribution-chart">
       <CardHeader>
         <CardTitle>팀원별 이번 달 기여율</CardTitle>
       </CardHeader>

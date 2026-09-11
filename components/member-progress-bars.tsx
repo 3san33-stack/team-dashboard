@@ -9,7 +9,7 @@ type Props = { tasks: Task[] };
 
 export function MemberProgressBars({ tasks }: Props) {
   return (
-    <Card>
+    <Card className="studio-member-chart">
       <CardHeader>
         <CardTitle>팀원별 업무 현황</CardTitle>
       </CardHeader>
