@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
-import { validateSalesData } from "@/lib/sales-import";
+import { validateSalesData, type SalesRecord } from "@/lib/sales-import";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,6 +21,15 @@ export async function GET() {
     const match = html.match(/const DATA = (.*);/);
     if (!match) throw new Error("Missing baseline");
     const payload = JSON.parse(match[1]);
+    // Historical exports contain multiple rows per product/year. Preserve totals.
+    const merged = new Map<string, SalesRecord>();
+    for (const record of payload.records as SalesRecord[]) {
+      const key = `${record.y}\t${record.n}`;
+      const previous = merged.get(key);
+      if (previous) previous.m = previous.m.map((quantity, month) => quantity + record.m[month]);
+      else merged.set(key, { ...record, m: [...record.m] });
+    }
+    payload.records = [...merged.values()];
     validateSalesData(payload);
     return json({ payload, updated_at: null, updated_by: null, available: !error, message: error ? setupMessage : "기본 판매 데이터 · 아직 공용 업로드 없음" });
   } catch {
