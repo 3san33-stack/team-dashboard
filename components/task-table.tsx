@@ -10,7 +10,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { MEMBERS, STATUSES, type Member, type Task } from "@/lib/types";
+import { MEMBERS, STATUSES, type Member, type Status, type Task, type TaskInput } from "@/lib/types";
 import { isOverdue, priorityColor, statusColor, taskMatchesQuery } from "@/lib/derived";
 import { downloadTasksAsCsv } from "@/lib/export-csv";
 import { ArrowUpRight, LayoutGrid, List, Search, SlidersHorizontal, X } from "lucide-react";
@@ -22,10 +22,47 @@ type Props = {
   member: Member;
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
+  onQuickUpdate: (id: string, patch: Partial<TaskInput>) => Promise<void>;
   preset?: TaskPreset;
 };
 
-export function TaskTable({ tasks, member, onEdit, onDelete, preset = {} }: Props) {
+// 진행률만 로컬 텍스트 상태로 분리 — task.progress를 직접 제어하면 blur 전에
+// 서버 새로고침이 와서 타이핑 중인 값을 덮어써버림 (0 지우고 새로 입력할 때
+// 특히 티남). 값이 바뀌면(다른 값 저장 후 새로고침 등) 로컬도 따라가되,
+// 포커스 중엔 사용자가 타이핑한 걸 우선.
+function InlineProgress({ task, onQuickUpdate }: { task: Task; onQuickUpdate: Props["onQuickUpdate"] }) {
+  const [text, setText] = useState(String(task.progress));
+  const [focused, setFocused] = useState(false);
+  const shown = focused ? text : String(task.progress);
+  const value = shown.trim() === "" ? 0 : Number(shown);
+  const valid = Number.isFinite(value) && value >= 0 && value <= 100;
+
+  function commit() {
+    setFocused(false);
+    if (valid && value !== task.progress) void onQuickUpdate(task.id, { progress: value });
+  }
+
+  return (
+    <span className="studio-table-progress">
+      <span><i style={{ width: `${task.progress}%` }} /></span>
+      <input
+        type="number"
+        min={0}
+        max={100}
+        value={shown}
+        aria-label={`${task.project} 진행률 수정`}
+        aria-invalid={!valid}
+        className="studio-inline-progress"
+        onFocus={() => { setText(String(task.progress)); setFocused(true); }}
+        onChange={(e) => setText(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+      />%
+    </span>
+  );
+}
+
+export function TaskTable({ tasks, member, onEdit, onDelete, onQuickUpdate, preset = {} }: Props) {
   const [memberFilter, setMemberFilter] = useState<string>(preset.member ?? member);
   const [statusFilter, setStatusFilter] = useState<string>(preset.status ?? "all");
   const [query, setQuery] = useState("");
@@ -121,11 +158,25 @@ export function TaskTable({ tasks, member, onEdit, onDelete, preset = {} }: Prop
                 <Badge className={priorityColor(task.priority)}>{task.priority}</Badge>
               </TableCell>
               <TableCell className={isOverdue(task) ? "font-medium text-red-500" : ""}>
-                {task.due_date ?? "-"}
+                <input
+                  type="date"
+                  value={task.due_date ?? ""}
+                  aria-label={`${task.project} 마감일 수정`}
+                  className="studio-inline-date"
+                  onChange={(e) => void onQuickUpdate(task.id, { due_date: e.target.value || null })}
+                />
               </TableCell>
-              <TableCell><span className="studio-table-progress"><span><i style={{width:`${task.progress}%`}}/></span>{task.progress}%</span></TableCell>
+              <TableCell><InlineProgress task={task} onQuickUpdate={onQuickUpdate} /></TableCell>
               <TableCell>
-                <span className="studio-task-status" data-status={task.status}>{task.status}</span>
+                <select
+                  value={task.status}
+                  aria-label={`${task.project} 상태 수정`}
+                  className="studio-task-status studio-inline-status"
+                  data-status={task.status}
+                  onChange={(e) => void onQuickUpdate(task.id, { status: e.target.value as Status })}
+                >
+                  {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
               </TableCell>
               <TableCell className="space-x-2">
                 <Button variant="ghost" size="sm" onClick={() => onEdit(task)}>수정</Button>
