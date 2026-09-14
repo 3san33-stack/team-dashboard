@@ -10,6 +10,8 @@ import { MemberAvatar } from "@/components/member-avatar";
 import { TaskTable, type TaskPreset } from "@/components/task-table";
 import { TaskFormDialog } from "@/components/task-form-dialog";
 import { TaskCalendar } from "@/components/task-calendar";
+import { PersonalDiary } from "@/components/personal-diary";
+import "./diary.css";
 import { PersonalTodo } from "@/components/personal-todo";
 import { SampleRequestBoard } from "@/components/sample-request-board";
 import { UploadLogWidget } from "@/components/upload-log-widget";
@@ -26,13 +28,14 @@ const titles:Record<StudioView,{title:string;description:string}>={
  overview:{title:"좋은 디자인은, 함께 만드는 것.",description:"팀의 오늘을 살펴보고, 다음 아이디어를 이어가세요."},
  tasks:{title:"업무의 흐름을 한눈에.",description:"담당자와 상태를 선택해 필요한 업무에 집중하세요."},
  samples:{title:"아이디어가 샘플이 되는 곳.",description:"요청부터 제직 완료까지, 팀의 작업을 함께 연결합니다."},
+ diary:{title:"오늘의 생각을, 한 장씩.",description:"짧은 메모와 일상의 기록을 나만의 흐름으로 남겨보세요."},
  planner:{title:"오늘의 할 일, 다음의 계획.",description:"개인 할 일과 업무 마감을 한곳에서 정리하세요."},
  uploads:{title:"차곡차곡 쌓이는 작업 기록.",description:"신규·수정·동일 업로드의 일별 흐름을 확인하세요."},
  report:{title:"팀의 성과를 함께 읽다.",description:"업무 진행 현황과 제품개발 기여율을 확인하세요."}
 };
 export default function DashboardPage(){
  const [member,setMember]=useState<Member|null>(null),[ready,setReady]=useState(false),[tasks,setTasks]=useState<Task[]>([]),[editingTask,setEditingTask]=useState<Task|null>(null),[error,setError]=useState<string|null>(null),[actionError,setActionError]=useState<string|null>(null),[loading,setLoading]=useState(true),[refreshing,setRefreshing]=useState(false),[view,setView]=useState<StudioView>('overview'),[preset,setPreset]=useState<TaskPreset>({}),[tableVersion,setTableVersion]=useState(0),[lastUpdated,setLastUpdated]=useState<Date|null>(null);
- useEffect(()=>{try{const saved=localStorage.getItem(MEMBER_STORAGE_KEY);if(MEMBERS.includes(saved as Member))setMember(saved as Member)}catch{}const hash=window.location.hash.slice(1);if(['tasks','samples','planner','uploads'].includes(hash))setView(hash as StudioView);setReady(true)},[]);
+ useEffect(()=>{try{const saved=localStorage.getItem(MEMBER_STORAGE_KEY);if(MEMBERS.includes(saved as Member))setMember(saved as Member)}catch{}const hash=window.location.hash.slice(1);if(['tasks','samples','planner','uploads','diary'].includes(hash))setView(hash as StudioView);setReady(true)},[]);
  useEffect(()=>{if(!member)return;let active=true;setLoading(true);listTasks().then(data=>{if(active){setTasks(data);setError(null);setLastUpdated(new Date())}}).catch(()=>{if(active)setError('업무 데이터를 불러오지 못했습니다. 연결을 확인하고 다시 시도해 주세요.')}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[member]);
  async function refresh(){setRefreshing(true);try{setTasks(await listTasks());setError(null);setLastUpdated(new Date())}catch{setError('업무 데이터를 새로 불러오지 못했습니다.')}finally{setLoading(false);setRefreshing(false)}}
  function selectMember(m:Member){try{localStorage.setItem(MEMBER_STORAGE_KEY,m)}catch{}setMember(m)}
@@ -61,6 +64,7 @@ export default function DashboardPage(){
    <section hidden={view!=='tasks'} id="tasks" className="studio-panel studio-task-panel"><div className="studio-panel-heading"><div><span className="studio-eyebrow">PROJECTS & TASKS</span><h2>팀 업무 보드</h2></div><ExcelImportButton tasks={tasks} onImported={refresh}/></div><TaskTable key={`${member}-${tableVersion}`} tasks={tasks} member={member} preset={preset} onEdit={setEditingTask} onDelete={handleDelete} onQuickUpdate={handleQuickUpdate}/></section>
    <section hidden={view!=='samples'} id="samples" className="studio-samples"><SampleRequestBoard member={member}/></section>
    <section hidden={view!=='planner'} id="planner" className="studio-planner"><PersonalTodo member={member}/><TaskCalendar tasks={tasks} member={member}/></section>
+   <section hidden={view!=='diary'} id="diary"><PersonalDiary key={member} member={member}/></section>
    <section hidden={view!=='uploads'} id="uploads"><UploadLogWidget/></section>
   </>}
   {editingTask&&<TaskFormDialog key={editingTask.id} member={editingTask.member} task={editingTask} open onOpenChange={open=>!open&&setEditingTask(null)} onSubmit={input=>handleUpdate(editingTask.id,input)}/>}

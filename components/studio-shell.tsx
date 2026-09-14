@@ -1,7 +1,7 @@
 "use client";
 import {useState} from 'react';
 import Link from 'next/link';
-import {ArrowUpRight,CalendarCheck,CalendarDays,ChevronRight,FileBarChart2,FlaskConical,Layers3,LayoutDashboard,LogOut,Menu,PieChart,Ruler,TrendingUp,Upload,X} from 'lucide-react';
+import {BookOpen,ArrowUpRight,CalendarCheck,CalendarDays,ChevronRight,FileBarChart2,FlaskConical,Layers3,LayoutDashboard,LogOut,Menu,PieChart,Ruler,TrendingUp,Upload,X} from 'lucide-react';
 import {ThemeToggle} from '@/components/theme-toggle';
 import {UpcomingDeadlines} from '@/components/upcoming-deadlines';
 import {MemberAvatar} from '@/components/member-avatar';
@@ -11,8 +11,8 @@ import {WeeklyReviewDialog} from '@/components/weekly-review-dialog';
 import {AnalyticsDialog} from '@/components/analytics-dialog';
 import {TowelAnalysisDialog} from '@/components/towel-analysis-dialog';
 import type {Member,Task} from '@/lib/types';
-export type StudioView='overview'|'tasks'|'samples'|'planner'|'uploads'|'report';
-const nav=[{id:'overview',label:'팀 오버뷰',icon:LayoutDashboard},{id:'tasks',label:'업무 보드',icon:Layers3},{id:'samples',label:'샘플 제직',icon:FlaskConical},{id:'planner',label:'일정 · 할 일',icon:CalendarDays},{id:'uploads',label:'업로드 기록',icon:Upload}] as const;
+export type StudioView='overview'|'tasks'|'samples'|'planner'|'uploads'|'report'|'diary';
+const nav=[{id:'overview',label:'팀 오버뷰',icon:LayoutDashboard},{id:'tasks',label:'업무 보드',icon:Layers3},{id:'samples',label:'샘플 제직',icon:FlaskConical},{id:'planner',label:'일정 · 할 일',icon:CalendarDays},{id:'diary',label:'내 다이어리',icon:BookOpen},{id:'uploads',label:'업로드 기록',icon:Upload}] as const;
 type Props={children:React.ReactNode;member:Member;tasks:Task[];active:StudioView;onNavigate?:(view:StudioView)=>void;onSwitchMember?:()=>void};
 export function StudioShell({children,member,tasks,active,onNavigate,onSwitchMember}:Props){
  const [mobile,setMobile]=useState(false);const label=active==='report'?'부서장님 보고':nav.find(n=>n.id===active)?.label;
