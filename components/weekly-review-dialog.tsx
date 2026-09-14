@@ -20,8 +20,8 @@ function fmtRange(a: string, b: string) {
 export function WeeklyReviewDialog({ tasks, trigger }: Props) {
   const { weekStartKey, weekEndKey, members } = weeklyReview(tasks);
   const byDue = (a: Task, b: Task) => (a.due_date ?? "").localeCompare(b.due_date ?? "");
-  const overdue = members.flatMap((m) => m.overdue).sort(byDue);
-  const dueThisWeek = members.flatMap((m) => m.dueThisWeek).sort(byDue);
+  const overdueGroups = members.map((m) => ({ member: m.member, tasks: [...m.overdue].sort(byDue) }));
+  const dueThisWeekGroups = members.map((m) => ({ member: m.member, tasks: [...m.dueThisWeek].sort(byDue) }));
 
   return (
     <Dialog>
@@ -59,34 +59,51 @@ export function WeeklyReviewDialog({ tasks, trigger }: Props) {
             </TableBody>
           </Table>
 
-          <TaskList title="지연 업무 (이월)" tasks={overdue} empty="지연된 업무가 없습니다." />
-          <TaskList title="이번 주 마감 업무" tasks={dueThisWeek} empty="이번 주 마감 업무가 없습니다." />
+          <MemberTaskGroups title="지연 업무 (이월)" groups={overdueGroups} empty="지연된 업무가 없습니다." />
+          <MemberTaskGroups title="이번 주 마감 업무" groups={dueThisWeekGroups} empty="이번 주 마감 업무가 없습니다." />
         </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-function TaskList({ title, tasks, empty }: { title: string; tasks: Task[]; empty: string }) {
+function MemberTaskGroups({
+  title, groups, empty,
+}: {
+  title: string;
+  groups: { member: string; tasks: Task[] }[];
+  empty: string;
+}) {
+  const nonEmpty = groups.filter((g) => g.tasks.length > 0);
+  const total = nonEmpty.reduce((sum, g) => sum + g.tasks.length, 0);
+
   return (
     <div>
       <p className="mb-2 text-sm font-medium">
-        {title} <span className="text-muted-foreground">({tasks.length})</span>
+        {title} <span className="text-muted-foreground">({total})</span>
       </p>
-      {tasks.length === 0 ? (
+      {nonEmpty.length === 0 ? (
         <p className="text-sm text-muted-foreground">{empty}</p>
       ) : (
-        <ul className="divide-y rounded-lg border text-sm">
-          {tasks.map((t) => (
-            <li key={t.id} className="flex items-center gap-3 px-3 py-2">
-              <span className="w-14 shrink-0 text-muted-foreground">{t.member}</span>
-              <span className="min-w-0 flex-1 truncate">{t.project}</span>
-              <span className="shrink-0 text-xs text-muted-foreground">{t.due_date ?? "-"}</span>
-              <span className="w-10 shrink-0 text-right text-xs">{t.progress}%</span>
-              <Badge className={`${statusColor(t.status)} shrink-0`}>{t.status}</Badge>
-            </li>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {nonEmpty.map((g) => (
+            <div key={g.member} className="overflow-hidden rounded-lg border">
+              <p className="border-b bg-muted/40 px-3 py-1.5 text-xs font-medium">
+                {g.member} <span className="text-muted-foreground">({g.tasks.length})</span>
+              </p>
+              <ul className="divide-y text-sm">
+                {g.tasks.map((t) => (
+                  <li key={t.id} className="flex items-center gap-3 px-3 py-2">
+                    <span className="min-w-0 flex-1 truncate">{t.project}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{t.due_date ?? "-"}</span>
+                    <span className="w-10 shrink-0 text-right text-xs">{t.progress}%</span>
+                    <Badge className={`${statusColor(t.status)} shrink-0`}>{t.status}</Badge>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
