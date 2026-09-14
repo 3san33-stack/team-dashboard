@@ -126,9 +126,8 @@ export function UploadLogWidget() {
   const [logs, setLogs] = useState<UploadLog[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(false);
-  const [range, setRange] = useState<"week" | "month">("week");
-  // Which month the expanded "월간" view is showing (1st of that month).
+  const [range, setRange] = useState<"week" | "month">("month");
+  // Which month the "월간" view is showing (1st of that month).
   const [viewDate, setViewDate] = useState(() => new Date());
   const tempIdRef = useRef(0);
 
@@ -222,7 +221,7 @@ export function UploadLogWidget() {
     ),
   }));
 
-  // Expanded "월간" view follows viewDate so past months can be browsed.
+  // "월간" view follows viewDate so past months can be browsed.
   const viewMonthDays = buildMonthGrid(viewDate);
 
   return (
@@ -237,13 +236,6 @@ export function UploadLogWidget() {
             className="text-xs text-primary underline disabled:pointer-events-none disabled:text-muted-foreground disabled:no-underline"
           >
             엑셀로 내보내기
-          </button>
-          <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            className="text-xs text-primary underline"
-          >
-            {expanded ? "숨기기" : "주간/월간 보기"}
           </button>
         </div>
       </CardHeader>
@@ -299,7 +291,7 @@ export function UploadLogWidget() {
 
             <UploadDayNote key={toLocalDateKey(now)} date={toLocalDateKey(now)}/>
 
-            {expanded && (
+            {(
               <div className="space-y-3 border-t pt-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <button
