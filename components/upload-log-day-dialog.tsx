@@ -3,7 +3,8 @@
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { uploadCountFor } from "@/lib/derived";
+import { UploadDayNote } from "@/components/upload-day-note";
+import { uploadCountFor, toLocalDateKey } from "@/lib/derived";
 import { UPLOAD_LOG_CATEGORIES, WEAVERS, type UploadLog, type UploadLogCategory, type Weaver } from "@/lib/types";
 
 type Props = {
@@ -56,6 +57,7 @@ export function UploadLogDayDialog({ date, logs, trigger, onAdd, onUndo }: Props
             </div>
           ))}
         </div>
+        <UploadDayNote key={toLocalDateKey(date)} date={toLocalDateKey(date)}/>
       </DialogContent>
     </Dialog>
   );

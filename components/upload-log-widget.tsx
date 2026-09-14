@@ -13,6 +13,7 @@ import {
   toLocalDateKey, uploadCountFor, uploadCountOnDay,
 } from "@/lib/derived";
 import { downloadUploadLogsAsCsv } from "@/lib/export-csv";
+import { UploadDayNote } from "@/components/upload-day-note";
 import { UploadLogDayDialog } from "@/components/upload-log-day-dialog";
 import {
   UPLOAD_LOG_CATEGORIES, WEAVERS, type UploadLog, type UploadLogCategory, type Weaver,
@@ -296,6 +297,8 @@ export function UploadLogWidget() {
               <MemberCategoryTable summary={currentMonthSummary} />
             </div>
 
+            <UploadDayNote key={toLocalDateKey(now)} date={toLocalDateKey(now)}/>
+
             {expanded && (
               <div className="space-y-3 border-t pt-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -353,7 +356,7 @@ export function UploadLogWidget() {
                   )}
                 </div>
 
-                <p className="text-xs text-muted-foreground">날짜를 클릭하면 그날 기록을 담당자·분류별로 보고 고칠 수 있어요.</p>
+                <p className="text-xs text-muted-foreground">날짜를 클릭하면 그날 건수와 일별 메모를 확인하고 수정할 수 있어요.</p>
 
                 {range === "week" ? (
                   <div className="grid grid-cols-7 gap-1">
