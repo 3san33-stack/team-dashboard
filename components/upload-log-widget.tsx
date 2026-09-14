@@ -94,6 +94,33 @@ function TrendLine({ title, points }: { title: string; points: TrendPoint[] }) {
   );
 }
 
+function MemberCategoryTable({ summary }: { summary: Record<Weaver, Record<UploadLogCategory, number>> }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>담당자</TableHead>
+          {UPLOAD_LOG_CATEGORIES.map((c) => <TableHead key={c}>{c}</TableHead>)}
+          <TableHead>합계</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {WEAVERS.map((member) => {
+          const row = summary[member];
+          const total = UPLOAD_LOG_CATEGORIES.reduce((sum, c) => sum + row[c], 0);
+          return (
+            <TableRow key={member}>
+              <TableCell className="font-medium">{member}</TableCell>
+              {UPLOAD_LOG_CATEGORIES.map((c) => <TableCell key={c}>{row[c]}</TableCell>)}
+              <TableCell className="font-medium">{total}</TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  );
+}
+
 export function UploadLogWidget() {
   const [logs, setLogs] = useState<UploadLog[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -151,6 +178,9 @@ export function UploadLogWidget() {
 
   const now = new Date();
   const summary = summarizeUploadLogs(logs, range, range === "month" ? viewDate : now);
+  // Always-visible monthly summary at the bottom, independent of the
+  // week/month toggle above (that one is for drilling into other months).
+  const currentMonthSummary = summarizeUploadLogs(logs, "month", now);
   const isCurrentMonth =
     viewDate.getFullYear() === now.getFullYear() && viewDate.getMonth() === now.getMonth();
   const shiftMonth = (delta: number) =>
@@ -259,6 +289,11 @@ export function UploadLogWidget() {
                 <TrendLine title="이번 주" points={weekPoints} />
                 <TrendLine title="월별 추이" points={monthPoints} />
               </div>
+            </div>
+
+            <div className="space-y-2 border-t pt-4">
+              <p className="text-sm font-medium">{now.getMonth() + 1}월 요약</p>
+              <MemberCategoryTable summary={currentMonthSummary} />
             </div>
 
             {expanded && (
@@ -373,28 +408,7 @@ export function UploadLogWidget() {
                   </div>
                 )}
 
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>담당자</TableHead>
-                      {UPLOAD_LOG_CATEGORIES.map((c) => <TableHead key={c}>{c}</TableHead>)}
-                      <TableHead>합계</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {WEAVERS.map((member) => {
-                      const row = summary[member];
-                      const total = UPLOAD_LOG_CATEGORIES.reduce((sum, c) => sum + row[c], 0);
-                      return (
-                        <TableRow key={member}>
-                          <TableCell className="font-medium">{member}</TableCell>
-                          {UPLOAD_LOG_CATEGORIES.map((c) => <TableCell key={c}>{row[c]}</TableCell>)}
-                          <TableCell className="font-medium">{total}</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                <MemberCategoryTable summary={summary} />
               </div>
             )}
           </>
