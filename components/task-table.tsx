@@ -39,7 +39,7 @@ export function TaskTable({ tasks, member, onEdit, onDelete, preset = {} }: Prop
   const filtered = tasks.filter(
     (t) =>
       (memberFilter === "all" || t.member === memberFilter) &&
-      (statusFilter === "all" || (statusFilter === "보류 제외" ? t.status !== "보류" : t.status === statusFilter)) &&
+      (statusFilter === "all" || (statusFilter === "보류·검토중 제외" ? t.status !== "보류" && t.status !== "검토중" : statusFilter === "보류 및 검토중" ? t.status === "보류" || t.status === "검토중" : t.status === statusFilter)) &&
       (!hidingCompleted || t.status !== "완료") &&
       (!onlyOverdue || isOverdue(t)) &&
       taskMatchesQuery(t, query)
@@ -77,7 +77,8 @@ export function TaskTable({ tasks, member, onEdit, onDelete, preset = {} }: Prop
           <SelectTrigger className="w-40" aria-label="상태 필터"><SelectValue>{statusFilter === "all" ? "전체 상태" : statusFilter}</SelectValue></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">전체 상태</SelectItem>
-            <SelectItem value="보류 제외">보류 제외</SelectItem>
+            <SelectItem value="보류·검토중 제외">보류·검토중 제외</SelectItem>
+            <SelectItem value="보류 및 검토중">보류 및 검토중</SelectItem>
             {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>
