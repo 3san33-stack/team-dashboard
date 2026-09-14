@@ -85,11 +85,14 @@ function MemberTaskGroups({
       {nonEmpty.length === 0 ? (
         <p className="text-sm text-muted-foreground">{empty}</p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="columns-1 gap-3 sm:columns-2">
           {nonEmpty.map((g) => (
-            <div key={g.member} className="overflow-hidden rounded-lg border">
-              <p className="border-b bg-muted/40 px-3 py-1.5 text-xs font-medium">
-                {g.member} <span className="text-muted-foreground">({g.tasks.length})</span>
+            <div
+              key={g.member}
+              className="mb-3 break-inside-avoid overflow-hidden rounded-lg border shadow-sm"
+            >
+              <p className="border-b bg-muted/60 px-3 py-1.5 text-xs font-semibold">
+                {g.member} <span className="font-normal text-muted-foreground">({g.tasks.length})</span>
               </p>
               <ul className="divide-y text-sm">
                 {g.tasks.map((t) => (
