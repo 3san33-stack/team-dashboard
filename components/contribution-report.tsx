@@ -13,7 +13,7 @@ export function ContributionReport({ tasks }: Props) {
   return (
     <Card className="studio-contribution-chart">
       <CardHeader>
-        <CardTitle>팀원별 이번 달 기여율</CardTitle>
+        <CardTitle>팀원별 이번 달 업무 비중</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {MEMBERS.map((member) => {

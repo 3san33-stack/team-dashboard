@@ -60,7 +60,7 @@ export default function ReportPage() {
   return (
     <StudioShell member={member} tasks={tasks} active="report"><div className="studio-report-content space-y-6">
       <div className="flex items-center justify-between">
-        <div><span className="studio-eyebrow">DEPARTMENT REPORT</span><h1 className="mt-2 text-2xl font-semibold">팀의 성과를 함께 읽다.</h1><p className="mt-2 text-sm text-muted-foreground">업무 현황과 제품개발 기여율을 확인하세요.</p></div>
+        <div><span className="studio-eyebrow">DEPARTMENT REPORT</span><h1 className="mt-2 text-2xl font-semibold">팀의 성과를 함께 읽다.</h1><p className="mt-2 text-sm text-muted-foreground">업무 현황과 제품개발 업무 비중을 확인하세요.</p></div>
         <Link href="/">
           <Button variant="outline" size="sm">대시보드로</Button>
         </Link>

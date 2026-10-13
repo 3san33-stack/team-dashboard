@@ -83,7 +83,7 @@ export function DepartmentReport({ tasks }: Props) {
 
       <Card>
         <CardHeader>
-          <CardTitle>담당자별 제품개발 기여율 (월별)</CardTitle>
+          <CardTitle>담당자별 제품개발 업무 비중 (월별)</CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <table className="w-full min-w-[820px] text-sm">

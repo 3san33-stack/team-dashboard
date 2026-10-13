@@ -31,7 +31,7 @@ const titles:Record<StudioView,{title:string;description:string}>={
  diary:{title:"오늘의 생각을, 한 장씩.",description:"짧은 메모와 일상의 기록을 나만의 흐름으로 남겨보세요."},
  planner:{title:"오늘의 할 일, 다음의 계획.",description:"개인 할 일과 업무 마감을 한곳에서 정리하세요."},
  uploads:{title:"차곡차곡 쌓이는 작업 기록.",description:"신규·수정·동일 업로드의 일별 흐름을 확인하세요."},
- report:{title:"팀의 성과를 함께 읽다.",description:"업무 진행 현황과 제품개발 기여율을 확인하세요."}
+ report:{title:"팀의 성과를 함께 읽다.",description:"업무 진행 현황과 제품개발 업무 비중을 확인하세요."}
 };
 export default function DashboardPage(){
  const [member,setMember]=useState<Member|null>(null),[ready,setReady]=useState(false),[tasks,setTasks]=useState<Task[]>([]),[editingTask,setEditingTask]=useState<Task|null>(null),[error,setError]=useState<string|null>(null),[actionError,setActionError]=useState<string|null>(null),[loading,setLoading]=useState(true),[refreshing,setRefreshing]=useState(false),[view,setView]=useState<StudioView>('overview'),[preset,setPreset]=useState<TaskPreset>({}),[tableVersion,setTableVersion]=useState(0),[lastUpdated,setLastUpdated]=useState<Date|null>(null);
