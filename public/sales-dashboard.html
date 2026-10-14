@@ -139,6 +139,38 @@
     .product-analysis-side { border-top: 1px solid #eaebee; padding-top: 16px; }
     .product-empty { min-height: 180px; }
   }
+
+  .wrap { max-width: 1840px; }
+  .sales-book { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; min-height: 0; }
+  .sales-page { min-width: 0; background: #faf9f7; border: 1px solid #e1ded9; border-radius: 10px; padding: 20px; box-shadow: 0 4px 16px #27221c08; }
+  .sales-page-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #e1ded9; }
+  .sales-page-heading span { font-size: 11px; color: #8b7c72; }
+  .sales-page-heading h2 { margin: 0; font-size: 17px; }
+  .sales-page .grid2 { grid-template-columns: 1fr; }
+  .sales-page .product-spread { grid-template-columns: 1fr; gap: 16px; }
+  .sales-page .product-search-side { padding: 0; border: 0; }
+  .sales-page #productResults { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sales-page #productControls .filter-bar { grid-template-columns: auto minmax(0, 1fr); }
+  .sales-page .product-analysis-side { border-top: 1px solid #eaebee; padding-top: 12px; }
+  .sales-page .product-analysis-side .table-scroll { max-height: none; }
+  .sales-page .product-empty { min-height: 160px; }
+  .sales-page footer { margin-top: 18px; }
+  @media (min-width: 1101px) {
+    body { padding: 20px; height: 100dvh; overflow: hidden; }
+    .wrap { height: 100%; display: flex; flex-direction: column; }
+    .wrap > header { margin-bottom: 12px; flex-shrink: 0; }
+    .wrap > .kpi-row { margin-bottom: 16px; flex-shrink: 0; }
+    .sales-book { flex: 1; }
+    .sales-page { overflow-y: auto; scrollbar-gutter: stable; overscroll-behavior-y: contain; }
+  }
+  @media (max-width: 1100px) {
+    .sales-book { grid-template-columns: 1fr; }
+    .sales-page { padding: 14px; }
+  }
+  @media (max-width: 600px) {
+    .sales-page #productResults { grid-template-columns: 1fr; }
+    .sales-page .panel { padding: 12px; }
+  }
 </style>
 <script src="/sales-product-explorer.js"></script>
 </head>
@@ -160,6 +192,9 @@
   </div>
   <div class="kpi-row" id="kpiRow"></div>
 
+  <div class="sales-book">
+  <article class="sales-page sales-page-product" aria-labelledby="productPageTitle" tabindex="0">
+  <div class="sales-page-heading"><span>01</span><h2 id="productPageTitle">상품별 판매 분석</h2></div>
   <section class="panel product-search-panel" aria-labelledby="productSearchTitle">
     <h2 class="panel-title" id="productSearchTitle">상품별 연도별 판매 추이</h2>
     <p id="productCoverage"></p>
@@ -183,14 +218,18 @@
       </div>
     </div></div>
     <div class="product-analysis-side">
-      <div id="productEmpty" class="product-empty"><strong>상품의 판매 흐름을 한눈에</strong><p>왼쪽에서 상품을 검색하고 선택하면<br>연도별 그래프와 판매 실적이 표시됩니다.</p></div>
+      <div id="productEmpty" class="product-empty"><strong>상품의 판매 흐름을 한눈에</strong><p>상품을 검색하고 선택하면<br>연도별 그래프와 판매 실적이 표시됩니다.</p></div>
       <div id="productDetail" hidden>
       <p id="productPeriodNote"></p>
       <div class="product-chart"><canvas id="productTrendChart" role="img" aria-label="선택 상품의 연도별 판매 추이. 아래 표에서 수치를 확인할 수 있습니다."></canvas></div>
       <table class="product-year-table"><thead><tr><th>연도</th><th class="num">판매수량</th><th class="num">추정 판매금액</th></tr></thead><tbody id="productYearBody"></tbody></table>
       <p class="note">추정 금액은 해당 연도에 저장된 공장도가 × 판매수량입니다. 실제 매출과 다를 수 있으며, 가격이 없는 판매 기록은 금액을 표시하지 않습니다.</p>
     </div>
+    </div></div>
   </section>
+  </article>
+  <article class="sales-page sales-page-overview" aria-labelledby="overviewPageTitle" tabindex="0">
+  <div class="sales-page-heading"><span>02</span><h2 id="overviewPageTitle">전체 판매 현황</h2></div>
 
 
   <div class="panel" style="margin-bottom:14px;">
@@ -294,6 +333,8 @@
     숫자·규격 표기나 거래처명처럼 색상이 아닌 값은 "기타(비색상)"으로, 두 가지 색이 섞인 표기나 특수 시리즈명은 "혼합/특수"로 별도 분류했습니다.
     가격·매출은 각 제품의 최근 확인된 공장도가를 기준으로 추정한 값입니다.
   </footer>
+  </article>
+  </div>
 </div>
 
 <script>
