@@ -55,6 +55,8 @@
     function renderDetail() {
       if (!selected) return;
       detail.hidden = false;
+      document.getElementById("productControls").hidden = false;
+      document.getElementById("productEmpty").hidden = true;
       document.getElementById("productSelected").textContent = selected;
       const series = annualSeries(data.records, selected, Number(period.value));
       document.getElementById("productPeriodNote").textContent =
@@ -112,7 +114,7 @@
         button.className = "product-result";
         button.textContent = name;
         button.setAttribute("aria-pressed", String(name === selected));
-        button.addEventListener("click", () => { selected = name; picker.hidden = true; status.textContent = "선택한 상품의 판매 추이를 표시합니다."; renderDetail(); change.focus({ preventScroll: true }); });
+        button.addEventListener("click", () => { selected = name; picker.hidden = false; search(); status.textContent = "선택한 상품의 판매 추이를 표시합니다."; renderDetail(); change.focus({ preventScroll: true }); });
         results.append(button);
       });
     }
@@ -121,12 +123,14 @@
       picker.hidden = false;
       selected = "";
       detail.hidden = true;
+      document.getElementById("productControls").hidden = true;
+      document.getElementById("productEmpty").hidden = false;
       if (chart) { chart.destroy(); chart = null; }
       search();
     });
     more.addEventListener("click", () => { page++; search(); results.querySelector("button")?.focus({ preventScroll: true }); });
     previous.addEventListener("click", () => { page--; search(); results.querySelector("button")?.focus({ preventScroll: true }); });
-    change.addEventListener("click", () => { picker.hidden = false; search(); results.querySelector("button")?.focus({ preventScroll: true }); });
+    change.addEventListener("click", () => { picker.hidden = false; search(); input.focus({ preventScroll: true }); input.select(); });
     period.addEventListener("change", renderDetail);
     metric.addEventListener("change", renderDetail);
     search();

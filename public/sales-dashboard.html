@@ -97,10 +97,10 @@
   .product-search-panel label { font-size: 13px; font-weight: 600; }
   #productSearch { display: block; margin-top: 8px; width: 100%; padding: 12px; font: inherit; border: 1px solid #ccc; border-radius: 8px; }
   #productSearchStatus, #productCoverage, #productPeriodNote { line-height: 1.6; color: #626773; font-size: 12px; }
-  #productResults { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; margin: 8px 0; }
+  #productResults { display: grid; grid-template-columns: 1fr; gap: 0 16px; margin: 8px 0; }
   .product-result { min-width: 0; text-align: left; padding: 10px 8px; border: 0; border-bottom: 1px solid #eaebee; border-radius: 0; background: #fff; cursor: pointer; font: inherit; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
   .product-result:hover, .product-result[aria-pressed=true] { background: #f7eff2; border-color: #813b50; }
-  #productDetail { margin-top: 20px; border-top: 1px solid #e1e1e5; padding-top: 18px; }
+  #productDetail { min-width: 0; }
   #productSelected { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
   .product-selection { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
   #productChange { flex-shrink: 0; }
@@ -118,6 +118,26 @@
     .panel { padding: 16px 14px; }
     .product-chart { height: 260px; }
     h1 { font-size: 20px; }
+  }
+
+  .product-spread { display: grid; grid-template-columns: minmax(0, 35fr) minmax(0, 65fr); gap: 24px; margin-top: 20px; }
+  .product-search-side { min-width: 0; padding-right: 24px; border-right: 1px solid #eaebee; }
+  .product-analysis-side { min-width: 0; }
+  #productControls { border-top: 1px solid #eaebee; margin-top: 20px; padding-top: 18px; }
+  #productControls .filter-bar { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  #productControls select { width: 100%; }
+  .product-selection { flex-wrap: wrap; }
+  #productSelected { font-size: 15px; line-height: 1.6; }
+  .product-empty { min-height: 340px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-radius: 8px; background: #f7f7f9; color: #626773; font-size: 13px; line-height: 1.8; }
+  .product-empty strong { color: #30343b; font-size: 16px; }
+  .product-analysis-side .table-scroll { max-height: 300px; overflow: auto; }
+  .product-year-table thead { position: sticky; top: 0; background: #fff; z-index: 1; }
+  .product-chart { height: 260px; }
+  @media (max-width: 900px) {
+    .product-spread { grid-template-columns: 1fr; gap: 18px; }
+    .product-search-side { padding-right: 0; border-right: 0; }
+    .product-analysis-side { border-top: 1px solid #eaebee; padding-top: 16px; }
+    .product-empty { min-height: 180px; }
   }
 </style>
 <script src="/sales-product-explorer.js"></script>
@@ -143,6 +163,7 @@
   <section class="panel product-search-panel" aria-labelledby="productSearchTitle">
     <h2 class="panel-title" id="productSearchTitle">상품별 연도별 판매 추이</h2>
     <p id="productCoverage"></p>
+    <div class="product-spread"><div class="product-search-side">
     <label for="productSearch">상품명 검색</label>
     <input id="productSearch" type="search" placeholder="제품명 일부를 입력하세요" autocomplete="off" aria-describedby="productSearchStatus">
     <p id="productSearchStatus" role="status" aria-live="polite"></p>
@@ -154,12 +175,16 @@
         <button id="productMore" class="toggle-btn" type="button">다음</button>
       </div>
     </div>
-    <div id="productDetail" hidden>
+    <div id="productControls" hidden>
       <div class="product-selection"><h3 id="productSelected"></h3><button id="productChange" class="toggle-btn" type="button">상품 변경</button></div>
       <div class="filter-bar">
         <label for="productThroughMonth">비교 기간</label><select id="productThroughMonth"></select>
         <label for="productMetric">그래프 지표</label><select id="productMetric"><option value="quantity">판매수량</option><option value="revenue">추정 판매금액</option></select>
       </div>
+    </div></div>
+    <div class="product-analysis-side">
+      <div id="productEmpty" class="product-empty"><strong>상품의 판매 흐름을 한눈에</strong><p>왼쪽에서 상품을 검색하고 선택하면<br>연도별 그래프와 판매 실적이 표시됩니다.</p></div>
+      <div id="productDetail" hidden>
       <p id="productPeriodNote"></p>
       <div class="product-chart"><canvas id="productTrendChart" role="img" aria-label="선택 상품의 연도별 판매 추이. 아래 표에서 수치를 확인할 수 있습니다."></canvas></div>
       <table class="product-year-table"><thead><tr><th>연도</th><th class="num">판매수량</th><th class="num">추정 판매금액</th></tr></thead><tbody id="productYearBody"></tbody></table>

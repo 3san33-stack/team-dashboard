@@ -52,7 +52,9 @@ describe("product sales explorer", () => {
     const search = document.getElementById("productSearch") as HTMLInputElement;
     search.value = "코마"; search.dispatchEvent(new Event("input"));
     (document.querySelector(".product-result") as HTMLButtonElement).click();
-    expect(document.getElementById("productPicker")?.hidden).toBe(true);
+    expect(document.getElementById("productPicker")?.hidden).toBe(false);
+    expect(document.getElementById("productControls")?.hidden).toBe(false);
+    expect(document.getElementById("productEmpty")?.hidden).toBe(true);
     (document.getElementById("productChange") as HTMLButtonElement).click();
     expect(document.getElementById("productPicker")?.hidden).toBe(false);
     expect(document.getElementById("productSelected")?.textContent).toBe("송월 코마40.하늘");
