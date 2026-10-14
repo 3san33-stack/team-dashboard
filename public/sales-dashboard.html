@@ -26,7 +26,7 @@
   .card .sub2 { font-size: 12px; margin-top: 6px; font-weight: 600; }
   .sub2.up { color: #C8433A; }
   .sub2.muted { color: #8B8F98; font-weight: 500; }
-  .grid2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr); gap: 14px; margin-bottom: 14px; }
   .panel {
     background: #fff; border-radius: 10px; padding: 18px 20px;
     box-shadow: 0 1px 2px rgba(16,18,22,0.05); border: 1px solid #EAEBEE;
@@ -84,7 +84,37 @@
     .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .grid2 { grid-template-columns: 1fr; }
   }
+
+  .panel, .card, .grid2 > * { min-width: 0; }
+  .table-scroll { width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+  .table-scroll:focus-visible { outline: 2px solid #813b50; outline-offset: 3px; }
+  table { min-width: 640px; }
+  th, td.num, td.rank { white-space: nowrap; }
+  td { line-height: 1.55; vertical-align: top; }
+  td:nth-child(2) { min-width: 220px; overflow-wrap: anywhere; word-break: normal; }
+  #topProdBody td:nth-child(3) { min-width: 108px; white-space: nowrap; }
+  .product-search-panel { margin-bottom: 20px; }
+  .product-search-panel label { font-size: 13px; font-weight: 600; }
+  #productSearch { display: block; margin-top: 8px; width: 100%; padding: 12px; font: inherit; border: 1px solid #ccc; border-radius: 8px; }
+  #productSearchStatus, #productCoverage, #productPeriodNote { line-height: 1.6; color: #626773; font-size: 12px; }
+  #productResults { max-height: 230px; overflow-y: auto; display: grid; gap: 6px; margin: 10px 0; }
+  .product-result { text-align: left; padding: 10px 12px; border: 1px solid #e1e1e5; border-radius: 6px; background: #fff; cursor: pointer; font: inherit; overflow-wrap: anywhere; }
+  .product-result:hover, .product-result[aria-pressed=true] { background: #f7eff2; border-color: #813b50; }
+  #productDetail { margin-top: 20px; border-top: 1px solid #e1e1e5; padding-top: 18px; }
+  #productSelected { margin: 0 0 14px; font-size: 17px; overflow-wrap: anywhere; }
+  .product-chart { position: relative; height: 300px; margin: 18px 0; }
+  .product-year-table { min-width: 480px; }
+  .product-year-table td:nth-child(2) { min-width: 0; }
+  .toggle-group, .legend-inline { flex-wrap: wrap; }
+  [hidden] { display: none !important; }
+  @media (max-width: 600px) {
+    body { padding: 16px 12px 40px; }
+    .panel { padding: 16px 14px; }
+    .product-chart { height: 260px; }
+    h1 { font-size: 20px; }
+  }
 </style>
+<script src="/sales-product-explorer.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -103,6 +133,28 @@
     <span id="sharedStatus" role="status" style="font-size:12px;color:#6B6F76">공용 데이터 확인 중…</span>
   </div>
   <div class="kpi-row" id="kpiRow"></div>
+
+  <section class="panel product-search-panel" aria-labelledby="productSearchTitle">
+    <h2 class="panel-title" id="productSearchTitle">상품별 연도별 판매 추이</h2>
+    <p id="productCoverage"></p>
+    <label for="productSearch">상품명 검색</label>
+    <input id="productSearch" type="search" placeholder="제품명 일부를 입력하세요" autocomplete="off" aria-describedby="productSearchStatus">
+    <p id="productSearchStatus" role="status" aria-live="polite"></p>
+    <div id="productResults" aria-label="검색된 상품"></div>
+    <button id="productMore" class="toggle-btn" type="button" hidden>검색 결과 더 보기</button>
+    <div id="productDetail" hidden>
+      <h3 id="productSelected"></h3>
+      <div class="filter-bar">
+        <label for="productThroughMonth">비교 기간</label><select id="productThroughMonth"></select>
+        <label for="productMetric">그래프 지표</label><select id="productMetric"><option value="quantity">판매수량</option><option value="revenue">추정 판매금액</option></select>
+      </div>
+      <p id="productPeriodNote"></p>
+      <div class="product-chart"><canvas id="productTrendChart" role="img" aria-label="선택 상품의 연도별 판매 추이. 아래 표에서 수치를 확인할 수 있습니다."></canvas></div>
+      <table class="product-year-table"><thead><tr><th>연도</th><th class="num">판매수량</th><th class="num">추정 판매금액</th></tr></thead><tbody id="productYearBody"></tbody></table>
+      <p class="note">추정 금액은 해당 연도에 저장된 공장도가 × 판매수량입니다. 실제 매출과 다를 수 있으며, 가격이 없는 판매 기록은 금액을 표시하지 않습니다.</p>
+    </div>
+  </section>
+
 
   <div class="panel" style="margin-bottom:14px;">
     <div class="panel-title">월별 판매수량 추이</div>
@@ -226,6 +278,16 @@ try {
 renderSales(source);
 }
 function renderSales(DATA) {
+document.querySelectorAll("table").forEach(table => {
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-scroll";
+  wrapper.tabIndex = 0;
+  wrapper.setAttribute("role", "region");
+  wrapper.setAttribute("aria-label", "판매 표 · 좁은 화면에서는 좌우로 스크롤하세요");
+  table.before(wrapper);
+  wrapper.append(table);
+});
+SalesProductExplorer.mount(DATA);
 const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const FAMILY_HEX = {
   "그레이": "#9AA0A6", "화이트": "#E7E8EA", "옐로": "#E8C33E", "스카이블루": "#7FB8E0",
