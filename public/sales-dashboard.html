@@ -97,17 +97,23 @@
   .product-search-panel label { font-size: 13px; font-weight: 600; }
   #productSearch { display: block; margin-top: 8px; width: 100%; padding: 12px; font: inherit; border: 1px solid #ccc; border-radius: 8px; }
   #productSearchStatus, #productCoverage, #productPeriodNote { line-height: 1.6; color: #626773; font-size: 12px; }
-  #productResults { max-height: 230px; overflow-y: auto; display: grid; gap: 6px; margin: 10px 0; }
-  .product-result { text-align: left; padding: 10px 12px; border: 1px solid #e1e1e5; border-radius: 6px; background: #fff; cursor: pointer; font: inherit; overflow-wrap: anywhere; }
+  #productResults { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; margin: 8px 0; }
+  .product-result { min-width: 0; text-align: left; padding: 10px 8px; border: 0; border-bottom: 1px solid #eaebee; border-radius: 0; background: #fff; cursor: pointer; font: inherit; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
   .product-result:hover, .product-result[aria-pressed=true] { background: #f7eff2; border-color: #813b50; }
   #productDetail { margin-top: 20px; border-top: 1px solid #e1e1e5; padding-top: 18px; }
-  #productSelected { margin: 0 0 14px; font-size: 17px; overflow-wrap: anywhere; }
+  #productSelected { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
+  .product-selection { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+  #productChange { flex-shrink: 0; }
+  #productPagination { display: flex; justify-content: flex-end; align-items: center; gap: 12px; font-size: 12px; margin-top: 10px; }
+  #productPagination button:disabled { opacity: .4; cursor: default; }
   .product-chart { position: relative; height: 300px; margin: 18px 0; }
   .product-year-table { min-width: 480px; }
   .product-year-table td:nth-child(2) { min-width: 0; }
   .toggle-group, .legend-inline { flex-wrap: wrap; }
   [hidden] { display: none !important; }
   @media (max-width: 600px) {
+    #productResults { grid-template-columns: 1fr; }
+    .product-selection { align-items: flex-start; }
     body { padding: 16px 12px 40px; }
     .panel { padding: 16px 14px; }
     .product-chart { height: 260px; }
@@ -140,10 +146,16 @@
     <label for="productSearch">상품명 검색</label>
     <input id="productSearch" type="search" placeholder="제품명 일부를 입력하세요" autocomplete="off" aria-describedby="productSearchStatus">
     <p id="productSearchStatus" role="status" aria-live="polite"></p>
-    <div id="productResults" aria-label="검색된 상품"></div>
-    <button id="productMore" class="toggle-btn" type="button" hidden>검색 결과 더 보기</button>
+    <div id="productPicker">
+      <div id="productResults" aria-label="검색된 상품"></div>
+      <div id="productPagination" hidden>
+        <button id="productPrevious" class="toggle-btn" type="button">이전</button>
+        <span id="productPageStatus" role="status" aria-live="polite"></span>
+        <button id="productMore" class="toggle-btn" type="button">다음</button>
+      </div>
+    </div>
     <div id="productDetail" hidden>
-      <h3 id="productSelected"></h3>
+      <div class="product-selection"><h3 id="productSelected"></h3><button id="productChange" class="toggle-btn" type="button">상품 변경</button></div>
       <div class="filter-bar">
         <label for="productThroughMonth">비교 기간</label><select id="productThroughMonth"></select>
         <label for="productMetric">그래프 지표</label><select id="productMetric"><option value="quantity">판매수량</option><option value="revenue">추정 판매금액</option></select>

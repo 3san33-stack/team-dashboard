@@ -34,7 +34,12 @@
     const period = document.getElementById("productThroughMonth");
     const metric = document.getElementById("productMetric");
     const more = document.getElementById("productMore");
-    let selected = "", limit = 30, chart;
+    const previous = document.getElementById("productPrevious");
+    const picker = document.getElementById("productPicker");
+    const change = document.getElementById("productChange");
+    const pageStatus = document.getElementById("productPageStatus");
+    const pageSize = 8;
+    let selected = "", page = 0, chart;
     const latestYear = Math.max(...data.records.map(r => r.y));
     let lastMonth = 0;
     data.records.filter(r => r.y === latestYear).forEach(r => r.m.forEach((q, i) => { if (q !== 0) lastMonth = Math.max(lastMonth, i + 1); }));
@@ -91,27 +96,37 @@
     function search() {
       const names = findProducts(data.records, input.value);
       results.replaceChildren();
-      more.hidden = names.length <= limit;
+      const pages = Math.ceil(names.length / pageSize);
+      page = Math.max(0, Math.min(page, pages - 1));
+      const start = page * pageSize;
+      document.getElementById("productPagination").hidden = pages <= 1;
+      previous.disabled = page === 0;
+      more.disabled = page >= pages - 1;
+      more.hidden = false;
+      pageStatus.textContent = pages ? (page + 1) + " / " + pages : "";
       status.textContent = !input.value.trim() ? "제품명을 입력하세요. 예: 뉴컬러무지40, 코마40" :
-        names.length ? names.length + "개 제품 검색됨 · " + Math.min(names.length, limit) + "개 표시" : "일치하는 제품이 없습니다.";
-      names.slice(0, limit).forEach(name => {
+        names.length ? names.length + "개 제품 · 원하는 상품을 선택하세요" : "일치하는 제품이 없습니다.";
+      names.slice(start, start + pageSize).forEach(name => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "product-result";
         button.textContent = name;
         button.setAttribute("aria-pressed", String(name === selected));
-        button.addEventListener("click", () => { selected = name; search(); renderDetail(); });
+        button.addEventListener("click", () => { selected = name; picker.hidden = true; status.textContent = "선택한 상품의 판매 추이를 표시합니다."; renderDetail(); change.focus({ preventScroll: true }); });
         results.append(button);
       });
     }
     input.addEventListener("input", () => {
-      limit = 30;
+      page = 0;
+      picker.hidden = false;
       selected = "";
       detail.hidden = true;
       if (chart) { chart.destroy(); chart = null; }
       search();
     });
-    more.addEventListener("click", () => { limit += 30; search(); });
+    more.addEventListener("click", () => { page++; search(); results.querySelector("button")?.focus({ preventScroll: true }); });
+    previous.addEventListener("click", () => { page--; search(); results.querySelector("button")?.focus({ preventScroll: true }); });
+    change.addEventListener("click", () => { picker.hidden = false; search(); results.querySelector("button")?.focus({ preventScroll: true }); });
     period.addEventListener("change", renderDetail);
     metric.addEventListener("change", renderDetail);
     search();

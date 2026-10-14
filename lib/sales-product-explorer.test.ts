@@ -52,6 +52,9 @@ describe("product sales explorer", () => {
     const search = document.getElementById("productSearch") as HTMLInputElement;
     search.value = "코마"; search.dispatchEvent(new Event("input"));
     (document.querySelector(".product-result") as HTMLButtonElement).click();
+    expect(document.getElementById("productPicker")?.hidden).toBe(true);
+    (document.getElementById("productChange") as HTMLButtonElement).click();
+    expect(document.getElementById("productPicker")?.hidden).toBe(false);
     expect(document.getElementById("productSelected")?.textContent).toBe("송월 코마40.하늘");
     expect(document.getElementById("productYearBody")?.textContent).toContain("12개");
     expect(document.getElementById("productYearBody")?.textContent).toContain("기록 없음");
@@ -62,6 +65,22 @@ describe("product sales explorer", () => {
     expect(chart).toHaveBeenCalledTimes(2);
     search.value = "다른"; search.dispatchEvent(new Event("input"));
     expect(document.getElementById("productDetail")?.hidden).toBe(true);
+  });
+  it("paginates compact results without hiding later matches", () => {
+    document.body.innerHTML = new DOMParser().parseFromString(html, "text/html").body.innerHTML;
+    globals.SalesProductExplorer.mount({ records: Array.from({ length: 19 }, (_, i) => record("상품" + String(i).padStart(2, "0"), 2026, [1])) });
+    const search = document.getElementById("productSearch") as HTMLInputElement;
+    search.value = "상품"; search.dispatchEvent(new Event("input"));
+    expect(document.querySelectorAll(".product-result")).toHaveLength(8);
+    expect((document.getElementById("productPrevious") as HTMLButtonElement).disabled).toBe(true);
+    (document.getElementById("productMore") as HTMLButtonElement).click();
+    expect(document.querySelector(".product-result")?.textContent).toBe("상품08");
+    (document.getElementById("productMore") as HTMLButtonElement).click();
+    expect(document.querySelectorAll(".product-result")).toHaveLength(3);
+    expect((document.getElementById("productMore") as HTMLButtonElement).disabled).toBe(true);
+    search.value = "상품00"; search.dispatchEvent(new Event("input"));
+    expect(document.querySelector(".product-result")?.textContent).toBe("상품00");
+    expect(document.getElementById("productPagination")?.hidden).toBe(true);
   });
   it("renders untrusted product names as text", () => {
     document.body.innerHTML = new DOMParser().parseFromString(html, "text/html").body.innerHTML;
