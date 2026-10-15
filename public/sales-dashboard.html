@@ -171,6 +171,22 @@
     .sales-page #productResults { grid-template-columns: 1fr; }
     .sales-page .panel { padding: 12px; }
   }
+
+  .sales-summary { flex-shrink: 0; margin-bottom: 14px; background: #fff; border: 1px solid #eaebee; border-radius: 8px; }
+  .sales-summary summary { cursor: pointer; padding: 11px 14px; font-size: 12px; color: #626773; }
+  .sales-summary summary:focus-visible { outline: 2px solid #813b50; outline-offset: 2px; }
+  .summary-toggle { color: #813b50; font-weight: 700; margin-right: 18px; }
+  .summary-compact { line-height: 1.6; }
+  .summary-close, .sales-summary[open] .summary-open { display: none; }
+  .sales-summary[open] .summary-close { display: inline; }
+  .sales-summary .kpi-row { padding: 0 12px 12px; margin: 0; gap: 8px; }
+  .sales-summary .card { padding: 12px 14px; }
+  .sales-summary .card .label { margin-bottom: 6px; }
+  .sales-summary .card .value { font-size: 20px; }
+  @media (max-width: 600px) {
+    .summary-compact { display: block; margin-top: 4px; }
+    .sales-summary .card { padding: 10px; }
+  }
 </style>
 <script src="/sales-product-explorer.js"></script>
 </head>
@@ -190,7 +206,10 @@
     <button onclick="location.reload()" class="toggle-btn">새로고침</button>
     <span id="sharedStatus" role="status" style="font-size:12px;color:#6B6F76">공용 데이터 확인 중…</span>
   </div>
-  <div class="kpi-row" id="kpiRow"></div>
+  <details class="sales-summary">
+    <summary><span class="summary-toggle"><span class="summary-open">전체 통계 펼치기</span><span class="summary-close">전체 통계 접기</span></span><span id="kpiCompact" class="summary-compact">전체 판매 통계</span></summary>
+    <div class="kpi-row" id="kpiRow"></div>
+  </details>
 
   <div class="sales-book">
   <article class="sales-page sales-page-product" aria-labelledby="productPageTitle" tabindex="0">
@@ -467,6 +486,8 @@ const kpi = {
 function cardHtml(label, value, sub, subClass) {
   return `<div class="card"><div class="label">${escapeHtml(label)}</div><div class="value">${value}</div>${sub ? `<div class="sub2 ${subClass||''}">${sub}</div>` : ""}</div>`;
 }
+document.getElementById("kpiCompact").textContent = `${CUR_YEAR}년 1~${activeMonths}월 · 수량 ${fmtM(kpi.cur_qty)} · 추정 금액 ${fmtEok(kpi.cur_revenue_est)}원 · 판매 제품 ${fmtInt(kpi.sku_count)}종`;
+
 document.getElementById("kpiRow").innerHTML =
   cardHtml(`${kpi.cur_year} 누계 판매수량`, fmtM(kpi.cur_qty), kpi.qty_yoy!=null ? `전년동기 ${kpi.qty_yoy>0?"+":""}${kpi.qty_yoy}%` : "", "up") +
   cardHtml(`${kpi.cur_year} 누계 판매금액`, fmtEok(kpi.cur_revenue_est)+"원", kpi.revenue_yoy!=null ? `전년동기 ${kpi.revenue_yoy>0?"+":""}${kpi.revenue_yoy}%` : "", "up") +
