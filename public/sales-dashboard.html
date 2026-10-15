@@ -187,25 +187,37 @@
     .summary-compact { display: block; margin-top: 4px; }
     .sales-summary .card { padding: 10px; }
   }
+
+  .wrap > .sales-header { align-items: center; gap: 8px 18px; margin-bottom: 10px; }
+  .sales-header h1 { margin: 0; font-size: 18px; letter-spacing: -.3px; line-height: 1.4; }
+  .sales-header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .sales-upload-link { background: #16181d; color: #fff; padding: 7px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; white-space: nowrap; }
+  .sales-data-info { position: relative; font-size: 12px; color: #626773; }
+  .sales-data-info summary { cursor: pointer; padding: 6px 8px; }
+  .sales-data-info-content { position: absolute; right: 0; top: calc(100% + 8px); width: min(420px, calc(100vw - 48px)); padding: 12px 16px; background: #fff; border: 1px solid #e1e1e5; border-radius: 8px; box-shadow: 0 6px 24px #0002; z-index: 10; line-height: 1.7; overflow-wrap: anywhere; }
+  .sales-data-info-content p { margin: 6px 0; }
+  @media (min-width: 1101px) { body { padding-top: 12px; } }
+  @media (max-width: 600px) { .sales-header h1 { font-size: 16px; } .sales-data-info-content { position: fixed; top: 100px; right: 16px; max-height: 60vh; overflow: auto; } }
 </style>
 <script src="/sales-product-explorer.js"></script>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div>
-      <h1>Design R&D · 내부데이터 대시보드</h1>
-      <div class="sub">타월 제품별 월판매현황 · 색상 · 가격대별 판매 분석</div>
-      <div class="sub" id="excludeNote" style="margin-top:2px;"></div>
+  <header class="sales-header">
+    <h1>Design R&D · 판매 대시보드</h1>
+    <div class="sales-header-actions">
+      <a href="/sales-upload" class="sales-upload-link">엑셀 업로드</a>
+      <button onclick="location.reload()" class="toggle-btn">새로고침</button>
+      <details id="salesDataInfo" class="sales-data-info">
+        <summary>데이터 안내</summary>
+        <div class="sales-data-info-content">
+          <p>타월 제품별 월판매현황 · 색상 · 가격대별 판매 분석</p>
+          <p id="excludeNote"></p>
+          <p id="sharedStatus" role="status">공용 데이터 확인 중…</p>
+        </div>
+      </details>
     </div>
-    <div class="badge">전 색상 자동 분류 반영</div>
   </header>
-
-  <div style="margin-bottom:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-    <a href="/sales-upload" style="background:#16181D;color:white;padding:10px 16px;border-radius:6px;text-decoration:none;font-size:13px">판매 엑셀 업로드</a>
-    <button onclick="location.reload()" class="toggle-btn">새로고침</button>
-    <span id="sharedStatus" role="status" style="font-size:12px;color:#6B6F76">공용 데이터 확인 중…</span>
-  </div>
   <details class="sales-summary">
     <summary><span class="summary-toggle"><span class="summary-open">전체 통계 펼치기</span><span class="summary-close">전체 통계 접기</span></span><span id="kpiCompact" class="summary-compact">전체 판매 통계</span></summary>
     <div class="kpi-row" id="kpiRow"></div>
@@ -371,6 +383,7 @@ try {
   status.textContent = shared.updated_at ? "팀 공용 데이터 · " + new Date(shared.updated_at).toLocaleString("ko-KR") + (shared.updated_by ? " · " + shared.updated_by : "") : shared.message;
 } catch (error) {
   status.textContent = "기본 저장본 표시 · " + error.message;
+  document.getElementById("salesDataInfo").open = true;
 }
 renderSales(source);
 }
