@@ -1,3 +1,4 @@
+import { syncTaskCompletion } from "./task-completion";
 import { createClient } from "@supabase/supabase-js";
 import type {
   Member, PersonalTodoItem, SampleRequest, SampleRequestInput, Task, TaskInput,
@@ -19,7 +20,7 @@ export async function listTasks(): Promise<Task[]> {
 }
 
 export async function createTask(input: TaskInput): Promise<Task> {
-  const { data, error } = await supabase.from("tasks").insert(input).select().single();
+  const { data, error } = await supabase.from("tasks").insert(syncTaskCompletion(input)).select().single();
   if (error) throw error;
   return data as Task;
 }
@@ -27,7 +28,7 @@ export async function createTask(input: TaskInput): Promise<Task> {
 export async function updateTask(id: string, input: Partial<TaskInput>): Promise<Task> {
   const { data, error } = await supabase
     .from("tasks")
-    .update({ ...input, updated_at: new Date().toISOString() })
+    .update({ ...syncTaskCompletion(input), updated_at: new Date().toISOString() })
     .eq("id", id)
     .select()
     .single();

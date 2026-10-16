@@ -125,7 +125,12 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
                 <Label>상태</Label>
                 <Select
                   value={form.status}
-                  onValueChange={(v) => v && setForm({ ...form, status: v as TaskInput["status"] })}
+                  onValueChange={(v) => {
+                    if (!v) return;
+                    setForm({ ...form, status: v as TaskInput["status"] });
+                    if (v === "완료") setProgressText("100");
+                    else if (progress === 100) setProgressText("0");
+                  }}
                 >
                   <SelectTrigger className="w-full" aria-label="상태"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -140,7 +145,12 @@ export function TaskFormDialog({ member, task, trigger, open: openProp, onOpenCh
                   min={0}
                   max={100}
                   value={progressText}
-                  onChange={(e) => setProgressText(e.target.value)}
+                  onChange={(e) => {
+                    setProgressText(e.target.value);
+                    const next = Number(e.target.value);
+                    if (e.target.value.trim() && next === 100) setForm({ ...form, status: "완료" });
+                    else if (form.status === "완료") setForm({ ...form, status: "진행중" });
+                  }}
                   aria-label="진행률 (%)"
                   aria-invalid={!validProgress}
                 />
