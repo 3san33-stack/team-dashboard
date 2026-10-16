@@ -26,10 +26,17 @@ export function ExcelImportButton({ tasks, onImported }: Props) {
     try {
       const { rows, skipped } = await parseTaskImportFile(file);
 
+      const keyCounts = new Map<string, number>();
+      for (const { input } of rows) {
+        const key = taskMatchKey(input.member, input.project, input.category);
+        keyCounts.set(key, (keyCounts.get(key) ?? 0) + 1);
+      }
+      const repeated = [...keyCounts.values()].filter((count) => count > 1).length;
       const { toCreate, toUpdate } = summarizeImport(rows, tasks);
       const proceed = confirm(
         `엑셀 ${rows.length}건 확인됨 — 신규 ${toCreate}건 추가, 기존 ${toUpdate}건 갱신됩니다.` +
-          (skipped.length > 0 ? `\n(${skipped.length}건은 형식 문제로 건너뜁니다)` : "") +
+          (skipped.length > 0 ? `\n${skipped.length}건 건너뜀:\n${skipped.slice(0, 5).map((item) => `${item.rowNumber}행: ${item.reason}`).join("\n")}` : "") +
+          (repeated > 0 ? `\n주의: 같은 담당자·프로젝트·업무구분이 반복되는 항목 ${repeated}개는 마지막 행의 내용과 날짜로 저장됩니다.` : "") +
           `\n\n계속할까요?`
       );
       if (!proceed) {

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { mapImportRow, taskMatchKey, summarizeImport } from "./excel-import";
+import * as XLSX from "xlsx";
+import { parseTaskImportFile, mapImportRow, taskMatchKey, summarizeImport } from "./excel-import";
 import type { Task } from "./types";
 
 function makeRow(overrides: Partial<Record<string, unknown>> = {}): Record<string, unknown> {
@@ -133,5 +134,30 @@ describe("summarizeImport", () => {
       { rowNumber: 3, input: { member: "구민석" as const, project: "신규 업무", category: "제품개발" as const, detail: null, priority: "P3-보통" as const, start_date: null, due_date: null, progress: 0, status: "예정" as const, comment: null } },
     ];
     expect(summarizeImport(rows, existing)).toEqual({ toCreate: 1, toUpdate: 1 });
+  });
+});
+
+
+describe("date import regression", () => {
+  it.each(["2026-10-13", "2026.10.13", "2026/10/13", "2026년 10월 13일", 46308])("reads %s without shifting the calendar date", (value) => {
+    const result = mapImportRow(makeRow({ 시작일: value }));
+    expect("input" in result && result.input.start_date).toBe("2026-10-13");
+  });
+  it.each(["2026-02-30", "10/13", new Date(NaN), 60])("rejects invalid dates instead of clearing stored dates: %s", (value) => {
+    expect(mapImportRow(makeRow({ 마감일: value }))).toHaveProperty("skipReason");
+  });
+  it.each([false, true])("reads formatted Excel dates using the workbook calendar (1904=%s)", async (date1904) => {
+    const row = makeRow({ 시작일: 46308 - (date1904 ? 1462 : 0), 마감일: 46311 - (date1904 ? 1462 : 0) });
+    const sheet = XLSX.utils.json_to_sheet([row]);
+    sheet.F2.z = "yyyy-mm-dd";
+    sheet.G2.z = "yyyy-mm-dd";
+    const workbook = XLSX.utils.book_new();
+    workbook.Workbook = { WBProps: { date1904 } };
+    XLSX.utils.book_append_sheet(workbook, sheet, "통합DB");
+    const bytes = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+    const parsed = await parseTaskImportFile({ arrayBuffer: async () => bytes } as File);
+    expect(parsed.skipped).toEqual([]);
+    expect(parsed.rows[0].input.start_date).toBe("2026-10-13");
+    expect(parsed.rows[0].input.due_date).toBe("2026-10-16");
   });
 });

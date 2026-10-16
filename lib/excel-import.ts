@@ -4,12 +4,27 @@ import {
   type Category, type Member, type Priority, type Status, type Task, type TaskInput,
 } from "./types";
 
-function toDateOrNull(value: unknown): string | null {
-  if (!(value instanceof Date)) return null;
-  const y = value.getFullYear();
-  const m = String(value.getMonth() + 1).padStart(2, "0");
-  const d = String(value.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+function toDateOrNull(value: unknown, date1904 = false): string | null {
+  if (value == null || value === 0 || (typeof value === "string" && value.trim() === "")) return null;
+  let y: number, m: number, d: number;
+  if (value instanceof Date) {
+    y = value.getFullYear(); m = value.getMonth() + 1; d = value.getDate();
+  } else if (typeof value === "number" && Number.isFinite(value)) {
+    const parsed = XLSX.SSF.parse_date_code(value, { date1904 });
+    if (!parsed) throw new Error("올바른 엑셀 날짜가 아닙니다");
+    y = parsed.y; m = parsed.m; d = parsed.d;
+  } else if (typeof value === "string") {
+    const match = value.trim().match(/^(\d{4})\s*[-/.년]\s*(\d{1,2})\s*[-/.월]\s*(\d{1,2})\s*(?:일|\.)?$/);
+    if (!match) throw new Error("YYYY-MM-DD 형식으로 입력해 주세요");
+    [, y, m, d] = match.map(Number);
+  } else {
+    throw new Error("올바른 날짜가 아닙니다");
+  }
+  const check = new Date(Date.UTC(y, m - 1, d));
+  if (y < 1900 || y > 9999 || check.getUTCFullYear() !== y || check.getUTCMonth() + 1 !== m || check.getUTCDate() !== d) {
+    throw new Error("존재하지 않는 날짜입니다");
+  }
+  return [String(y), String(m).padStart(2, "0"), String(d).padStart(2, "0")].join("-");
 }
 
 function toPriority(value: unknown): Priority {
@@ -34,7 +49,8 @@ function toTextOrNull(value: unknown): string | null {
 }
 
 export function mapImportRow(
-  row: Record<string, unknown>
+  row: Record<string, unknown>,
+  date1904 = false
 ): { input: TaskInput } | { skipReason: string } {
   const member = row["담당자"];
   if (!(MEMBERS as readonly unknown[]).includes(member)) {
@@ -55,6 +71,17 @@ export function mapImportRow(
   const progressRaw = row["진행률"];
   const progress = typeof progressRaw === "number" ? Math.round(progressRaw * 100) : 0;
 
+  let startDate: string | null = null;
+  let dueDate: string | null = null;
+  for (const field of ["시작일", "마감일"] as const) {
+    try {
+      const date = toDateOrNull(row[field], date1904);
+      if (field === "시작일") startDate = date;
+      else dueDate = date;
+    } catch (error) {
+      return { skipReason: field + ": " + (error instanceof Error ? error.message : "날짜 오류") };
+    }
+  }
   return {
     input: {
       member: member as Member,
@@ -62,8 +89,8 @@ export function mapImportRow(
       category: category as Category,
       detail: toTextOrNull(row["세부업무"]),
       priority: toPriority(row["우선순위"]),
-      start_date: toDateOrNull(row["시작일"]),
-      due_date: toDateOrNull(row["마감일"]),
+      start_date: startDate,
+      due_date: dueDate,
       progress,
       status: toStatus(row["상태"]),
       comment: toTextOrNull(row["팀장코멘트"]),
@@ -115,7 +142,8 @@ export type ImportParseResult = {
 
 export async function parseTaskImportFile(file: File): Promise<ImportParseResult> {
   const buffer = await file.arrayBuffer();
-  const workbook = XLSX.read(buffer, { type: "array", cellDates: true });
+  // Keep Excel calendar serials: Date conversion can shift a day in browser time zones.
+  const workbook = XLSX.read(buffer, { type: "array", cellDates: false });
   const sheet = workbook.Sheets["통합DB"];
   if (!sheet) throw new Error("통합DB 시트를 찾을 수 없습니다");
 
@@ -144,7 +172,7 @@ export async function parseTaskImportFile(file: File): Promise<ImportParseResult
     const projectBlank = projectCell == null || projectCell === "";
     if (memberBlank && projectBlank) return; // blank row (including formula-filled "" cells)
 
-    const result = mapImportRow(record);
+    const result = mapImportRow(record, !!workbook.Workbook?.WBProps?.date1904);
     if ("skipReason" in result) {
       skipped.push({ rowNumber, reason: result.skipReason });
     } else {
